@@ -5,7 +5,7 @@ from PIL import Image
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
 
     def save(self, *args, **kwargs):
