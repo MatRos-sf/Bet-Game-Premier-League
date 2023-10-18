@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
+from django.urls import reverse
 
 
 class Profile(models.Model):
@@ -8,7 +9,8 @@ class Profile(models.Model):
     image = models.ImageField(default='default.jpg', upload_to='profile_pics', verbose_name='profile picture')
 
     def get_absolute_url(self):
-        pass
+        return reverse('profile-detail', args=[str(self.user.username)])
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
