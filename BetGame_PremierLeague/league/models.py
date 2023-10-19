@@ -17,3 +17,21 @@ class Team(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+class LeagueTable(models.Model):
+
+    league = models.ForeignKey(League, on_delete=models.CASCADE)
+    team = models.ForeignKey(League, on_delete=models.CASCADE)
+
+    played = models.SmallIntegerField(default=0)
+    won = models.SmallIntegerField(default=0)
+    drawn = models.SmallIntegerField(default=0)
+    goals_for = models.SmallIntegerField(default=0)
+    goals_against = models.SmallIntegerField(default=0)
+
+    points = models.SmallIntegerField(default=0)
+
+    @property
+    def goal_difference(self):
+        return int(self.goals_for) - int(self.goals_against)
+
