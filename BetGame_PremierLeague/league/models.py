@@ -2,10 +2,11 @@ from django.db import models
 
 class League(models.Model):
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     # https://pypi.org/project/django-countries/
     country = models.CharField(max_length=50)
     emblem = models.URLField(blank=True, null=True)
+    last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -30,12 +31,12 @@ class Season(models.Model):
 class Team(models.Model):
 
     name = models.CharField(max_length=100, unique=True)
-    short_name = models.CharField(max_length=50)
-    shortcut = models.CharField(max_length=5)
+    short_name = models.CharField(max_length=50, blank=True, null=True)
+    shortcut = models.CharField(max_length=5, blank=True, null=True)
     league = models.ForeignKey(League, on_delete=models.CASCADE)
     crest = models.URLField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
-    club_colors = models.CharField(max_length=150, unique=True)
+    club_colours = models.CharField(max_length=150, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name}"
