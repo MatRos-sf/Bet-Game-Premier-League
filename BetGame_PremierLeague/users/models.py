@@ -23,3 +23,13 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}"
+
+
+class Point(models.Model):
+
+    profile = models.ForeignKey(Profile, related_name='points', on_delete=models.CASCADE)
+    point = models.IntegerField(default=0)
+    season = models.ForeignKey('league.Season', on_delete=models.CASCADE)
+    current = models.BooleanField(default=True)
+
+
