@@ -21,8 +21,12 @@ class Season(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     league = models.ForeignKey(League, on_delete=models.CASCADE)
-    #status = models.Choices()
 
+    is_currently = models.BooleanField(default=True)
+
+    def __str__(self):
+        league = self.league.name
+        return f"{league} {self.start_date}"
 
     def get_winner(self):
         pass
