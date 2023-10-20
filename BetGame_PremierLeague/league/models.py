@@ -7,6 +7,13 @@ class League(models.Model):
     country = models.CharField(max_length=50)
     emblem = models.URLField(blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
+    def current_season(self):
+        pass
+
+
 
 class Season(models.Model):
 
@@ -30,7 +37,7 @@ class Team(models.Model):
     def __str__(self):
         return f"{self.name}"
 
-class Team_Stats(models.Model):
+class TeamStats(models.Model):
 
     team = models.ForeignKey(League, on_delete=models.CASCADE)
     season = models.ForeignKey(Season, on_delete=models.CASCADE)

@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-from .models import League, Team, Season, Team_Stats
+from .models import League, Team, Season, TeamStats
 
 
 class LeagueListView(LoginRequiredMixin, ListView):
@@ -12,7 +12,7 @@ class LeagueListView(LoginRequiredMixin, ListView):
     #ordering = ['-season']
 
 
-class LeagueDetailView(LoginRequiredMixin, ListView):
+class LeagueDetailView(LoginRequiredMixin, DetailView):
     model = League
     template_name = "league/"
 
@@ -25,4 +25,63 @@ class LeagueUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         return self.request.user.is_superuser()
 
+
+class SeasonListView(LoginRequiredMixin, ListView):
+    model = Season
+    template_name = ''
+    context_object_name = 'leagues/'
+
+
+class SeasonDetailView(LoginRequiredMixin, DetailView):
+    model = Season
+    template_name = "league/"
+
+
+class SeasonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Season
+    template_name = 'league/'
+    fields = ['start_date', 'end_date', 'league']
+
+    def test_func(self):
+        return self.request.user.is_superuser()
+
+
+class TeamListView(LoginRequiredMixin, ListView):
+    model = Team
+    template_name = ''
+    context_object_name = 'leagues/'
+
+
+class TeamDetailView(LoginRequiredMixin, DetailView):
+    model = Team
+    template_name = "league/"
+
+
+class TeamUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Team
+    template_name = 'league/'
+    fields = ['name', 'shortcut', 'league', 'crest']
+
+    def test_func(self):
+        return self.request.user.is_superuser()
+
+
+class TeamStatsListView(LoginRequiredMixin, ListView):
+    model = TeamStats
+    template_name = ''
+    context_object_name = 'leagues/'
+
+
+class TeamStatsDetailView(LoginRequiredMixin, DetailView):
+    model = TeamStats
+    template_name = "league/"
+
+
+class TeamStatsUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = TeamStats
+    template_name = 'league/'
+    fields = ['played', 'won', 'drawn', 'goals_for', 'goals_against', 'points']
+
+    def test_func(self):
+        return self.request.user.is_superuser()
 
