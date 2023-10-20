@@ -30,12 +30,16 @@ class Season(models.Model):
 class Team(models.Model):
 
     name = models.CharField(max_length=100, unique=True)
+    short_name = models.CharField(max_length=50)
     shortcut = models.CharField(max_length=5)
     league = models.ForeignKey(League, on_delete=models.CASCADE)
-    crest = models.URLField()
+    crest = models.URLField(blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+    club_colors = models.CharField(max_length=150, unique=True)
 
     def __str__(self):
         return f"{self.name}"
+
 
 class TeamStats(models.Model):
 
