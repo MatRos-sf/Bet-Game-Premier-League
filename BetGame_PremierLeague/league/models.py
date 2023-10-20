@@ -5,7 +5,6 @@ class League(models.Model):
     name = models.CharField(max_length=100)
     # https://pypi.org/project/django-countries/
     country = models.CharField(max_length=50)
-    season = models.DateField()
     emblem = models.URLField(blank=True, null=True)
 
 
