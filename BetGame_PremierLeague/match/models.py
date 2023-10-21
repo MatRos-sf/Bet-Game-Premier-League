@@ -38,17 +38,14 @@ class Match(models.Model):
     home_goals = models.SmallIntegerField(blank=True, null=True)
     away_goals = models.SmallIntegerField(blank=True, null=True)
 
-    @property
-    def status(self):
-        """
-        before, now, end, cancel
-        :return:
-        """
-        pass
 
     def results(self):
 
-        if self.status == 'end':
-            return f'{self.home.name:>5} {self.home_goals}:{self.away_goals} {self.away.name}'
+        if self.home_goals and self.away_goals:
+            return f'{self.home_team.name:>5} {self.home_goals}:{self.away_goals} {self.away_team.name}'
 
-        return self.status
+        return f'{self.home_team.name:>5} : {self.away_team.name}'
+
+    def is_finished(self):
+        # start_date += 45 + 10 + 15 + 45 + 10 + 10
+        pass
