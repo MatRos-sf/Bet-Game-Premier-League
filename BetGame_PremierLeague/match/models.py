@@ -12,20 +12,25 @@ class Matchweek(models.Model):
     )
     start_date = models.DateField()
     end_date = models.DateField()
-    league = models.ForeignKey("league.League", on_delete=models.CASCADE)
+    season = models.ForeignKey("league.Season", on_delete=models.CASCADE)
 
     @property
     def status(self):
         '''
         3 differents status: before, now, after
-        :return:
         '''
-        pass
+        time_now = timezone.now()
+        if self.start_date <= time_now <= self.end_date:
+            return "Now"
+        elif time_now <= self.start_date:
+            return "Before"
+        else:
+            return "After"
 
 
 class Match(models.Model):
-    home = models.ForeignKey('league.Team', on_delete=models.CASCADE)
-    away = models.ForeignKey('league.Team', on_delete=models.CASCADE)
+    home_team = models.ForeignKey('league.Team', on_delete=models.CASCADE)
+    away_team = models.ForeignKey('league.Team', on_delete=models.CASCADE)
 
     start_date = models.DateTimeField()
     matchweek = models.ForeignKey(Matchweek, on_delete=models.CASCADE)
