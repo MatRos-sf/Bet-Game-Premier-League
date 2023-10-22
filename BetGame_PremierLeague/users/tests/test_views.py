@@ -5,13 +5,14 @@ from django.contrib.auth.models import User
 
 from users.forms import UserRegisterForm
 from users.models import Profile
+from http import HTTPStatus
 
 
 class RegisterTest(TestCase):
 
     def test_view_url_exist_at_desired_location(self):
         response = self.client.get('/register/')
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
 
     def test_view_url_accessible_by_name(self):
         response = self.client.get(reverse('register'))

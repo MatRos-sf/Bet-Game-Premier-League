@@ -18,7 +18,7 @@ class League(models.Model):
 
 class Season(models.Model):
 
-    id_form_fd = models.CharField(max_length=20, unique=True)
+    id_form_fd = models.CharField(max_length=20, unique=True, help_text='Season id from football database.') #TODO fb_id
     start_date = models.DateField()
     end_date = models.DateField()
     league = models.ForeignKey(League, on_delete=models.CASCADE)
@@ -41,7 +41,7 @@ class Team(models.Model):
     short_name = models.CharField(max_length=50, blank=True, null=True)
     shortcut = models.CharField(max_length=5, blank=True, null=True)
     # ???
-    league = models.ForeignKey(League, on_delete=models.CASCADE)
+    league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='teams')
     crest = models.URLField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     club_colours = models.CharField(max_length=150, blank=True, null=True)
@@ -52,7 +52,7 @@ class Team(models.Model):
 
 class TeamStats(models.Model):
 
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, releated_name='stats')
     season = models.ForeignKey(Season, on_delete=models.CASCADE)
 
     played = models.SmallIntegerField(default=0)

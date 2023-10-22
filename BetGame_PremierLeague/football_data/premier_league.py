@@ -1,6 +1,7 @@
 import requests
 from typing import Dict, List, Tuple
 from datetime import datetime
+
 HEADER = {
     'X-Auth-Token': 'b77f4c1f9e31408ebe32979cb77c92e4'
 }
@@ -18,6 +19,11 @@ class PremierLeague:
         self.url_matchweek: str = 'competitions/PL/matches'
         self.headers: Dict[str, str] = HEADER
 
+    def __get_full_url(self, url: str, filter = None):
+        if filter:
+            return PremierLeague.API + url + filter
+        return PremierLeague.API + url
+
     def get_info_currently_league(self) -> Dict[str, str]:
 
         url = self.API + self.url_competitions
@@ -34,7 +40,7 @@ class PremierLeague:
 
     def get_info_currently_teams_in_league(self) -> Tuple[str, List[Dict[str, str]] | None]:
 
-        url = self.API + self.url_competitions
+        url = self.__get_full_url(self.url_competitions)
         response = requests.get(url, headers=HEADER)
 
         data = response.json()
@@ -45,15 +51,9 @@ class PremierLeague:
         teams = []
 
         for team in response_teams_ino:
-            team_payload = {}
-
-            team_payload['id_from_fd'] = team['id']
-            team_payload['name'] = team['name']
-            team_payload['short_name'] = team['shortName']
-            team_payload['shortcut'] = team['tla']
-            team_payload['crest'] = team['crest']
-            team_payload['website'] = team['website']
-            team_payload['club_colours'] = team['clubColors']
+            team_payload = {'id_from_fd': team['id'], 'name': team['name'], 'short_name': team['shortName'],
+                            'shortcut': team['tla'], 'crest': team['crest'], 'website': team['website'],
+                            'club_colours': team['clubColors'],}
 
             teams.append(team_payload)
 
@@ -134,4 +134,43 @@ class PremierLeague:
             matches.append(payload)
         return matchweek, matches
 
-    def get_
+    def get_matches_result(self, mw: int, year: int) -> Tuple[Tuple[str, str], List[Tuple[str, str]]]:
+        """
+        Return only finished matches
+        """
+        url = self.API + self.url_matchweek + f"?matchday={str(mw)}"
+        if year:
+            url += f"&season={str(year)}"
+
+        response = requests.get(url, headers=HEADER)
+
+        data = response.json()
+
+        info = {
+            'all': data['resultSet']['count'],
+            'played': data['resultSet']['played']
+        }
+
+        matches = []
+
+        for match in data['matches']:
+            payload = {}
+
+            if match['status'] != 'FINISHED':
+                continue
+
+            payload['status'] = match['status']
+            payload['matchweek'] = match['season']['id']
+            payload['home_team_id'] = match['homeTeam']['id']
+            payload['away_team_id'] = match['awayTeam']['id']
+            payload['home_goals'] = match['score']['fullTime']['home']
+            payload['away_goals'] = match['score']['fullTime']['away']
+
+            matches.append(payload)
+
+        return info, matches
+
+
+
+
+

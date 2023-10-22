@@ -13,12 +13,17 @@ class Matchweek(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     season = models.ForeignKey("league.Season", on_delete=models.CASCADE, related_name='current_season')
+    canceled = models.BooleanField(default=False)
 
     @property
     def status(self):
-        '''
+        """
         3 differents status: before, now, after
-        '''
+        """
+        if self.canceled:
+            return "Canceled"
+
+
         time_now = timezone.now()
         if self.start_date <= time_now <= self.end_date:
             return "Now"
@@ -39,13 +44,15 @@ class Match(models.Model):
     home_goals = models.SmallIntegerField(blank=True, null=True)
     away_goals = models.SmallIntegerField(blank=True, null=True)
 
-    def results(self):
+    finished = models.BooleanField(default=False)
 
+    @property
+    def results(self):
         if self.home_goals and self.away_goals:
             return f'{self.home_team.name:>5} {self.home_goals}:{self.away_goals} {self.away_team.name}'
 
         return f'{self.home_team.name:>5} : {self.away_team.name}'
 
-    def is_finished(self):
-        # start_date += 45 + 10 + 15 + 45 + 10 + 10
-        pass
+    # def is_finished(self):
+    #     # start_date += 45 + 10 + 15 + 45 + 10 + 10
+    #     pass
