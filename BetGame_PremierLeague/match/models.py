@@ -38,7 +38,6 @@ class Match(models.Model):
     home_goals = models.SmallIntegerField(blank=True, null=True)
     away_goals = models.SmallIntegerField(blank=True, null=True)
 
-
     def results(self):
 
         if self.home_goals and self.away_goals:
