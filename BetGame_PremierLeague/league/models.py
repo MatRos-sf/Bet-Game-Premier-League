@@ -21,6 +21,7 @@ class Season(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     league = models.ForeignKey(League, on_delete=models.CASCADE)
+    matchweek = models.PositiveIntegerField(default=1)
 
     is_currently = models.BooleanField(default=True)
 
@@ -48,12 +49,13 @@ class Team(models.Model):
 
 class TeamStats(models.Model):
 
-    team = models.ForeignKey(League, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
     season = models.ForeignKey(Season, on_delete=models.CASCADE)
 
     played = models.SmallIntegerField(default=0)
     won = models.SmallIntegerField(default=0)
     drawn = models.SmallIntegerField(default=0)
+    lost = models.SmallIntegerField(default=0)
     goals_for = models.SmallIntegerField(default=0)
     goals_against = models.SmallIntegerField(default=0)
 

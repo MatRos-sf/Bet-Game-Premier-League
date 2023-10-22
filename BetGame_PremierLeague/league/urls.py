@@ -17,8 +17,6 @@ urlpatterns = [
 
     path('team_stats/', views.TeamStatsListView.as_view(), name='league-teamstats-list'),
     path('team_stats/<int:pk>/', views.TeamStatsDetailView.as_view(), name='league-teamstats-detail'),
-    path('team_stats/<int:pk>/', views.TeamStatsUpdateView.as_view(), name='league-teamstats-update'),
+    path('team_stats/<int:pk>/', views.TeamStatsUpdateView.as_view(), name='league-teamstats-update')
 
-    path('generate/', views.GenericLeagueView.as_view(), name='league-generator-league'),
-    path('generate/team/', views.GenericTeamsView.as_view(), name='league-generator-teams')
 ]

@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from typing import List
 from league.models import League, Team, Season, TeamStats
 from league.forms import TeamForm
+#from match.models import Matchweek, Match
 from football_data.premier_league import PremierLeague
 
 
@@ -85,6 +86,37 @@ class GenerateTeamStatsView(LoginRequiredMixin, UserPassesTestMixin, View):
 
         season = Season.objects.filter(start_date=season['start_date'],
                                           end_date=season['end_date'])
+
+        if not season.exists():
+            return render(request, "league/generate/", {})
+
+        season = season.first()
+
+        for t in table:
+            team = t.pop('team')
+            team_obj = Team.objects.get(name=team)
+
+            if TeamStats.objects.filter(team=team_obj, season=season).exists():
+                continue
+
+            TeamStats.objects.create(team=team_obj, season=season, **t)
+
+        return render(request, "league/generate/", {}, status=201)
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
+class GenerateMatchweekView(LoginRequiredMixin, UserPassesTestMixin, View):
+
+    def get(self, request):
+
+        season = self.kwargs['season'] if self.kwargs['season'] else None
+        mw = self.kwargs['matchweek']
+        pl = PremierLeague()
+
+        matchweek, matches = pl.get_matchweek(mw, season)
+
+        season = Season.objects.filter(start_date__year=matchweek['start_date'])
 
         if not season.exists():
             return render(request, "league/generate/", {})

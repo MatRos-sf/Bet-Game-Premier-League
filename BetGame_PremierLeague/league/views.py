@@ -8,6 +8,7 @@ from .models import League, Team, Season, TeamStats
 from .forms import TeamForm
 from football_data.premier_league import PremierLeague
 
+
 class LeagueListView(LoginRequiredMixin, ListView):
     model = League
     template_name = ''
@@ -88,46 +89,3 @@ class TeamStatsUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         return self.request.user.is_superuser()
 
-class GenericLeagueView(LoginRequiredMixin, UserPassesTestMixin, View):
-
-    def get(self, request):
-
-        pl = PremierLeague()
-        league = pl.get_info_currently_league()
-
-        obj, created = League.objects.get_or_create(**league)
-        if created:
-
-            return render(request, 'league/generic/league.html',
-                          {'object': league}, status=201)
-        return render(request, 'league/generic/league.html', {},
-                      status=200)
-
-    def test_func(self):
-        return self.request.user.is_superuser
-
-
-class GenericTeamsView(LoginRequiredMixin, UserPassesTestMixin, View):
-
-    def get(self, request):
-
-        pl = PremierLeague()
-        teams = pl.get_info_currently_teams_in_league()
-        created_team: List[Team] | None = []
-        league = League.objects.get(name='Premier League')
-        queryset = League.objects.all()
-
-        for team in teams:
-            if queryset.filter(name=team['name']).exists():
-                continue
-
-            team['league'] = league
-            form = TeamForm(data=team)
-            if form.is_valid():
-                obj = form.save()
-                created_team.append(obj)
-
-        return render(request, 'league/generate/team.html')
-
-    def test_func(self):
-        return self.request.user.is_superuser

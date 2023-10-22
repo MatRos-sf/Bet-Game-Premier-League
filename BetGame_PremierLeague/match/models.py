@@ -12,7 +12,7 @@ class Matchweek(models.Model):
     )
     start_date = models.DateField()
     end_date = models.DateField()
-    season = models.ForeignKey("league.Season", on_delete=models.CASCADE)
+    season = models.ForeignKey("league.Season", on_delete=models.CASCADE, related_name='current_season')
 
     @property
     def status(self):
@@ -29,8 +29,8 @@ class Matchweek(models.Model):
 
 
 class Match(models.Model):
-    home_team = models.ForeignKey('league.Team', on_delete=models.CASCADE)
-    away_team = models.ForeignKey('league.Team', on_delete=models.CASCADE)
+    home_team = models.ForeignKey('league.Team', on_delete=models.CASCADE, related_name='home')
+    away_team = models.ForeignKey('league.Team', on_delete=models.CASCADE, related_name='away')
 
     start_date = models.DateTimeField()
     matchweek = models.ForeignKey(Matchweek, on_delete=models.CASCADE)

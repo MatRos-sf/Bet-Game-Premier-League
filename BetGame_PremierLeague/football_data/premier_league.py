@@ -118,13 +118,14 @@ class PremierLeague:
 
         data = response.json()
 
-        matchweek_data = data['resultSet']
+        matchweek_data = data
         matches_data = data['matches']
 
         matchweek = dict()
 
-        matchweek['start_date'] = matchweek_data['first']
-        matchweek['end_date'] = matchweek_data['last']
+        matchweek['start_date'] = matchweek_data['resultSet']['first']
+        matchweek['end_date'] = matchweek_data['resultSet']['last']
+
 
         matches = list()
         for match in matches_data:
