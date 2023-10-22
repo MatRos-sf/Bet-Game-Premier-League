@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from typing import List
 from league.models import League, Team, Season, TeamStats
 from league.forms import TeamForm
-#from match.models import Matchweek, Match
+from match.models import Matchweek, Match
 from football_data.premier_league import PremierLeague
 
 
@@ -108,29 +108,27 @@ class GenerateTeamStatsView(LoginRequiredMixin, UserPassesTestMixin, View):
 
 class GenerateMatchweekView(LoginRequiredMixin, UserPassesTestMixin, View):
 
-    def get(self, request):
+    def get(self, request, s, mw):
 
-        season = self.kwargs['season'] if self.kwargs['season'] else None
-        mw = self.kwargs['matchweek']
+        season = s
+        mw = mw
         pl = PremierLeague()
 
         matchweek, matches = pl.get_matchweek(mw, season)
 
-        season = Season.objects.filter(start_date__year=matchweek['start_date'])
+        season = Season.objects.filter(start_date__year=season)
 
         if not season.exists():
             return render(request, "league/generate/", {})
 
         season = season.first()
+        matchweek_obj = Matchweek.objects.create(season=season, matchweek=mw, **matchweek)
 
-        for t in table:
-            team = t.pop('team')
-            team_obj = Team.objects.get(name=team)
+        for match in matches:
 
-            if TeamStats.objects.filter(team=team_obj, season=season).exists():
-                continue
-
-            TeamStats.objects.create(team=team_obj, season=season, **t)
+            home_team = Team.objects.get(name=match.pop('home_team'))
+            away_team = Team.objects.get(name=match.pop('away_team'))
+            Match.objects.create(matchweek=matchweek_obj, home_team=home_team, away_team=away_team, **match)
 
         return render(request, "league/generate/", {}, status=201)
 

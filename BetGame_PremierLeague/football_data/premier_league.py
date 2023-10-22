@@ -132,7 +132,7 @@ class PremierLeague:
             payload = dict()
 
             payload['home_team'] = match['homeTeam']['name']
-            payload['awayTeam'] = match['awayTeam']['name']
+            payload['away_team'] = match['awayTeam']['name']
             payload['start_date'] = match['utcDate']
 
             matches.append(payload)
