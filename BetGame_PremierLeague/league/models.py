@@ -18,6 +18,7 @@ class League(models.Model):
 
 class Season(models.Model):
 
+    id_form_fd = models.CharField(max_length=20, unique=True)
     start_date = models.DateField()
     end_date = models.DateField()
     league = models.ForeignKey(League, on_delete=models.CASCADE)
@@ -35,9 +36,11 @@ class Season(models.Model):
 
 class Team(models.Model):
 
-    name = models.CharField(max_length=100, unique=True)
+    id_from_fd = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=100)
     short_name = models.CharField(max_length=50, blank=True, null=True)
     shortcut = models.CharField(max_length=5, blank=True, null=True)
+    # ???
     league = models.ForeignKey(League, on_delete=models.CASCADE)
     crest = models.URLField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)

@@ -29,6 +29,7 @@ class Matchweek(models.Model):
 
 
 class Match(models.Model):
+
     home_team = models.ForeignKey('league.Team', on_delete=models.CASCADE, related_name='home')
     away_team = models.ForeignKey('league.Team', on_delete=models.CASCADE, related_name='away')
 

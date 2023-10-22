@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
@@ -18,7 +18,6 @@ class GenerateLeagueView(LoginRequiredMixin, UserPassesTestMixin, View):
 
         obj, created = League.objects.get_or_create(**league)
         if created:
-
             return render(request, 'league/generic/league.html',
                           {'object': league}, status=201)
         return render(request, 'league/generic/league.html', {},
@@ -33,14 +32,17 @@ class GenerateTeamsView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
 
         pl = PremierLeague()
-        teams = pl.get_info_currently_teams_in_league()
+        name_league, teams = pl.get_info_currently_teams_in_league()
         created_team: List[Team] | None = []
-        league = League.objects.get(name='Premier League')
-        queryset = League.objects.all()
+        league = League.objects.filter(name=name_league)
+
+        if not league.exsits():
+            #League doesn't exist
+            return render(request, "generate/", {})
+
+        league = league.first()
 
         for team in teams:
-            if queryset.filter(name=team['name']).exists():
-                continue
 
             team['league'] = league
             form = TeamForm(data=team)
@@ -48,7 +50,7 @@ class GenerateTeamsView(LoginRequiredMixin, UserPassesTestMixin, View):
                 obj = form.save()
                 created_team.append(obj)
 
-        return render(request, 'league/generate/team.html')
+        return render(request, 'generate/team.html')
 
     def test_func(self):
         return self.request.user.is_superuser
@@ -60,16 +62,17 @@ class GenerateSeasonView(LoginRequiredMixin, UserPassesTestMixin, View):
 
         pl = PremierLeague()
         season = pl.get_info_current_season()
-        league = League.objects.get(name='Premier League')
+        id_form_fd = season.pop('id_form_fd')
 
-        is_season = Season.objects.filter(start_date=season['start_date'],
-                                          end_date=season['end_date'], league=league).exists()
+        league = get_object_or_404(League, name=season.pop('league'))
+
+        is_season = Season.objects.filter(id_form_fd=id_form_fd, league=league).exists()
 
         if is_season:
+            # HERE CAN BE UPDATE
             return render(request, "league/generate/", {})
 
-        season['league'] = league
-        season_obj = Season.objects.create(**season)
+        season_obj = Season.objects.create(league=league, id_form_fd=id_form_fd, **season)
 
         return render(request, "league/generate/", {}, status=201)
 
@@ -84,20 +87,15 @@ class GenerateTeamStatsView(LoginRequiredMixin, UserPassesTestMixin, View):
         pl = PremierLeague()
         season, table = pl.get_current_standings()
 
-        season = Season.objects.filter(start_date=season['start_date'],
-                                          end_date=season['end_date'])
-
-        if not season.exists():
-            return render(request, "league/generate/", {})
-
-        season = season.first()
+        season = get_object_or_404(Season, id_from_fd=season)
 
         for t in table:
-            team = t.pop('team')
-            team_obj = Team.objects.get(name=team)
+            id_team = t.pop('id_from_fd')
+
+            team_obj = get_object_or_404(Team, id_from_fd=id_team)
 
             if TeamStats.objects.filter(team=team_obj, season=season).exists():
-                continue
+                continue    # or create update
 
             TeamStats.objects.create(team=team_obj, season=season, **t)
 
@@ -126,8 +124,8 @@ class GenerateMatchweekView(LoginRequiredMixin, UserPassesTestMixin, View):
 
         for match in matches:
 
-            home_team = Team.objects.get(name=match.pop('home_team'))
-            away_team = Team.objects.get(name=match.pop('away_team'))
+            home_team = Team.objects.get(id_from_fd=match.pop('home_team_id'))
+            away_team = Team.objects.get(id_from_fd=match.pop('away_team_id'))
             Match.objects.create(matchweek=matchweek_obj, home_team=home_team, away_team=away_team, **match)
 
         return render(request, "league/generate/", {}, status=201)

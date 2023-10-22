@@ -6,15 +6,6 @@ HEADER = {
 }
 
 
-# def convert_date(date: str) -> str:
-#     """
-#     The function convert date %y-%m-%d to %d/%m/%y
-#     """
-#     date = datetime.strptime(date, "%Y-%m-%d")
-#
-#     return date.strftime('%d/%m/%Y')
-#
-
 class PremierLeague:
 
     API = "http://api.football-data.org/v4/"
@@ -41,18 +32,22 @@ class PremierLeague:
 
         return league
 
-    def get_info_currently_teams_in_league(self) -> List[Dict[str, str]] | None:
+    def get_info_currently_teams_in_league(self) -> Tuple[str, List[Dict[str, str]] | None]:
 
         url = self.API + self.url_competitions
         response = requests.get(url, headers=HEADER)
 
-        response_teams_ino = response.json()['teams']
+        data = response.json()
+
+        league_name = data['competition']['name']
+        response_teams_ino = data['teams']
 
         teams = []
 
         for team in response_teams_ino:
             team_payload = {}
 
+            team_payload['id_from_fd'] = team['id']
             team_payload['name'] = team['name']
             team_payload['short_name'] = team['shortName']
             team_payload['shortcut'] = team['tla']
@@ -62,40 +57,41 @@ class PremierLeague:
 
             teams.append(team_payload)
 
-        return teams
+        return league_name, teams
 
     def get_info_current_season(self) -> Dict[str, str]:
         url = self.API + self.url_current_season
         response = requests.get(url, headers=HEADER)
 
-        current = response.json()['currentSeason']
+        data = response.json()
+
         season = {
-            'start_date': current['startDate'],
-            'end_date': current['endDate'],
-            'matchweek': current['currentMatchday']
+            'league': data['name'],
+            'id_form_fd': data['currentSeason']['id'],
+            'start_date': data['currentSeason']['startDate'],
+            'end_date': data['currentSeason']['endDate'],
+            'matchweek': data['currentSeason']['currentMatchday']
         }
 
         return season
 
-    def get_current_standings(self) -> Tuple[Dict[str, str], List[Dict[str, str]]]:
+    def get_current_standings(self) -> Tuple[str, List[Dict[str, str]]]:
 
         url = self.API + self.url_standings
         response = requests.get(url, headers=HEADER)
 
-        season = response.json()['season']
-        season_info = {
-            'start_date': season['startDate'],
-            'end_date': season['endDate']
-        }
+        data = response.json()
 
-        table = response.json()['standings'][0]['table']
+        season_id: str = data['season']['id']
+
+        table = data['standings'][0]['table']
 
         pl_table = []
 
         for position in table:
             payload = {}
 
-            payload['team'] = position['team']['name']
+            payload['id_from_fd'] = position['team']['id']
             payload['played'] = position['playedGames']
             payload['won'] = position['won']
             payload['drawn'] = position['draw']
@@ -106,7 +102,7 @@ class PremierLeague:
 
             pl_table.append(payload)
 
-        return season_info, pl_table
+        return season_id, pl_table
 
     def get_matchweek(self, value, year=None) -> Tuple[Dict[str, str], List[Dict[str,str]]]:
 
@@ -131,10 +127,11 @@ class PremierLeague:
         for match in matches_data:
             payload = dict()
 
-            payload['home_team'] = match['homeTeam']['name']
-            payload['away_team'] = match['awayTeam']['name']
+            payload['home_team_id'] = match['homeTeam']['id']
+            payload['away_team_id'] = match['awayTeam']['id']
             payload['start_date'] = match['utcDate']
 
             matches.append(payload)
         return matchweek, matches
 
+    def get_
