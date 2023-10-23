@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 class League(models.Model):
 
@@ -30,9 +31,25 @@ class Season(models.Model):
         league = self.league.name
         return f"{league} {self.start_date}"
 
+    def save(self, *args, **kwargs):
+
+        start_year = self.start_date.year
+        end_year = self.end_date.year
+        league = self.league
+
+        if end_year - start_year != 0:
+            raise ValidationError("The different between end_data and start_date should equal 0")
+
+        if Season.objects.filter(league=league, start_date__year=start_year, end_date__year=end_year).exists():
+            raise ValidationError(f"The league {league} already exists in these years ({start_year}-{end_year}).")
+
+        super(Season, self).save(*args, **kwargs)
+
     def get_winner(self):
         pass
 
+    class Meta:
+        ordering = ['start_date']
 
 class Team(models.Model):
 
