@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import SeasonPoints, Profile
+
+admin.site.register(Profile)
+admin.site.register(SeasonPoints)

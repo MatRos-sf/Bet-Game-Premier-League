@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
 from .models import Profile
 from .forms import UserRegisterForm
@@ -12,6 +13,10 @@ def home(request):
 
 
 def register(request):
+    if request.user.is_authenticated:
+        name = request.user.username
+        logout(request)
+        messages.info(request, f"Dear {name}, you have been successfully log out!")
 
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
