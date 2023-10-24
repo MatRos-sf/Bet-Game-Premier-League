@@ -1,10 +1,15 @@
+import os
+
 import requests
 from typing import Dict, List, Tuple
-from datetime import datetime
+from dotenv import load_dotenv
 
-HEADER = {"X-Auth-Token": "b77f4c1f9e31408ebe32979cb77c92e4"}
+load_dotenv()
+
+HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
 
 
+# https://reqbin.com/code/python/3zdpeao1/python-requests-timeout-example
 class PremierLeague:
     API = "http://api.football-data.org/v4/"
 
