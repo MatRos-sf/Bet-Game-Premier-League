@@ -8,6 +8,9 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics', verbose_name='profile picture')
 
+    friends = models.ManyToManyField(User, related_name='friends')
+    support_team = models.ForeignKey('league.Team', on_delete=models.CASCADE, related_name="fans",
+                                     blank=True, null=True)
     def get_absolute_url(self):
         return reverse('profile-detail', args=[str(self.user.username)])
 
