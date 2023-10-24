@@ -72,7 +72,7 @@ class Team(models.Model):
 
 class TeamStats(models.Model):
 
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, releated_name='stats')
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='stats')
     season = models.ForeignKey(Season, on_delete=models.CASCADE)
 
     played = models.SmallIntegerField(default=0)

@@ -10,6 +10,7 @@ from .forms import UserRegisterForm
 def home(request):
     return render(request, "users/home.html")
 
+
 def register(request):
 
     if request.method == 'POST':

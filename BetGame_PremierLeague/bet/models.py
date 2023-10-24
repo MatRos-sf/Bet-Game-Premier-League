@@ -3,13 +3,13 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 class Bet(models.Model):
-    # choices = [('home', 'Home Team')]
+    choices = [('home', 'Home Team'), ('draw', "Draw"), ('away', 'Away Team')]
     match = models.OneToOneField('match.Match', on_delete=models.CASCADE)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # home_team = models.ManyToManyField(User, related_name='bet_home')
-    # draw = models.ManyToManyField(User, related_name='bet_draw')
-    # away_team = models.ManyToManyField(User, related_name='bet_away')
+    choice = models.CharField(max_length=20, choices=choices)
+
+    # status
 
     def all_bet(self):
         pass
