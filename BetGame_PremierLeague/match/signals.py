@@ -9,4 +9,3 @@ from bet.models import Bet
 def create_bet(sender, instance, created, **kwargs):
     if created:
         Bet.objects.create(match=instance)
-

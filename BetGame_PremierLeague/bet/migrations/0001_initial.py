@@ -6,25 +6,53 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('match', '0001_initial'),
+        ("match", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Bet',
+            name="Bet",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('choice', models.CharField(choices=[('home', 'Home Team'), ('draw', 'Draw'), ('away', 'Away Team')], max_length=20)),
-                ('match', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='match.match')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "choice",
+                    models.CharField(
+                        choices=[
+                            ("home", "Home Team"),
+                            ("draw", "Draw"),
+                            ("away", "Away Team"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "match",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, to="match.match"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('match', 'user')},
+                "unique_together": {("match", "user")},
             },
         ),
     ]

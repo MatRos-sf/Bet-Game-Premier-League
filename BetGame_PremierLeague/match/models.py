@@ -5,14 +5,15 @@ from django.utils import timezone
 
 
 class Matchweek(models.Model):
-
     matchweek = models.SmallIntegerField(
-        help_text=_('Matchweek number (from 1 to n)'),
-        validators=[MinValueValidator(1, _("Matchweek number cannot be less than 1."))]
+        help_text=_("Matchweek number (from 1 to n)"),
+        validators=[MinValueValidator(1, _("Matchweek number cannot be less than 1."))],
     )
     start_date = models.DateField()
     end_date = models.DateField()
-    season = models.ForeignKey("league.Season", on_delete=models.CASCADE, related_name='current_season')
+    season = models.ForeignKey(
+        "league.Season", on_delete=models.CASCADE, related_name="current_season"
+    )
     canceled = models.BooleanField(default=False)
 
     @property
@@ -22,7 +23,6 @@ class Matchweek(models.Model):
         """
         if self.canceled:
             return "Canceled"
-
 
         time_now = timezone.now()
         if self.start_date <= time_now <= self.end_date:
@@ -34,9 +34,12 @@ class Matchweek(models.Model):
 
 
 class Match(models.Model):
-
-    home_team = models.ForeignKey('league.Team', on_delete=models.CASCADE, related_name='home')
-    away_team = models.ForeignKey('league.Team', on_delete=models.CASCADE, related_name='away')
+    home_team = models.ForeignKey(
+        "league.Team", on_delete=models.CASCADE, related_name="home"
+    )
+    away_team = models.ForeignKey(
+        "league.Team", on_delete=models.CASCADE, related_name="away"
+    )
 
     start_date = models.DateTimeField()
     matchweek = models.ForeignKey(Matchweek, on_delete=models.CASCADE)
@@ -49,9 +52,9 @@ class Match(models.Model):
     @property
     def results(self):
         if self.home_goals and self.away_goals:
-            return f'{self.home_team.name:>5} {self.home_goals}:{self.away_goals} {self.away_team.name}'
+            return f"{self.home_team.name:>5} {self.home_goals}:{self.away_goals} {self.away_team.name}"
 
-        return f'{self.home_team.name:>5} : {self.away_team.name}'
+        return f"{self.home_team.name:>5} : {self.away_team.name}"
 
     # def is_finished(self):
     #     # start_date += 45 + 10 + 15 + 45 + 10 + 10

@@ -6,36 +6,88 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('league', '0001_initial'),
+        ("league", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Matchweek',
+            name="Matchweek",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('matchweek', models.SmallIntegerField(help_text='Matchweek number (from 1 to n)', validators=[django.core.validators.MinValueValidator(1, 'Matchweek number cannot be less than 1.')])),
-                ('start_date', models.DateField()),
-                ('end_date', models.DateField()),
-                ('canceled', models.BooleanField(default=False)),
-                ('season', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='current_season', to='league.season')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "matchweek",
+                    models.SmallIntegerField(
+                        help_text="Matchweek number (from 1 to n)",
+                        validators=[
+                            django.core.validators.MinValueValidator(
+                                1, "Matchweek number cannot be less than 1."
+                            )
+                        ],
+                    ),
+                ),
+                ("start_date", models.DateField()),
+                ("end_date", models.DateField()),
+                ("canceled", models.BooleanField(default=False)),
+                (
+                    "season",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="current_season",
+                        to="league.season",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Match',
+            name="Match",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('start_date', models.DateTimeField()),
-                ('home_goals', models.SmallIntegerField(blank=True, null=True)),
-                ('away_goals', models.SmallIntegerField(blank=True, null=True)),
-                ('finished', models.BooleanField(default=False)),
-                ('away_team', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='away', to='league.team')),
-                ('home_team', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='home', to='league.team')),
-                ('matchweek', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='match.matchweek')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("start_date", models.DateTimeField()),
+                ("home_goals", models.SmallIntegerField(blank=True, null=True)),
+                ("away_goals", models.SmallIntegerField(blank=True, null=True)),
+                ("finished", models.BooleanField(default=False)),
+                (
+                    "away_team",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="away",
+                        to="league.team",
+                    ),
+                ),
+                (
+                    "home_team",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="home",
+                        to="league.team",
+                    ),
+                ),
+                (
+                    "matchweek",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="match.matchweek",
+                    ),
+                ),
             ],
         ),
     ]

@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from users.models import SeasonPoints, Profile
 from .models import Season
 
+
 @receiver(post_save, sender=Season)
 def change_previous_season_status(sender, instance, created, **kwargs):
     """
@@ -32,9 +33,7 @@ def create_season_points(sender, instance, created, **kwargs):
     """
 
     if created:
-
         profiles = Profile.objects.all()
 
         for profile in profiles:
             SeasonPoints.objects.create(profile=profile, season=instance)
-

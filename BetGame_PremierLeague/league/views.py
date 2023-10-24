@@ -11,9 +11,9 @@ from football_data.premier_league import PremierLeague
 
 class LeagueListView(LoginRequiredMixin, ListView):
     model = League
-    template_name = ''
-    context_object_name = 'leagues/'
-    #ordering = ['-season']
+    template_name = ""
+    context_object_name = "leagues/"
+    # ordering = ['-season']
 
 
 class LeagueDetailView(LoginRequiredMixin, DetailView):
@@ -23,8 +23,8 @@ class LeagueDetailView(LoginRequiredMixin, DetailView):
 
 class LeagueUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = League
-    template_name = 'league/'
-    fields = ['name', 'country', 'emblem']
+    template_name = "league/"
+    fields = ["name", "country", "emblem"]
 
     def test_func(self):
         return self.request.user.is_superuser()
@@ -32,8 +32,8 @@ class LeagueUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class SeasonListView(LoginRequiredMixin, ListView):
     model = Season
-    template_name = ''
-    context_object_name = 'leagues/'
+    template_name = ""
+    context_object_name = "leagues/"
 
 
 class SeasonDetailView(LoginRequiredMixin, DetailView):
@@ -43,8 +43,8 @@ class SeasonDetailView(LoginRequiredMixin, DetailView):
 
 class SeasonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Season
-    template_name = 'league/'
-    fields = ['start_date', 'end_date', 'league']
+    template_name = "league/"
+    fields = ["start_date", "end_date", "league"]
 
     def test_func(self):
         return self.request.user.is_superuser()
@@ -52,8 +52,8 @@ class SeasonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class TeamListView(LoginRequiredMixin, ListView):
     model = Team
-    template_name = ''
-    context_object_name = 'leagues/'
+    template_name = ""
+    context_object_name = "leagues/"
 
 
 class TeamDetailView(LoginRequiredMixin, DetailView):
@@ -63,8 +63,8 @@ class TeamDetailView(LoginRequiredMixin, DetailView):
 
 class TeamUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Team
-    template_name = 'league/'
-    fields = ['name', 'shortcut', 'league', 'crest']
+    template_name = "league/"
+    fields = ["name", "shortcut", "league", "crest"]
 
     def test_func(self):
         return self.request.user.is_superuser()
@@ -72,8 +72,8 @@ class TeamUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class TeamStatsListView(LoginRequiredMixin, ListView):
     model = TeamStats
-    template_name = ''
-    context_object_name = 'leagues/'
+    template_name = ""
+    context_object_name = "leagues/"
 
 
 class TeamStatsDetailView(LoginRequiredMixin, DetailView):
@@ -83,9 +83,8 @@ class TeamStatsDetailView(LoginRequiredMixin, DetailView):
 
 class TeamStatsUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = TeamStats
-    template_name = 'league/'
-    fields = ['played', 'won', 'drawn', 'goals_for', 'goals_against', 'points']
+    template_name = "league/"
+    fields = ["played", "won", "drawn", "goals_for", "goals_against", "points"]
 
     def test_func(self):
         return self.request.user.is_superuser()
-
