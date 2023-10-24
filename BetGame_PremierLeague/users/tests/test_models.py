@@ -1,8 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.uploadedfile import InMemoryUploadedFile, SimpleUploadedFile
 from PIL import Image
-from io import BytesIO
+from io import BytesIO, StringIO
 from typing import Tuple
 import os
 import string
@@ -10,8 +10,9 @@ from django.conf import settings
 from random import randint, choices
 
 from users.models import Profile
-
-
+from django.test import tag
+from parameterized import parameterized, parameterized_class
+from django.core.files.base import File
 def get_random_name(suffix: str) -> str:
 
     letters = string.ascii_letters + string.digits
@@ -20,18 +21,29 @@ def get_random_name(suffix: str) -> str:
     return name + suffix
 
 
-def get_temporary_image(size: Tuple[int, int], name: str) -> InMemoryUploadedFile:
+# def get_temporary_image(size: Tuple[int, int], name: str) -> InMemoryUploadedFile:
+#     name = name if name.endswith('.jpg') else name + '.jpg'
+#     io = BytesIO()
+#     color = (255, 0, 0, 0)
+#     image = Image.new("RGB", size, color)
+#     image.save(io, format='JPEG')
+#     image_file = InMemoryUploadedFile(io, None, name, 'jpeg', io.tell(), None)
+#     image_file.seek(0)
+#
+#     return image_file
+
+def get_temporary_image(size: Tuple[int, int], name: str) -> File:
     name = name if name.endswith('.jpg') else name + '.jpg'
-    io = BytesIO()
-    color = (255, 0, 0, 0)
-    image = Image.new("RGB", size, color)
-    image.save(io, format='JPEG')
-    image_file = InMemoryUploadedFile(io, None, name, 'jpeg', io.tell(), None)
-    image_file.seek(0)
+    file_obj = BytesIO()
+    color = (256, 0, 0)
+    image = Image.new("RGB", size=size, color=color)
+    image.save(file_obj, format='JPEG')
 
-    return image_file
+    file_obj.seek(0)
 
+    return File(file_obj, name=name)
 
+@tag('profile')
 class ProfileTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -53,13 +65,20 @@ class ProfileTest(TestCase):
 
         self.assertEquals(self.profile.image.url, expected)
 
-    def test_should_set_new_size_image_when_image_is_too_high(self):
+    @parameterized.expand([
+        (30, 301, 300), (250, 312, 300), (250, 550, 300)
+    ])
+    def test_should_set_new_default_height_image_when_image_is_too_height(self, width, height, expected):
 
         name = get_random_name('.jpg')
-        self.profile.image = get_temporary_image((301,19), name)
+        pic = get_temporary_image((width, height), name)
+        self.profile.image = pic
         self.profile.save()
 
         self.assertEquals(self.profile.image.name, "profile_pics/" + name)
+        self.assertLessEqual(self.profile.image.width, expected)
+        self.assertEquals(self.profile.image.height, expected)
+
         os.remove(os.path.join(settings.BASE_DIR, "media", "profile_pics", name))
 
     def test_str_method_should_return_username(self):
