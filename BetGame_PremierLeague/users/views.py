@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -38,3 +38,11 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
     model = Profile
     template_name = "users/profile.html"
     slug_field = "user__username"
+
+    def get_object(self, queryset=None):
+        username = self.kwargs.get("slag")
+
+        return get_object_or_404(Profile, user__username=username)
+
+
+# TODO: setting: edit profile, passsword, picture,

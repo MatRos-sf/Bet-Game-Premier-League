@@ -19,7 +19,7 @@ class League(models.Model):
 class Season(models.Model):
     fb_id = models.CharField(
         max_length=20, unique=True, help_text="Season id from football database."
-    )  # TODO fb_id
+    )
     start_date = models.DateField()
     end_date = models.DateField()
     league = models.ForeignKey(League, on_delete=models.CASCADE)
@@ -64,7 +64,7 @@ class Team(models.Model):
     shortcut = models.CharField(max_length=5, blank=True, null=True)
 
     currently_league = models.ForeignKey(
-        League, on_delete=models.CASCADE, related_name="teams"
+        League, on_delete=models.CASCADE, related_name="teams", blank=True, null=True
     )
     last_league = models.ForeignKey(
         League,

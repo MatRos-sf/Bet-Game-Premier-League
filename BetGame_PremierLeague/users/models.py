@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
-from PIL import Image
 from django.urls import reverse
+from django.db.models import Sum
+
+from PIL import Image
 
 
 class Profile(models.Model):
@@ -19,6 +21,18 @@ class Profile(models.Model):
         null=True,
     )
 
+    @property
+    def all_points(self):
+        points = self.points.aggregate(total_points=Sum("points"))["total_points"]
+        return points if points else 0
+
+    @property
+    def current_season_points(self):
+        points = self.points.filter(current=True).aggregate(total_points=Sum("points"))[
+            "total_points"
+        ]
+        return points or 0
+
     def get_absolute_url(self):
         return reverse("user-profile-detail", args=[str(self.user.username)])
 
@@ -29,7 +43,6 @@ class Profile(models.Model):
         if img.height > 300 or img.width > 300:
             max_size = (300, 300)
             img.thumbnail(max_size)
-            # img = img.resize(max_size, Image.BOX)
             img.save(self.image.path)
 
     def __str__(self):
@@ -43,3 +56,6 @@ class SeasonPoints(models.Model):
     points = models.IntegerField(default=0)
     season = models.ForeignKey("league.Season", on_delete=models.CASCADE)
     current = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.profile.user.username} {self.points}"

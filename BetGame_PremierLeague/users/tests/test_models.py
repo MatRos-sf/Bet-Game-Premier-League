@@ -10,9 +10,14 @@ from io import BytesIO
 from typing import Tuple
 import os
 import string
+from unittest import mock
+from unittest.mock import Mock, MagicMock
+
+# import mock
 from random import randint, choices
 
 from users.models import Profile
+from league.models import Team
 
 
 def get_random_name(suffix: str) -> str:
@@ -57,7 +62,7 @@ class ProfileTest(TestCase):
         self.assertEquals(self.profile.image.url, expected)
 
     @parameterized.expand([(30, 301, 300), (250, 312, 300), (250, 550, 300)])
-    def test_should_set_new_default_height_image_when_image_is_too_height(
+    def test_should_set_new_default_image_height_when_image_is_too_height(
         self, width, height, expected
     ):
         name = get_random_name(".jpg")
@@ -110,6 +115,36 @@ class ProfileTest(TestCase):
         self.assertEquals(self.profile.image.height, height)
 
         os.remove(os.path.join(settings.BASE_DIR, "media", "profile_pics", name))
+
+    def test_should_add_two_new_friends(self):
+        friend_1 = User.objects.create(
+            username="friend1", password="qjgN2927fQHvs1W"
+        )  # nosec
+        friend_2 = User.objects.create(
+            username="friend2", password="qjgN2927fQHvs1W"
+        )  # nosec
+
+        self.profile.friends.add(friend_1, friend_2)
+
+        self.assertEquals(self.profile.friends.count(), 2)
+
+    # TODO jeżeli wprowadzę ograniczenia zrobić test czy działa poprawnie
+
+    def test_should_set_none_support_team_field_when_user_did_not_set_it(self):
+        self.assertIsNone(self.profile.support_team)
+
+    def test_should_set_support_team_field_when_user_sets_one(self):
+        # TODO link: https://dev.to/thedevtimeline/mock-django-models-using-faker-and-factory-boy-3ib0
+
+        team_mock = MagicMock()
+        team_mock.name = "Team Test"
+
+        self.profile.support_team = team_mock
+        self.profile.save()
+
+        self.assertTrue(self.profile.support_team)
+
+        team_mock.reset_mock()
 
     def test_str_method_should_return_username(self):
         expected_obj_name = f"{self.profile.user}"

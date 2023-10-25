@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
+# TODO basic Legue gdzie będzie dziedziczone dzięki tej klasie będzie można stworzyć różne ligi
 
 
 # https://reqbin.com/code/python/3zdpeao1/python-requests-timeout-example

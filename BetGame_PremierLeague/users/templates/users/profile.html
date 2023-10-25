@@ -1,10 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'bet/base.html'%}
+{% load crispy_forms_tags %}
+{% block title %}Profile{% endblock %}
 
-</body>
-</html>
+{% block content %}
+<div class="content-section">
+
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-8">
+                <h1>{{ object.user.username }}</h1>
+
+            </div>
+            <div class="col-4">
+                <h1>{{ object.all_points }}</h1>
+                <h5>{{ object.current_season_points }}</h5>
+            </div>
+      </div>
+
+    </div>
+</div>
+
+{% endblock %}
