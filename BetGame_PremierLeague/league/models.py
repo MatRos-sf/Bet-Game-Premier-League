@@ -36,7 +36,7 @@ class Season(models.Model):
         end_year = self.end_date.year
         league = self.league
 
-        if end_year - start_year != 0:
+        if end_year - start_year != 1:
             raise ValidationError(
                 "The different between end_data and start_date should equal 0"
             )

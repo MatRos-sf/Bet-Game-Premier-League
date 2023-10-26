@@ -32,6 +32,10 @@ class Matchweek(models.Model):
         else:
             return "After"
 
+    @property
+    def amt_matches(self) -> int:
+        return self.matches.all().count()
+
 
 class Match(models.Model):
     home_team = models.ForeignKey(
@@ -42,7 +46,9 @@ class Match(models.Model):
     )
 
     start_date = models.DateTimeField()
-    matchweek = models.ForeignKey(Matchweek, on_delete=models.CASCADE)
+    matchweek = models.ForeignKey(
+        Matchweek, on_delete=models.CASCADE, related_name="matches"
+    )
 
     home_goals = models.SmallIntegerField(blank=True, null=True)
     away_goals = models.SmallIntegerField(blank=True, null=True)
@@ -56,6 +62,12 @@ class Match(models.Model):
 
         return f"{self.home_team.name:>5} : {self.away_team.name}"
 
-    # def is_finished(self):
-    #     # start_date += 45 + 10 + 15 + 45 + 10 + 10
-    #     pass
+    @property
+    def league(self):
+        return self.matchweek.season.league.name
+
+    def has_bet_for_match(self, user):
+        return self.bet_set.filter(user=user).exists()
+
+    def __str__(self):
+        return f"{self.home_team.name: <50} : {self.away_team.name: >50}"
