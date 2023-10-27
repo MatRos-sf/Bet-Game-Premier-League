@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 
+from league.models import Team
+
 
 class Matchweek(models.Model):
     matchweek = models.SmallIntegerField(
@@ -16,15 +18,18 @@ class Matchweek(models.Model):
     )
     canceled = models.BooleanField(default=False)
 
+    finished = models.BooleanField(default=False)
+
     @property
     def status(self):
         """
         3 differents status: before, now, after
         """
+        # TODO zastanowić się czy to jest potrzebne
         if self.canceled:
             return "Canceled"
 
-        time_now = timezone.now()
+        time_now = timezone.now().date()
         if self.start_date <= time_now <= self.end_date:
             return "Now"
         elif time_now <= self.start_date:
@@ -35,6 +40,11 @@ class Matchweek(models.Model):
     @property
     def amt_matches(self) -> int:
         return self.matches.all().count()
+
+    def check_bet_user(self, pk):
+        bet = self.bet_set.filter(user_id=pk)
+
+        return bet.first().choice if bet.exists() else False
 
 
 class Match(models.Model):
@@ -63,11 +73,26 @@ class Match(models.Model):
         return f"{self.home_team.name:>5} : {self.away_team.name}"
 
     @property
+    def winner(self) -> None | str:
+        if not self.finished:
+            return
+
+        if self.home_goals > self.away_goals:
+            return "home"
+        elif self.home_team == self.away_team:
+            return "draw"
+        else:
+            return "away"
+
+    @property
     def league(self):
         return self.matchweek.season.league.name
 
     def has_bet_for_match(self, user):
         return self.bet_set.filter(user=user).exists()
+
+    def winners_bet(self):
+        pass
 
     def __str__(self):
         return f"{self.home_team.name: <50} : {self.away_team.name: >50}"
