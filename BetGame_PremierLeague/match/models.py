@@ -46,6 +46,10 @@ class Matchweek(models.Model):
 
         return bet.first().choice if bet.exists() else False
 
+    def is_editable(self):
+        now = timezone.now().date()
+        return now < self.start_date
+
 
 class Match(models.Model):
     home_team = models.ForeignKey(
