@@ -1,25 +1,63 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-
+from django.contrib import messages
 from typing import List
+from http import HTTPStatus
+from django.core.exceptions import FieldError
+
 from league.models import League, Team, Season, TeamStats
 from league.forms import TeamForm
 from match.models import Matchweek, Match
 from football_data.premier_league import PremierLeague
 
 
+def generate(request):
+    return render(request, "generate/set_database.html")
+
+
 class GenerateLeagueView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """
+    A class downloads information about the league and put it into our database.
+    """
+
     def get(self, request):
         pl = PremierLeague()
         league = pl.get_info_currently_league()
 
-        obj, created = League.objects.get_or_create(**league)
-        if created:
-            return render(
-                request, "league/generic/league.html", {"object": league}, status=201
+        if not league:
+            messages.error(
+                "Something is wrong with the server. Please, try again for a moment."
             )
-        return render(request, "league/generic/league.html", {}, status=200)
+            return render(self.request, "generate/set_database.html", {})
+
+        try:
+            obj, created = League.objects.get_or_create(**league)
+        except FieldError:
+            messages.error(self.request, "The payload has incorrect data.")
+            return render(
+                self.request,
+                "generate/set_database.html",
+                {},
+                status=HTTPStatus.BAD_REQUEST,
+            )
+
+        if created:
+            messages.success(
+                self.request, f"The {obj.name} has been successfully created"
+            )
+            return render(
+                self.request,
+                "generate/set_database.html",
+                {"object": league},
+                status=HTTPStatus.CREATED,
+            )
+
+        messages.error(self.request, f"The {obj.name} already exist.")
+
+        return render(
+            self.request, "generate/set_database.html", {}, status=HTTPStatus.OK
+        )
 
     def test_func(self):
         return self.request.user.is_superuser
@@ -123,7 +161,7 @@ class GenerateMatchweekView(LoginRequiredMixin, UserPassesTestMixin, View):
                 matchweek=matchweek_obj,
                 home_team=home_team,
                 away_team=away_team,
-                **match
+                **match,
             )
 
         return render(request, "league/generate/", {}, status=201)

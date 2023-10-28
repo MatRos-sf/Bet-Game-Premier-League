@@ -26,9 +26,19 @@ class PremierLeague:
             return PremierLeague.API + url + filter
         return PremierLeague.API + url
 
-    def get_info_currently_league(self) -> Dict[str, str]:
+    def __get_response(self, url: str) -> Tuple[bool, requests.Response | None]:
+        try:
+            response = requests.get(url=url, headers=self.headers, timeout=5)
+        except requests.exceptions.Timeout:
+            return False, None
+        return True, response
+
+    def get_info_currently_league(self) -> Dict[str, str] | None:
         url = self.API + self.url_competitions
-        response = requests.get(url, headers=HEADER, timeout=5)
+        succeed, response = self.__get_response(url)
+
+        if not succeed:
+            return
 
         response_league_ino = response.json()["competition"]
         league = {
