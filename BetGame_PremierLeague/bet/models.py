@@ -13,11 +13,11 @@ class Bet(models.Model):
     match = models.ForeignKey("match.Match", on_delete=models.CASCADE)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    choice = models.CharField(max_length=20, choices=choices)
+    choice = models.CharField(max_length=20, choices=choices, default="none")
 
     is_active = models.BooleanField(default=True)
+    is_won = models.BooleanField(blank=True, null=True)
 
-    # TODO status
-
+    # TODO kiedy is_active ma się zmieniać na false ( wtedy  kiedy rozpoczyna się kolejka)
     class Meta:
         unique_together = ("match", "user")

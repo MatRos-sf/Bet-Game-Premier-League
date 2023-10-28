@@ -1,37 +1,47 @@
 from django.shortcuts import render, redirect
-from django.views import View
 from django.views.generic import ListView
-from django.forms import formset_factory
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 
 from match.models import Match, Matchweek
 from .models import Bet
-from django.contrib.auth.models import User
-from django.views.generic.edit import ModelFormMixin
-from .forms import BetForm
 
 
-class BetsListView(ListView):
+class BetsListView(LoginRequiredMixin, ListView):
     model = Match
-    template_name = "bet/home.html"
     context_object_name = "matches"
 
-    def get(self, request, *args, **kwargs):
-        bets = Bet.objects.filter(user=request.user, is_active=True)
-        matchweek = Matchweek.objects.all().first()
-
-        amt_matches = matchweek.amt_matches
-
-        if amt_matches != bets.count():
-            # TODO na sztywno klepane jest 10 meczy, sprawdzić czy istnieje taki mecz
-            for match in matchweek.matches.all():
-                Bet.objects.create(user=request.user, match=match, choice="none")
-
-        return super().get(request, *args, **kwargs)
+    def get_template_names(self):
+        obj = Matchweek.objects.all().first()
+        # TODO 2 różne template
+        if obj.status == "Now":
+            return ["bet/home.html"]
+        return ["bet/home.html"]
 
     def get_queryset(self):
         matches = Matchweek.objects.all().first()
         return matches.matches.all()
 
 
-# def set_bet(request, pk: int, choice: str):
-#     bet =
+@login_required
+def set_bet(request, pk: int, choice: str):
+    match = Match.objects.get(id=pk)
+
+    if not match.matchweek.is_editable():
+        messages.error(
+            request,
+            "You cannot change your bet because the matchweek has already started.",
+        )
+        return redirect("bet-home")
+
+    bet, created = Bet.objects.get_or_create(user=request.user, match=match)
+
+    if not created and bet.choice == choice:
+        bet.choice = "none"
+    else:
+        bet.choice = choice
+
+    bet.save(update_fields=["choice"])
+
+    return redirect("bet-home")

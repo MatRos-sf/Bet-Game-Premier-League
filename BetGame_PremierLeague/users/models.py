@@ -46,7 +46,7 @@ class Profile(models.Model):
             img.save(self.image.path)
 
     def __str__(self):
-        return f"{self.user.username}"
+        return f"Profile: {self.user.username}"
 
 
 class SeasonPoints(models.Model):
@@ -58,4 +58,4 @@ class SeasonPoints(models.Model):
     current = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.profile.user.username} {self.points}"
+        return f"Season Points: {self.profile.user.username}, {self.points}"

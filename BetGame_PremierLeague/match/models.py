@@ -3,8 +3,6 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 
-from league.models import Team
-
 
 class Matchweek(models.Model):
     matchweek = models.SmallIntegerField(
@@ -49,6 +47,10 @@ class Matchweek(models.Model):
     def is_editable(self):
         now = timezone.now().date()
         return now < self.start_date
+
+    def __str__(self):
+        start = self.season.start_date.strftime("%y")
+        return f"Matchweek {self.matchweek}/{start}"
 
 
 class Match(models.Model):
@@ -99,4 +101,4 @@ class Match(models.Model):
         pass
 
     def __str__(self):
-        return f"{self.home_team.name: <50} : {self.away_team.name: >50}"
+        return f"{self.home_team.name} vs {self.away_team.name}"
