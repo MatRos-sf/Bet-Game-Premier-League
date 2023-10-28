@@ -99,3 +99,13 @@ class TeamStats(models.Model):
     @property
     def goal_difference(self):
         return int(self.goals_for) - int(self.goals_against)
+
+    def __str__(self):
+        season_date = self.season.start_date.strftime("%y")
+        return f"{self.team.name} {season_date} {self.points}"
+
+    @classmethod
+    def get_season_table(cls, season: int, league: str):
+        return cls.objects.filter(
+            season__start_date__year=season, season__league__name=league
+        ).order_by("points", "goals_for", "team__name")
