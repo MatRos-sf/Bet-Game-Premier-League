@@ -34,7 +34,7 @@ class PremierLeague:
         return True, response
 
     def get_info_currently_league(self) -> Dict[str, str] | None:
-        url = self.API + self.url_competitions
+        url = self.__get_full_url(self.url_competitions)
         succeed, response = self.__get_response(url)
 
         if not succeed:
@@ -53,8 +53,10 @@ class PremierLeague:
         self,
     ) -> Tuple[str, List[Dict[str, str]] | None]:
         url = self.__get_full_url(self.url_competitions)
-        response = requests.get(url, headers=HEADER, timeout=5)
+        succeed, response = self.__get_response(url)
 
+        if not succeed:
+            return
         data = response.json()
 
         league_name = data["competition"]["name"]
@@ -64,7 +66,7 @@ class PremierLeague:
 
         for team in response_teams_ino:
             team_payload = {
-                "id_from_fd": team["id"],
+                "fb_id": team["id"],
                 "name": team["name"],
                 "short_name": team["shortName"],
                 "shortcut": team["tla"],
@@ -77,15 +79,18 @@ class PremierLeague:
 
         return league_name, teams
 
-    def get_info_current_season(self) -> Dict[str, str]:
-        url = self.API + self.url_current_season
-        response = requests.get(url, headers=HEADER, timeout=5)
+    def get_info_current_season(self) -> Dict[str, str] | None:
+        url = self.__get_full_url(self.url_current_season)
+        succeed, response = self.__get_response(url)
+
+        if not succeed:
+            return
 
         data = response.json()
 
         season = {
             "league": data["name"],
-            "id_form_fd": data["currentSeason"]["id"],
+            "fb_id": data["currentSeason"]["id"],
             "start_date": data["currentSeason"]["startDate"],
             "end_date": data["currentSeason"]["endDate"],
             "matchweek": data["currentSeason"]["currentMatchday"],
@@ -93,9 +98,14 @@ class PremierLeague:
 
         return season
 
-    def get_current_standings(self) -> Tuple[str, List[Dict[str, str]]]:
-        url = self.API + self.url_standings
-        response = requests.get(url, headers=HEADER, timeout=5)
+    def get_current_standings(
+        self,
+    ) -> Tuple[str, List[Dict[str, str]]] | Tuple[None, None]:
+        url = self.__get_full_url(self.url_standings)
+        succeed, response = self.__get_response(url)
+
+        if not succeed:
+            return None, None
 
         data = response.json()
 
@@ -108,7 +118,7 @@ class PremierLeague:
         for position in table:
             payload = {}
 
-            payload["id_from_fd"] = position["team"]["id"]
+            payload["fb_id"] = position["team"]["id"]
             payload["played"] = position["playedGames"]
             payload["won"] = position["won"]
             payload["drawn"] = position["draw"]
@@ -123,12 +133,16 @@ class PremierLeague:
 
     def get_matchweek(
         self, value, year=None
-    ) -> Tuple[Dict[str, str], List[Dict[str, str]]]:
-        url = self.API + self.url_matchweek + f"?matchday={str(value)}"
+    ) -> Tuple[Dict[str, str], List[Dict[str, str]]] | Tuple[None, None]:
+        url = self.__get_full_url(self.url_matchweek, f"?matchday={str(value)}")
+
         if year:
             url += f"&season={str(year)}"
 
-        response = requests.get(url, headers=HEADER, timeout=5)
+        succeed, response = self.__get_response(url)
+
+        if not succeed:
+            return None, None
 
         data = response.json()
 
