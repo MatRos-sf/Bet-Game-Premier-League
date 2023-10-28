@@ -1,0 +1,37 @@
+{% extends 'bet/base.html'%}
+{% load crispy_forms_tags %}
+{% load bet_tags %}
+
+{% block title %}Detail{% endblock %}
+
+{% block content %}
+
+<div class="content-section">
+
+    {% user_bet user=user match=match as choiced %}
+    <div class="card">
+          <div class="card-header">
+            {{ match }}
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">{{ match }}</h5>
+            {{ p }}
+            <div class="btn-group" role="group" aria-label="Basic outlined example">
+                <a type="button" class="btn btn-outline-primary {% if choiced == 'home' %}active{% endif %}" href="{% url 'bet-set' match.id 'home'%}">{{ match.home_team.name }}</a>
+                <a type="button" class="btn btn-outline-primary {% if choiced == 'draw' %}active{% endif %}" href="{% url 'bet-set' match.id 'draw'%}">Draw</a>
+                <a type="button" class="btn btn-outline-primary {% if choiced == 'away' %}active{% endif %}" href="{% url 'bet-set' match.id 'away'%}">{{ match.away_team.name }}</a>
+
+            </div>
+          </div>
+    </div>
+</div>
+
+<div class="content-section">
+    <h1>Table: </h1>
+    <!-- #TODO zrobić to w tabeli -->
+    {% for team in table %}
+        <p>{{ forloop.counter }}. {{ team.team.name }} {{ team.points }}</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,3 +1,5 @@
+import datetime
+from typing import Tuple
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
@@ -99,6 +101,11 @@ class Match(models.Model):
 
     def winners_bet(self):
         pass
+
+    def get_season_and_league(self) -> Tuple[datetime.date, str]:
+        season = self.matchweek.season.start_date
+        league = self.matchweek.season.league.name
+        return season, league
 
     def __str__(self):
         return f"{self.home_team.name} vs {self.away_team.name}"

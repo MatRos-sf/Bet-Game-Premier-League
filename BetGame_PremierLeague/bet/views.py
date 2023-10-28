@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import HttpResponseRedirect
 from django.contrib import messages
 
 from match.models import Match, Matchweek
@@ -33,7 +34,8 @@ def set_bet(request, pk: int, choice: str):
             request,
             "You cannot change your bet because the matchweek has already started.",
         )
-        return redirect("bet-home")
+        # return redirect("bet-home")
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
     bet, created = Bet.objects.get_or_create(user=request.user, match=match)
 
@@ -44,4 +46,5 @@ def set_bet(request, pk: int, choice: str):
 
     bet.save(update_fields=["choice"])
 
-    return redirect("bet-home")
+    # return redirect("bet-home")
+    return HttpResponseRedirect(request.META.get("HTTP_REFERER"))

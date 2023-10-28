@@ -23,4 +23,5 @@ urlpatterns = [
     path("league/", include("league.urls")),
     path("generate/", include("generate.urls")),
     path("bet/", include("bet.urls")),
+    path("match/", include("match.urls")),
 ]
