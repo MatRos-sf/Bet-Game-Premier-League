@@ -6,7 +6,7 @@ from django.db.models import F
 
 from .models import Match, Matchweek
 from bet.models import Bet
-from league.models import Team, TeamStats
+from league.models import Team, TeamStats, Season
 
 
 @receiver(pre_save, sender=Matchweek)
@@ -145,7 +145,15 @@ def team_points_allocation(sender, instance, update_fields=None, **kwargs):
             ts_away.save()
 
 
-# TODO przyznanie użytkownikom pkt.
+@receiver(post_save, sender=Matchweek)
+def update_obj_season_when_add_new_matchweek(sender, instance, **kwargs):
+    season = instance.season
+    if season.matchweek < instance.matchweek:
+        season.matchweek = instance.matchweek
+        season.save(update_fields=["matchweek"])
+        # TODO zrobić kiedy koniec sezonu
+
+
 @receiver(post_save, sender=Match)
 def check_bets(sender, instance, **kwargs):
     if instance.finished:

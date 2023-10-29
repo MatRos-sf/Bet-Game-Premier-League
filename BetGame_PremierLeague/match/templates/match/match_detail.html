@@ -30,7 +30,7 @@
     <h1>Table: </h1>
     <!-- #TODO zrobić to w tabeli -->
     {% for team in table %}
-        <p>{{ forloop.counter }}. {{ team.team.name }} {{ team.points }}</p>
+        <p class="{% if team.team.name == match.home_team.name or team.team.name == match.away_team.name %}bg-success{% endif %}">{{ forloop.counter }}. {{ team.team.name }} {{ team.points }}</p>
     {% endfor %}
     <!-- #TODO zrobić ostatnie 5 meczy wyniki  -->
 </div>

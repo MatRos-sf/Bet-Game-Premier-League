@@ -46,5 +46,4 @@ def set_bet(request, pk: int, choice: str):
 
     bet.save(update_fields=["choice"])
 
-    # return redirect("bet-home")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
