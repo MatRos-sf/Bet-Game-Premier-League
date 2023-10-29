@@ -78,10 +78,10 @@ class Match(models.Model):
 
     @property
     def results(self):
-        if self.home_goals and self.away_goals:
-            return f"{self.home_team.name:>5} {self.home_goals}:{self.away_goals} {self.away_team.name}"
+        if self.finished:
+            return f"{self.home_team.name} {self.home_goals}:{self.away_goals} {self.away_team.name}"
 
-        return f"{self.home_team.name:>5} : {self.away_team.name}"
+        return f"{self.home_team.name} vs {self.away_team.name}"
 
     @property
     def winner(self) -> Tuple[None, None] | Tuple[str, object]:
@@ -111,4 +111,4 @@ class Match(models.Model):
         return season, league
 
     def __str__(self):
-        return f"{self.home_team.name} vs {self.away_team.name}"
+        return self.results

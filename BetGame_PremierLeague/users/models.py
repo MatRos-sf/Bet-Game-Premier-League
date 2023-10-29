@@ -12,7 +12,7 @@ class Profile(models.Model):
         default="default.jpg", upload_to="profile_pics", verbose_name="profile picture"
     )
 
-    friends = models.ManyToManyField(User, related_name="friends")
+    friends = models.ManyToManyField(User, related_name="friends", blank=True)
     support_team = models.ForeignKey(
         "league.Team",
         on_delete=models.CASCADE,

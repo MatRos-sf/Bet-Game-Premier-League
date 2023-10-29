@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from .models import Profile
 from .forms import UserRegisterForm
 from bet.models import Bet
+from django.db.models import Avg
 
 
 def home(request):
@@ -47,9 +48,10 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProfileDetailView, self).get_context_data(**kwargs)
-        context["currently_bets"] = Bet.objects.filter(
-            user=self.request.user, is_active=True
-        )
+        context["amt_bets"] = Bet.objects.filter(user=self.request.user).count()
+        win_rate = Bet.objects.aggregate(win_rate=Avg("is_won"))["win_rate"]
+        context["win_rate"] = round(win_rate * 100, 2)
+
         return context
 
 

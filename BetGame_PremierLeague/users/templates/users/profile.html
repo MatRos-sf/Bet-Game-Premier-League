@@ -6,23 +6,27 @@
 <div class="content-section">
 
     <div class="container text-center">
-        <div class="row">
-            <div class="col-8">
-                <h1>{{ object.user.username }}</h1>
-                <div class="container">
-                    <p>joined: {{ object.user.date_joined|date:"d M Y"  }}</p>
-                    <p>sx</p>
-                </div>
-            </div>
-            <div class="col-4">
-                <h1>{{ object.all_points }}</h1>
-                <h5>{{ object.current_season_points}}</h5>
+      <div class="row align-items-start">
+        <div class="col">
+          <!-- Picture section -->
+            <div class="media">
+                <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
             </div>
         </div>
-        <div class="container text-center">
-            <h1>Hello</h1>
+        <div class="col">
+          <!-- About user section -->
+            <h1>{{ user.username }}</h1>
+            <p>{{ object.user.date_joined|date:"d M Y"  }}</p>
+            {% if user.profile.support_team %}
+                <img src="{{ user.profile.support_team.crest }}" class="rounded mx-auto d-block">
+            {% endif %}
         </div>
-
+        <div class="col">
+            <!-- Points sector -->
+            <h1>{{ object.all_points }}</h1>
+            <h5>{{ object.current_season_points}}</h5>
+        </div>
+      </div>
     </div>
 </div>
 
@@ -30,14 +34,13 @@
 
     <div class="container text-center">
         <div class="container text-center">
-            <h1>Bets</h1>
+            <h1>Stats</h1>
         </div>
-        {% for bet in currently_bets %}
-            <p>{{ bet.match.home_team }} vs {{ bet.match.away_team }}</p>
-            {{ bet.winner }}
-        {% endfor %}
+        <p>Win rate: {{ win_rate }}%</p>
 
     </div>
 </div>
+
+
 
 {% endblock %}

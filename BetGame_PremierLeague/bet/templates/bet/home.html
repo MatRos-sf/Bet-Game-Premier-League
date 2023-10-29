@@ -16,18 +16,47 @@
               </div>
               <div class="card-body">
                 <h5 class="card-title"><a href="{% url 'match-detail' match.pk %}">{{ match }}</a></h5>
-                {{ p }}
-                <div class="btn-group" role="group" aria-label="Basic outlined example">
-                    <a type="button" class="btn btn-outline-primary {% if choiced == 'home' %}active{% endif %}" href="{% url 'bet-set' match.id 'home'%}">{{ match.home_team.name }}</a>
-                    <a type="button" class="btn btn-outline-primary {% if choiced == 'draw' %}active{% endif %}" href="{% url 'bet-set' match.id 'draw'%}">Draw</a>
-                    <a type="button" class="btn btn-outline-primary {% if choiced == 'away' %}active{% endif %}" href="{% url 'bet-set' match.id 'away'%}">{{ match.away_team.name }}</a>
-
-                </div>
+                {% if is_started %}
+                    <div class="btn-group" role="group" aria-label="Basic outlined example">
+                        <a type="button" class="btn btn-outline-primary {% if choiced == 'home' %}active{% endif %}" href="{% url 'bet-set' match.id 'home'%}">{{ match.home_team.name }}</a>
+                        <a type="button" class="btn btn-outline-primary {% if choiced == 'draw' %}active{% endif %}" href="{% url 'bet-set' match.id 'draw'%}">Draw</a>
+                        <a type="button" class="btn btn-outline-primary {% if choiced == 'away' %}active{% endif %}" href="{% url 'bet-set' match.id 'away'%}">{{ match.away_team.name }}</a>
+                    </div>
+                  {% else %}
+                        {% if choiced != 'None' %}
+                            <p>Your bet:  {{ choiced }}</p>
+                        {% endif %}
+                  {% endif %}
 
               </div>
         </div>
     {% endfor %}
 
+    <h1>Finished Matches</h1>
+
+        {% for match in finished_matches %}
+        {% user_check_bet user=user match=match as won %}
+        <div class="card ">
+              <div class="card-header {% if won == True %}bg-success{% elif won == False %}bg-danger{% endif %}">
+                {{ match}}
+              </div>
+              <div class="card-body">
+                <h5 class="card-title"><a href="{% url 'match-detail' match.pk %}">{{ match }}</a></h5>
+                {% if is_started %}
+                    <div class="btn-group" role="group" aria-label="Basic outlined example">
+                        <a type="button" class="btn btn-outline-primary {% if choiced == 'home' %}active{% endif %}" href="{% url 'bet-set' match.id 'home'%}">{{ match.home_team.name }}</a>
+                        <a type="button" class="btn btn-outline-primary {% if choiced == 'draw' %}active{% endif %}" href="{% url 'bet-set' match.id 'draw'%}">Draw</a>
+                        <a type="button" class="btn btn-outline-primary {% if choiced == 'away' %}active{% endif %}" href="{% url 'bet-set' match.id 'away'%}">{{ match.away_team.name }}</a>
+                    </div>
+                  {% else %}
+                        {% if choiced != 'None' %}
+                            <p>Your bet:  {{ choiced }}</p>
+                        {% endif %}
+                  {% endif %}
+
+              </div>
+        </div>
+    {% endfor %}
 </div>
 
 {% endblock %}
