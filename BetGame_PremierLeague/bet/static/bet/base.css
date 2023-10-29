@@ -14,6 +14,9 @@ ul {
 .bg-steel {
   background-color: #5f788a;
 }
+.site-header{
+  background: indigo;
+}
 
 .site-header .navbar-nav .nav-link {
   color: blueviolet;

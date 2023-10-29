@@ -1,0 +1,36 @@
+{% extends 'bet/base.html'%}
+{% load crispy_forms_tags %}
+{% load bet_tags %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+<div class="content-section">
+    <h1 class="display-6">Are you ready for an exciting journey through the world of English football?</h1>
+    <br>
+    <p>
+        Our website is the place where you can test your match prediction skills, track scores, get thrilled by matches,
+        and compete with {{ amt_users }} of other users, all without the risk of losing money. Whether you're a die-hard
+        Premier League fan or just enjoy an extra dose of adrenaline, we're here to provide you with the best
+        experience in sports event prediction.
+    </p>
+
+    <br>
+    <br>
+    <p>
+        Don't hesitate any longer and join our community of football enthusiasts!
+        Whether you're an experienced bettor or just starting your journey into sports event prediction,
+        we're confident that you'll find plenty of entertainment and excitement here.
+    </p>
+
+    <br>
+    <p>
+        Together, we will celebrate successful predictions, share the emotions of matches, and refine our prediction skills.
+    </p>
+    <p>
+        Are you ready? <a href="{% url 'user-register' %}"> Join us now!</a> or <a href="{% url 'user-login' %}">Log in!</a>
+    </p>
+</div>
+
+{% endblock %}

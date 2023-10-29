@@ -4,15 +4,15 @@ from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-
+from django.contrib.auth.models import User
 from .models import Profile
 from .forms import UserRegisterForm
 from bet.models import Bet
 
 
-@login_required
 def home(request):
-    return render(request, "users/home.html")
+    amt_of_users = User.objects.all().count()
+    return render(request, "users/home_page.html", {"amt_users": amt_of_users})
 
 
 def register(request):
