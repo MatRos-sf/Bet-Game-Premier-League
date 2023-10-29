@@ -255,6 +255,7 @@ class UpdateCurrentlyMatchweekView(LoginRequiredMixin, UserPassesTestMixin, View
             return render(self.request, "generate/set_database.html", {})
 
         season_matches = Match.objects.filter(matchweek__season=season, finished=False)
+        count = 0
 
         for match in matches:
             match_instance = season_matches.filter(
@@ -268,7 +269,8 @@ class UpdateCurrentlyMatchweekView(LoginRequiredMixin, UserPassesTestMixin, View
             match_instance.away_goals = match["away_goals"]
             match_instance.finished = True
             match_instance.save(update_fields=["home_goals", "away_goals", "finished"])
-
+            count += 1
+        messages.info(self.request, f"Updated {count} matches!")
         return render(
             self.request, "generate/set_database.html", {}, status=HTTPStatus.CREATED
         )

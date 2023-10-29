@@ -14,7 +14,7 @@ class BetsListView(LoginRequiredMixin, ListView):
     context_object_name = "matches"
 
     def get_template_names(self):
-        obj = Matchweek.objects.all().first()
+        obj = Matchweek.objects.first()
         # TODO 2 różne template
         if obj.status == "Now":
             return ["bet/home.html"]
