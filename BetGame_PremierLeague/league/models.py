@@ -31,6 +31,10 @@ class Season(models.Model):
         league = self.league.name
         return f"{league} {self.start_date}"
 
+    @classmethod
+    def get_currently_season(cls, league: str):
+        return cls.objects.get(league__name=league, is_currently=True)
+
     # TODO sprawdzić coś nie działa kiedy próbuje generować sezon pisczy że str nie ma .year
     # def save(self, *args, **kwargs):
     #     start_year = self.start_date.year

@@ -73,6 +73,9 @@ class Match(models.Model):
 
     finished = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ["start_date"]
+
     @property
     def results(self):
         if self.home_goals and self.away_goals:
@@ -81,16 +84,16 @@ class Match(models.Model):
         return f"{self.home_team.name:>5} : {self.away_team.name}"
 
     @property
-    def winner(self) -> None | str:
+    def winner(self) -> Tuple[None, None] | Tuple[str, object]:
         if not self.finished:
-            return
+            return None, None
 
         if self.home_goals > self.away_goals:
-            return "home"
+            return "home", self.home_team
         elif self.home_team == self.away_team:
-            return "draw"
+            return "draw", True
         else:
-            return "away"
+            return "away", self.away_team
 
     @property
     def league(self):

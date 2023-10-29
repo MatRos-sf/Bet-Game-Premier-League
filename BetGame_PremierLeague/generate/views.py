@@ -236,3 +236,42 @@ class GenerateMatchweekView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def test_func(self):
         return self.request.user.is_superuser
+
+
+class UpdateCurrentlyMatchweekView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def get(self, request):
+        pl = PremierLeague()
+        season = Season.get_currently_season(pl.name_league)
+
+        info, matches = pl.get_matches_result(
+            mw=season.matchweek, year=season.start_date.year
+        )
+
+        if not info and not matches:
+            messages.error(
+                self.request,
+                "Something is wrong with the server. Please, try again for a moment.",
+            )
+            return render(self.request, "generate/set_database.html", {})
+
+        season_matches = Match.objects.filter(matchweek__season=season, finished=False)
+
+        for match in matches:
+            match_instance = season_matches.filter(
+                home_team__fb_id=match["home_team_id"]
+            ).first()
+
+            if not match_instance:
+                continue
+
+            match_instance.home_goals = match["home_goals"]
+            match_instance.away_goals = match["away_goals"]
+            match_instance.finished = True
+            match_instance.save(update_fields=["home_goals", "away_goals", "finished"])
+
+        return render(
+            self.request, "generate/set_database.html", {}, status=HTTPStatus.CREATED
+        )
+
+    def test_func(self):
+        return self.request.user.is_superuser

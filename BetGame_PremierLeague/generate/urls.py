@@ -13,4 +13,9 @@ urlpatterns = [
         v.GenerateMatchweekView.as_view(),
         name="generate-matchweek",
     ),
+    path(
+        "update/",
+        v.UpdateCurrentlyMatchweekView.as_view(),
+        name="generate-update-currently",
+    ),
 ]

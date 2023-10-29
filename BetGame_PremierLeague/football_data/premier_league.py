@@ -15,6 +15,7 @@ class PremierLeague:
     API = "http://api.football-data.org/v4/"
 
     def __init__(self):
+        self.name_league = "Premier League"
         self.url_competitions: str = "competitions/PL/teams"
         self.url_current_season: str = "competitions/PL"
         self.url_standings: str = "competitions/PL/standings"
@@ -23,7 +24,7 @@ class PremierLeague:
 
     def __get_full_url(self, url: str, filter=None):
         if filter:
-            return PremierLeague.API + url + filter
+            return PremierLeague.API + url + "?" + "&".join(filter)
         return PremierLeague.API + url
 
     def __get_response(self, url: str) -> Tuple[bool, requests.Response | None]:
@@ -134,7 +135,7 @@ class PremierLeague:
     def get_matchweek(
         self, value, year=None
     ) -> Tuple[Dict[str, str], List[Dict[str, str]]] | Tuple[None, None]:
-        url = self.__get_full_url(self.url_matchweek, f"?matchday={str(value)}")
+        url = self.__get_full_url(self.url_matchweek, [f"?matchday={str(value)}"])
 
         if year:
             url += f"&season={str(year)}"
@@ -167,15 +168,17 @@ class PremierLeague:
 
     def get_matches_result(
         self, mw: int, year: int
-    ) -> Tuple[Tuple[str, str], List[Tuple[str, str]]]:
+    ) -> Tuple[Dict[str, str], List[Dict[str, str]]] | Tuple[None, None]:
         """
         Return only finished matches
         """
-        url = self.API + self.url_matchweek + f"?matchday={str(mw)}"
-        if year:
-            url += f"&season={str(year)}"
+        url = self.__get_full_url(
+            self.url_matchweek, [f"matchday={str(mw)}", f"season={str(year)}"]
+        )
+        succeed, response = self.__get_response(url)
 
-        response = requests.get(url, headers=HEADER, timeout=5)
+        if not succeed:
+            return None, None
 
         data = response.json()
 
@@ -192,8 +195,6 @@ class PremierLeague:
             if match["status"] != "FINISHED":
                 continue
 
-            payload["status"] = match["status"]
-            payload["matchweek"] = match["season"]["id"]
             payload["home_team_id"] = match["homeTeam"]["id"]
             payload["away_team_id"] = match["awayTeam"]["id"]
             payload["home_goals"] = match["score"]["fullTime"]["home"]

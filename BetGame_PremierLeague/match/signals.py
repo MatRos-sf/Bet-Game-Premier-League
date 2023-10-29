@@ -1,4 +1,4 @@
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
@@ -42,7 +42,7 @@ def team_points_allocation(sender, instance, update_fields=None, **kwargs):
         matches = Match.objects.filter(matchweek=old_instance, finished=True)
 
         for match in matches:
-            winner = match.winner
+            winner, _ = match.winner
 
             ts_home = TeamStats.objects.get(
                 team=match.home_team, season=match.matchweek.season
@@ -95,7 +95,7 @@ def team_points_allocation(sender, instance, update_fields=None, **kwargs):
         matches = Match.objects.filter(matchweek=old_instance, finished=True)
 
         for match in matches:
-            winner = match.winner
+            winner, _ = match.winner
 
             ts_home = TeamStats.objects.get(
                 team=match.home_team, season=match.matchweek.season
@@ -146,3 +146,9 @@ def team_points_allocation(sender, instance, update_fields=None, **kwargs):
 
 
 # TODO przyznanie użytkownikom pkt.
+@receiver(post_save, sender=Match)
+def check_bets(sender, instance, **kwargs):
+    if instance.finished:
+        bets = Bet.objects.filter(match=instance)
+        for bet in bets:
+            bet.winner()

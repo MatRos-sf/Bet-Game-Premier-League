@@ -26,4 +26,18 @@
     </div>
 </div>
 
+<div class="content-section">
+
+    <div class="container text-center">
+        <div class="container text-center">
+            <h1>Bets</h1>
+        </div>
+        {% for bet in currently_bets %}
+            <p>{{ bet.match.home_team }} vs {{ bet.match.away_team }}</p>
+            {{ bet.winner }}
+        {% endfor %}
+
+    </div>
+</div>
+
 {% endblock %}
