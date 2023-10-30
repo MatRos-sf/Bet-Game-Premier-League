@@ -1,16 +1,10 @@
-{% extends 'bet/base.html'%}
+{% extends 'bet/index.html'%}
 {% load crispy_forms_tags %}
 {% block title %}Log out!{% endblock %}
 
-{% block content %}
-
-<div class="content-section">
-    <h2>You have been log out.</h2>
-    <div class="border-top pt-3">
-        <small class="text-muted">
-                <a href="{% url 'user-login' %}">Log In Again?</a>
-        </small>
+{% block bg_section %}
+    <div class="col-lg-9 mx-auto text-center">
+        <h1 class="text-white">You have been log out.</h1>
+        <a href="{% url 'user-login' %}" class="btn btn-primary py-3 px-4 mr-3">Log In Again?</a>
     </div>
-</div>
-
 {% endblock %}

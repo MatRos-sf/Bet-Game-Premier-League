@@ -110,7 +110,9 @@ class TeamStats(models.Model):
         return f"{self.team.name} {season_date} {self.points}"
 
     @classmethod
-    def get_season_table(cls, season: int, league: str):
+    def get_season_table(cls, league: str, season: int = None):
+        # TODO ma szukać w League aktualny sezon
+
         return cls.objects.filter(
             season__start_date__year=season, season__league__name=league
         ).order_by("-points", "-goals_for", "team__name")

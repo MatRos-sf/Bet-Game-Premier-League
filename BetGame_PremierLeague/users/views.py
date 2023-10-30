@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from .models import Profile
+from league.models import TeamStats
+from match.models import Match
 from .forms import UserRegisterForm
 from bet.models import Bet
 from django.db.models import Avg
@@ -13,7 +14,19 @@ from django.db.models import Avg
 
 def home(request):
     amt_of_users = User.objects.all().count()
-    return render(request, "users/home_page.html", {"amt_users": amt_of_users})
+    table = TeamStats.get_season_table(season=2023, league="Premier League")[:8]
+    last_match = Match.get_last_match()
+    next_match = Match.get_next_matches().first()
+    return render(
+        request,
+        "users/home_page.html",
+        {
+            "amt_users": amt_of_users,
+            "table": table,
+            "last_match": last_match,
+            "next_match": next_match,
+        },
+    )
 
 
 def register(request):

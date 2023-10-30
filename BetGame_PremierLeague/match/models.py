@@ -99,6 +99,14 @@ class Match(models.Model):
     def league(self):
         return self.matchweek.season.league.name
 
+    @classmethod
+    def get_last_match(cls):
+        return cls.objects.filter(finished=True).order_by("-start_date").first()
+
+    @classmethod
+    def get_next_matches(cls):
+        return cls.objects.filter(finished=False)
+
     def has_bet_for_match(self, user):
         return self.bet_set.filter(user=user).exists()
 
