@@ -12,7 +12,7 @@ class Profile(models.Model):
         default="default.jpg", upload_to="profile_pics", verbose_name="profile picture"
     )
 
-    friends = models.ManyToManyField(User, related_name="friends", blank=True)
+    following = models.ManyToManyField(User, related_name="friends", blank=True)
     support_team = models.ForeignKey(
         "league.Team",
         on_delete=models.CASCADE,
@@ -20,6 +20,7 @@ class Profile(models.Model):
         blank=True,
         null=True,
     )
+    description = models.TextField(max_length=500, blank=True, null=True)
 
     @property
     def all_points(self):
@@ -32,6 +33,13 @@ class Profile(models.Model):
             "total_points"
         ]
         return points or 0
+
+    @classmethod
+    def followers(cls, user):
+        """
+        The method displays a list of all users who are following the specified user.
+        """
+        return cls.objects.filter(following=user)
 
     def get_absolute_url(self):
         return reverse("user-profile-detail", args=[str(self.user.username)])
