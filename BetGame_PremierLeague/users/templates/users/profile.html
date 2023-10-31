@@ -1,34 +1,129 @@
-{% extends 'bet/base.html'%}
+{% extends 'bet/index.html'%}
 {% load crispy_forms_tags %}
 {% block title %}Profile{% endblock %}
 
-{% block content %}
-<div class="content-section">
+{% block bg_section %}
+    <div class="col-lg-9 mx-auto text-center">
+        <div class="vcard bio">
+            <img class="rounded-circle" src="{{ object.image.url }}" alt="Profile Image">
+        </div>
+        <h1 class="text-white">{{ object.user.username }}</h1>
+        <p><span>{{ object.all_points }}</span> <span class="mx-3">&bullet;</span> <span>{{ object.current_season_points }}</span></p>
+    </div>
+{% endblock %}
 
-    <div class="container text-center">
-      <div class="row align-items-start">
-        <div class="col">
-          <!-- Picture section -->
-            <div class="media">
-                <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+{% block between_section %}
+    {% if not self %}
+        {% with you=user %}
+            <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="d-flex team-vs">
+                <span class="score">{{ you.profile.all_points }} - {{ object.all_points }}</span>
+                <div class="team-1 w-50">
+                  <div class="team-details w-100 text-center">
+                    <img src="{{ you.profile.image.url }}" alt="Image" class="img-fluid">
+                    <h3>You</h3>
+                    <!--
+                      <ul class="list-unstyled">
+                      <li>Anja Landry (7)</li>
+                      <li>Eadie Salinas (12)</li>
+                      <li>Ashton Allen (10)</li>
+                      <li>Baxter Metcalfe (5)</li>
+                    </ul>
+                    -->
+                  </div>
+                </div>
+                <div class="team-2 w-50">
+                  <div class="team-details w-100 text-center">
+                    <img src="{{ object.image.url }}" alt="Image" class="img-fluid">
+                    <h3>{{ object.user.username }}</h3>
+                      <!-- Who scored
+                      <ul class="list-unstyled">
+                      <li>Macauly Green (3)</li>
+                      <li>Arham Stark (8)</li>
+                      <li>Stephan Murillo (9)</li>
+                      <li>Ned Ritter (5)</li>
+                    </ul>
+                    -->
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-        <div class="col">
-          <!-- About user section -->
-            <h1>{{ user.username }}</h1>
-            <p>{{ object.user.date_joined|date:"d M Y"  }}</p>
-            {% if user.profile.support_team %}
-                <img src="{{ user.profile.support_team.crest }}" class="rounded mx-auto d-block">
-            {% endif %}
+        {% endwith %}
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container site-section">
+  <div class="row">
+    <div class="col-6 title-section">
+      <h2 class="heading">Detail</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="custom-media d-flex">
+        <div class="img mr-4">
+          <img src="{{ object.support_team.crest }}" alt="He doesn't support any teams." class="img-fluid">
         </div>
-        <div class="col">
-            <!-- Points sector -->
-            <h1>{{ object.all_points }}</h1>
-            <h5>{{ object.current_season_points}}</h5>
+        <div class="text">
+            <h2 class="mb-1">{{ object.user.username }}</h2>
+            <span class="meta">Joined {{ object.user.date_joined }}</span> <!--TODO format date date May 20, 2020 -->
+            <h3 class="mb-1">Points:  {{ object.all_points  }}<span class="mx-2">&bullet;</span>{{ object.current_season_points  }}</h3>
+            <h3 class="mb-1">Rank: ?21? </h3> <!-- TODO rank -->
+            <h3 class="mb-1">Following:  {{ amt_following }}</h3>
+            <h3 class="mb-1">Followers:  {{ amt_followers }}</h3>
         </div>
       </div>
     </div>
+    {% if not self %}
+        <div class="col-lg-6">
+
+        <div class="custom-media d-flex">
+          <div class="form-group">
+            <!-- TODO Check if user is follow -->
+            <input type="submit" value="Follow" class="btn btn-primary py-3 px-4 text-white">
+          </div>
+
+      </div>
+    </div>
+      {% else %}
+          <div class="col-lg-6">
+
+                <div class="custom-media d-flex">
+                  <div class="form-group">
+                    <!-- TODO setting -->
+                    <input type="submit" value="Settings" class="btn btn-primary py-3 px-4 text-white">
+                  </div>
+
+              </div>
+            </div>
+
+      {% endif %}
+  </div>
 </div>
+
+<!-- Description section -->
+{% if object.description %}
+    <div class="site-section bg-dark">
+        <div class="container">
+          <div class="row">
+            <div class="col-6 title-section">
+              <h2 class="heading">Description</h2>
+            </div>
+          </div>
+            <div class="text">
+                <p> {{ object.description }} </p>
+        </div>
+      </div>
+    </div>
+
+{% endif %}
 
 <div class="content-section">
 
@@ -40,6 +135,84 @@
 
     </div>
 </div>
+
+ <div class="latest-news">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 title-section">
+            <h2 class="heading">User Predictions!</h2>
+          </div>
+        </div>
+
+<!--        <div class="row no-gutters">-->
+<!--          <div class="col-md-4">-->
+<!--            <div class="post-entry">-->
+<!--              <a href="#">-->
+<!--                <img src="images/img_1.jpg" alt="Image" class="img-fluid">-->
+<!--              </a>-->
+<!--              <div class="caption">-->
+<!--                <div class="caption-inner">-->
+<!--                  <h3 class="mb-3">Romolu to stay at Real Nadrid?</h3>-->
+<!--                  <div class="author d-flex align-items-center">-->
+<!--                    <div class="img mb-2 mr-3">-->
+<!--                      <img src="images/person_1.jpg" alt="">-->
+<!--                    </div>-->
+<!--                    <div class="text">-->
+<!--                      <h4>Mellissa Allison</h4>-->
+<!--                      <span>May 19, 2020 &bullet; Sports</span>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="col-md-4">-->
+<!--            <div class="post-entry">-->
+<!--              <a href="#">-->
+<!--                <img src="images/img_3.jpg" alt="Image" class="img-fluid">-->
+<!--              </a>-->
+<!--              <div class="caption">-->
+<!--                <div class="caption-inner">-->
+<!--                  <h3 class="mb-3">Kai Nets Double To Secure Comfortable Away Win</h3>-->
+<!--                  <div class="author d-flex align-items-center">-->
+<!--                    <div class="img mb-2 mr-3">-->
+<!--                      <img src="images/person_1.jpg" alt="">-->
+<!--                    </div>-->
+<!--                    <div class="text">-->
+<!--                      <h4>Mellissa Allison</h4>-->
+<!--                      <span>May 19, 2020 &bullet; Sports</span>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="col-md-4">-->
+<!--            <div class="post-entry">-->
+<!--              <a href="#">-->
+<!--                <img src="images/img_2.jpg" alt="Image" class="img-fluid">-->
+<!--              </a>-->
+<!--              <div class="caption">-->
+<!--                <div class="caption-inner">-->
+<!--                  <h3 class="mb-3">Dogba set for Juvendu return?</h3>-->
+<!--                  <div class="author d-flex align-items-center">-->
+<!--                    <div class="img mb-2 mr-3">-->
+<!--                      <img src="images/person_1.jpg" alt="">-->
+<!--                    </div>-->
+<!--                    <div class="text">-->
+<!--                      <h4>Mellissa Allison</h4>-->
+<!--                      <span>May 19, 2020 &bullet; Sports</span>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+
+      </div>
+    </div>
+
 
 
 
