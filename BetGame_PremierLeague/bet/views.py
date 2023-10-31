@@ -26,11 +26,14 @@ class BetsListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(BetsListView, self).get_context_data(**kwargs)
+
         mw = context["matches"].first().matchweek
         matchweek_is_started = mw.is_editable
+
         context["is_started"] = matchweek_is_started
         finished_matches = Match.objects.filter(matchweek=mw, finished=True)
         context["finished_matches"] = finished_matches
+
         return context
 
 

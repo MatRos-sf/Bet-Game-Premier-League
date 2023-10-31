@@ -28,7 +28,6 @@ class Bet(models.Model):
         if won:
             self.is_won = won == self.choice
             self.save(update_fields=["is_won"])
-
         return self.is_won
 
     class Meta:
