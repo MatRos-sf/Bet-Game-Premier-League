@@ -1,38 +1,88 @@
-{% extends 'bet/base.html'%}
+{% extends 'bet/index.html'%}
 {% load crispy_forms_tags %}
 {% load bet_tags %}
 
-{% block title %}Detail{% endblock %}
+{% block title %}Mach Detail{% endblock %}
+
+
+{% block bg_section %}
+    <div class="col-lg-9 mx-auto text-center">
+        <h1 class="text-white">Match</h1>
+        <p>Matchweek {{ match.matchweek.matchweek }}</p>
+    </div>
+{% endblock %}
+
+{% block between_section %}
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="d-flex team-vs">
+            <span class="score">{{ match.home_goals}}-{{ match.away_goals}}</span>
+            <div class="team-1 w-50">
+              <div class="team-details w-100 text-center">
+                <img src="{{ match.home_team.crest }}" alt="Image" class="img-fluid">
+                <h3>{{ match.home_team.short_name }}</h3>
+              </div>
+            </div>
+            <div class="team-2 w-50">
+              <div class="team-details w-100 text-center">
+                <img src="{{ match.away_team.crest }}" alt="Image" class="img-fluid">
+                <h3>{{ match.away_team.short_name }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}
 
 {% block content %}
 
-<div class="content-section">
-
-    {% user_bet user=user match=match as choiced %}
-    <div class="card">
-          <div class="card-header">
-            {{ match }}
+      <div class="container py-4">
+        <div class="row text-center">
+          <div class="col-lg-12 ">
+            <a type="submit" class="btn {% if chose == 'home' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5 bg-transparent" href="{% url 'bet-set' match.id 'home'%}" >{{ match.home_team.short_name}}</a>
+            <a type="submit" class="btn {% if chose == 'draw' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" href="{% url 'bet-set' match.id 'draw'%}">Draw</a>
+            <a type="submit" class="btn {% if chose == 'away' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" href="{% url 'bet-set' match.id 'away'%}">{{ match.away_team.short_name}}</a>
           </div>
-          <div class="card-body">
-            <h5 class="card-title">{{ match }}</h5>
-            {{ p }}
-            <div class="btn-group" role="group" aria-label="Basic outlined example">
-                <a type="button" class="btn btn-outline-primary {% if choiced == 'home' %}active{% endif %}" href="{% url 'bet-set' match.id 'home'%}">{{ match.home_team.name }}</a>
-                <a type="button" class="btn btn-outline-primary {% if choiced == 'draw' %}active{% endif %}" href="{% url 'bet-set' match.id 'draw'%}">Draw</a>
-                <a type="button" class="btn btn-outline-primary {% if choiced == 'away' %}active{% endif %}" href="{% url 'bet-set' match.id 'away'%}">{{ match.away_team.name }}</a>
+        </div>
 
+      </div>
+    <div class="site-section bg-dark">
+        <div class="container">
+        <div class="row">
+          <div class="col-lg-6">
+
+            <div class="widget-next-match">
+              <table class="table custom-table">
+                <thead>
+                  <tr>
+                    <th>P</th>
+                    <th>Team</th>
+                    <th>W</th>
+                    <th>D</th>
+                    <th>L</th>
+                    <th>PTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for team in table %}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong class="text-white">{{ team.team.name }}</strong></td>
+                        <td>{{ team.won }}</td>
+                        <td>{{ team.drawn }}</td>
+                        <td>{{ team.lost }}</td>
+                        <td>{{ team.points }}</td>
+                      </tr>
+                  {% endfor %}
+
+                </tbody>
+              </table>
             </div>
+
           </div>
-    </div>
-</div>
-
-<div class="content-section">
-    <h1>Table: </h1>
-    <!-- #TODO zrobić to w tabeli -->
-    {% for team in table %}
-        <p class="{% if team.team.name == match.home_team.name or team.team.name == match.away_team.name %}bg-success{% endif %}">{{ forloop.counter }}. {{ team.team.name }} {{ team.points }}</p>
-    {% endfor %}
-    <!-- #TODO zrobić ostatnie 5 meczy wyniki  -->
-</div>
-
+        </div>
+      </div>
+    </div> <!-- .site-section -->
 {% endblock %}

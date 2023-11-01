@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.utils import timezone
+from django.urls import reverse
 
 
 class Matchweek(models.Model):
@@ -76,6 +77,9 @@ class Match(models.Model):
     class Meta:
         ordering = ["start_date"]
 
+    def get_absolute_url(self):
+        return reverse("match-detail", kwargs={"pk": self.pk})
+
     @property
     def results(self):
         if self.finished:
@@ -97,7 +101,10 @@ class Match(models.Model):
 
     @property
     def league(self):
-        return self.matchweek.season.league.name
+        """
+        League object
+        """
+        return self.matchweek.season.league
 
     @classmethod
     def get_last_match(cls):
@@ -115,7 +122,7 @@ class Match(models.Model):
 
     def get_season_and_league(self) -> Tuple[datetime.date, str]:
         season = self.matchweek.season.start_date
-        league = self.matchweek.season.league.name
+        league = self.league
         return season, league
 
     def __str__(self):

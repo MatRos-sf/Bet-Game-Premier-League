@@ -3,7 +3,7 @@ from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from .models import Match, Matchweek
-from league.models import TeamStats
+from league.models import TeamStats, Team
 
 
 class MatchDetailView(LoginRequiredMixin, DetailView):
@@ -14,5 +14,7 @@ class MatchDetailView(LoginRequiredMixin, DetailView):
         context = super(MatchDetailView, self).get_context_data(**kwargs)
         match = context["match"]
         season, league = match.get_season_and_league()
-        context["table"] = TeamStats.get_season_table(season=season.year, league=league)
+        table = TeamStats.get_season_table(season=season.year, league=league)
+        context["table"] = table
+        # TODO takie staty jak tu: https://www.premierleague.com/match/93424
         return context

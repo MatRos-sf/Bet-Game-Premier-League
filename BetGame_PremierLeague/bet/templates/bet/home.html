@@ -5,7 +5,7 @@
 {% block title %}Bets{% endblock %}
 
 {% block bg_section %}
-    <div class="col-lg-9 mx-auto text-center">
+<div class="col-lg-9 mx-auto text-center" xmlns="http://www.w3.org/1999/html">
         <h1 class="text-white">Bets</h1>
         <p>Matchweek {{ mw}}</p>
     </div>
@@ -25,9 +25,11 @@
                 {% user_bet user=user match=match as chose %}
                  <div class="col-lg-12 mb-4">
                   <div class="widget-next-match">
+                    <a href="{{ match.get_absolute_url }}">
                   <div class="widget-title">
                     <h3>Next Match</h3>
                   </div>
+                    </a>
                   <div class="widget-body mb-3">
                     <div class="widget-vs">
                       <div class="d-flex align-items-center justify-content-around justify-content-between w-100">
@@ -45,7 +47,6 @@
                       </div>
                     </div>
                   </div>
-
                   <div class="text-center widget-vs-contents mb-4">
                     <h4>{{ match.league }}</h4>
                     <p class="mb-5">
@@ -75,6 +76,7 @@
             {% for match in finished_matches %}
                 {% user_check_bet user=user match=match as won %}
                 <div class="col-lg-6 mb-4">
+                    <a href="{{ match.get_absolute_url }}">
                     <div class="bg-light p-4 rounded">
                       <div class="widget-body">
                           <div class="widget-vs">
@@ -105,9 +107,10 @@
                         <div class="text-center widget-vs-contents mb-4">
                             {% if won == True %}<h4>WIN</h4>{% elif won == False %}<h4>LOSE</h4>{% endif %}
                         </div>
-
                     </div>
+                </a>
                 </div>
+
             {% endfor %}
 
         </div>
