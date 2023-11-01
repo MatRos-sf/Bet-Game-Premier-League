@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import register, ProfileDetailView, home
+from .views import register, ProfileDetailView, ProfileListView, home
 
 
 urlpatterns = [
@@ -14,6 +14,7 @@ urlpatterns = [
         LogoutView.as_view(template_name="users/logout.html"),
         name="user-logout",
     ),
+    path("profiles/", ProfileListView.as_view(), name="user-profile-list"),
     path(
         "profile/<str:slag>/", ProfileDetailView.as_view(), name="user-profile-detail"
     ),
