@@ -72,6 +72,18 @@ class Matchweek:
     matches: List[Match]
 
 
+@dataclass
+class TeamStats:
+    team_fb_id: int
+    played: int
+    won: int
+    drawn: int
+    lost: int
+    goals_for: int
+    goals_against: int
+    points: int
+
+
 class PremierLeague:
     API = "http://api.football-data.org/v4/"
 
@@ -80,6 +92,7 @@ class PremierLeague:
         self.season: Season | None = None
         self.teams: List[Team] = []
         self.matchweek: List[Matchweek] = []
+        self.standings: List[TeamStats] = []
 
         self.shortcut_league = "PL"
         self.name_league = "Premier League"
@@ -111,17 +124,20 @@ class PremierLeague:
 
         dataset = response.json()
 
-        # connect with server
+        # set league, season
         self.league = self.get_league(dataset)
         self.season = self.get_season(dataset)
 
-        # get teams
+        # set teams
         self.teams = self.get_teams()
 
-        # get Matches
+        # set matches and matchweeks
         matches = self.get_matches(self.season.start_date.year)
         # sort and create Matchweek
         self.matchweek = self.get_matchweeks(matches)
+
+        # set current standing
+        self.standings = self.get_standings()
 
     def get_league(self, dataset: dict):
         name = dataset["name"]
@@ -211,6 +227,9 @@ class PremierLeague:
         return matches
 
     def get_matchweeks(self, matches: List[Match]) -> List[Matchweek]:
+        """
+        The method splits a list of matches by Matchweek and returns a list of Matchweeks.        :param matches:
+        """
         from operator import attrgetter
 
         all_matchweek = (len(self.teams) * 2) - 1
@@ -229,8 +248,45 @@ class PremierLeague:
                 finished=end_date > datetime.now(),
                 matches=mw_matches,
             )
+            matchweeks.append(matchweek_obj)
 
-        return matchweek_obj
+        return matchweeks
+
+    def get_standings(self) -> List[TeamStats] | None:
+        """
+        The method that retrieves information about league ranking
+        """
+
+        url = self.__get_full_url(self.url_standings)
+        succeed, response = self.__get_response(url)
+
+        if not succeed and response.status_code != 200:
+            return
+
+        dataset = response.json()["standings"][0]["table"]
+
+        teams_standings = []
+
+        for position in dataset:
+            team = TeamStats(
+                team_fb_id=position["team"]["id"],
+                played=position["playedGames"],
+                won=position["won"],
+                drawn=position["draw"],
+                lost=position["lost"],
+                goals_for=position["goalsFor"],
+                goals_against=position["goalsAgainst"],
+                points=position["points"],
+            )
+
+            teams_standings.append(team)
+
+        return teams_standings
+
+    def convert_season_to_dict(self):
+        if not self.season:
+            raise AttributeError("The season attribute is None!")
+        return self.season.__dict__
 
     # below probably delete
     def get_info_currently_league(self) -> Dict[str, str] | None:
@@ -267,39 +323,6 @@ class PremierLeague:
         }
 
         return season
-
-    def get_current_standings(
-        self,
-    ) -> Tuple[str, List[Dict[str, str]]] | Tuple[None, None]:
-        url = self.__get_full_url(self.url_standings)
-        succeed, response = self.__get_response(url)
-
-        if not succeed:
-            return None, None
-
-        data = response.json()
-
-        season_id: str = data["season"]["id"]
-
-        table = data["standings"][0]["table"]
-
-        pl_table = []
-
-        for position in table:
-            payload = {}
-
-            payload["fb_id"] = position["team"]["id"]
-            payload["played"] = position["playedGames"]
-            payload["won"] = position["won"]
-            payload["drawn"] = position["draw"]
-            payload["lost"] = position["lost"]
-            payload["goals_for"] = position["goalsFor"]
-            payload["goals_against"] = position["goalsAgainst"]
-            payload["points"] = position["points"]
-
-            pl_table.append(payload)
-
-        return season_id, pl_table
 
     def get_matches_result(
         self, mw: int, year: int
