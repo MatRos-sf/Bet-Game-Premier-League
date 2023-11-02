@@ -1,8 +1,11 @@
 import os
-
+from dataclasses import dataclass
 import requests
 from typing import Dict, List, Tuple
 from dotenv import load_dotenv
+from datetime import datetime
+from django.utils import timezone
+from time import sleep
 
 load_dotenv()
 
@@ -11,10 +14,74 @@ HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
 
 
 # https://reqbin.com/code/python/3zdpeao1/python-requests-timeout-example
+
+
+@dataclass
+class League:
+    name: str
+    country: str
+    emblem: str
+
+
+@dataclass
+class Season:
+    fb_id: int
+    start_date: datetime.date
+    end_date: datetime.date
+    league: League
+    matchweek: int
+    is_currently: bool
+
+
+@dataclass
+class Team:
+    fb_id: int
+    name: str
+    short_name: str
+    shortcut: str
+    currently_league: League | None
+    crest: str
+    website: str
+    club_colours: str
+
+    def __repr__(self):
+        return f"{self.name}"
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+@dataclass
+class Match:
+    home_team_id: int
+    away_team_id: int
+    start_date: datetime.date
+    home_goals: int
+    away_goals: int
+    finished: bool
+    matchweek: int
+
+
+@dataclass
+class Matchweek:
+    matchweek: int
+    start_date: datetime.date
+    end_date: datetime.date
+    season: Season
+    finished: bool
+    matches: List[Match]
+
+
 class PremierLeague:
     API = "http://api.football-data.org/v4/"
 
     def __init__(self):
+        self.league: League | None = None
+        self.season: Season | None = None
+        self.teams: List[Team] = []
+        self.matchweek: List[Matchweek] = []
+
+        self.shortcut_league = "PL"
         self.name_league = "Premier League"
         self.url_competitions: str = "competitions/PL/teams"
         self.url_current_season: str = "competitions/PL"
@@ -32,8 +99,140 @@ class PremierLeague:
             response = requests.get(url=url, headers=self.headers, timeout=5)
         except requests.exceptions.Timeout:
             return False, None
+
         return True, response
 
+    def pull(self):
+        url = self.__get_full_url(self.url_current_season)
+        succeed, response = self.__get_response(url)
+
+        if not succeed or response.status_code != 200:
+            return
+
+        dataset = response.json()
+
+        # connect with server
+        self.league = self.get_league(dataset)
+        self.season = self.get_season(dataset)
+
+        # get teams
+        self.teams = self.get_teams()
+
+        # get Matches
+        matches = self.get_matches(self.season.start_date.year)
+        # sort and create Matchweek
+        self.matchweek = self.get_matchweeks(matches)
+
+    def get_league(self, dataset: dict):
+        name = dataset["name"]
+        country = dataset["area"]["name"]
+        emblem = dataset["emblem"]
+
+        return League(name, country, emblem)
+
+    def get_season(self, dataset: dict):
+        if not self.league:
+            raise ValueError("You don't set League!")
+
+        fb_id = dataset["currentSeason"]["id"]
+        start_date = datetime.strptime(
+            dataset["currentSeason"]["startDate"], "%Y-%m-%d"
+        )
+        end_date = datetime.strptime(dataset["currentSeason"]["endDate"], "%Y-%m-%d")
+        matchweek = dataset["currentSeason"]["currentMatchday"]
+        is_currently = dataset["currentSeason"]["winner"] == None
+
+        return Season(
+            fb_id=fb_id,
+            start_date=start_date,
+            end_date=end_date,
+            matchweek=matchweek,
+            is_currently=is_currently,
+            league=self.league,
+        )
+
+    def get_teams(self, league: League = None):
+        """
+        The method retrieves information about teams. It returns a list of Team objects.
+        """
+        url = self.__get_full_url(self.url_competitions)
+        succeed, response = self.__get_response(url)
+
+        if not succeed:
+            return
+        dataset = response.json()["teams"]
+
+        teams: List[Team] = []
+
+        for team in dataset:
+            team_obj = Team(
+                fb_id=team["id"],
+                name=team["name"],
+                short_name=team["shortName"],
+                shortcut=team["tla"],
+                crest=team["crest"],
+                website=team["website"],
+                club_colours=team["clubColors"],
+                currently_league=league,
+            )
+
+            teams.append(team_obj)
+
+        return teams
+
+    def get_matches(self, year: int, finished: bool = True) -> List[Match] | None:
+        """
+        The method retrieves information about all season matches.
+        It returns a list of Match objects.
+        """
+        url = self.__get_full_url(self.url_matchweek, [f"&season={str(year)}"])
+        succeed, response = self.__get_response(url)
+
+        if not succeed:
+            return
+
+        dataset = response.json()
+
+        matches = list()
+
+        for match in dataset["matches"]:
+            match_obj = Match(
+                home_team_id=match["homeTeam"]["id"],
+                away_team_id=match["awayTeam"]["id"],
+                start_date=datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ"),
+                home_goals=match["score"]["fullTime"]["home"],
+                away_goals=match["score"]["fullTime"]["away"],
+                finished=match["status"] == "FINISHED",
+                matchweek=match["matchday"],
+            )
+
+            matches.append(match_obj)
+
+        return matches
+
+    def get_matchweeks(self, matches: List[Match]) -> List[Matchweek]:
+        from operator import attrgetter
+
+        all_matchweek = (len(self.teams) * 2) - 1
+        matchweeks = list()
+        matches = sorted(matches, key=attrgetter("matchweek", "start_date"))
+
+        for mw in range(1, all_matchweek):
+            mw_matches = [match for match in matches if match.matchweek == mw]
+            start_date = mw_matches[0].start_date
+            end_date = mw_matches[-1].start_date
+            matchweek_obj = Matchweek(
+                matchweek=mw,
+                start_date=start_date,
+                end_date=end_date,
+                season=self.season,
+                finished=end_date > datetime.now(),
+                matches=mw_matches,
+            )
+
+        return matchweek_obj
+
+    # below probably delete
     def get_info_currently_league(self) -> Dict[str, str] | None:
         url = self.__get_full_url(self.url_competitions)
         succeed, response = self.__get_response(url)
@@ -49,36 +248,6 @@ class PremierLeague:
         }
 
         return league
-
-    def get_info_currently_teams_in_league(
-        self,
-    ) -> Tuple[str, List[Dict[str, str]] | None]:
-        url = self.__get_full_url(self.url_competitions)
-        succeed, response = self.__get_response(url)
-
-        if not succeed:
-            return
-        data = response.json()
-
-        league_name = data["competition"]["name"]
-        response_teams_ino = data["teams"]
-
-        teams = []
-
-        for team in response_teams_ino:
-            team_payload = {
-                "fb_id": team["id"],
-                "name": team["name"],
-                "short_name": team["shortName"],
-                "shortcut": team["tla"],
-                "crest": team["crest"],
-                "website": team["website"],
-                "club_colours": team["clubColors"],
-            }
-
-            teams.append(team_payload)
-
-        return league_name, teams
 
     def get_info_current_season(self) -> Dict[str, str] | None:
         url = self.__get_full_url(self.url_current_season)
@@ -131,40 +300,6 @@ class PremierLeague:
             pl_table.append(payload)
 
         return season_id, pl_table
-
-    def get_matchweek(
-        self, value, year=None
-    ) -> Tuple[Dict[str, str], List[Dict[str, str]]] | Tuple[None, None]:
-        url = self.__get_full_url(self.url_matchweek, [f"?matchday={str(value)}"])
-
-        if year:
-            url += f"&season={str(year)}"
-
-        succeed, response = self.__get_response(url)
-
-        if not succeed:
-            return None, None
-
-        data = response.json()
-
-        matchweek_data = data
-        matches_data = data["matches"]
-
-        matchweek = dict()
-
-        matchweek["start_date"] = matchweek_data["resultSet"]["first"]
-        matchweek["end_date"] = matchweek_data["resultSet"]["last"]
-
-        matches = list()
-        for match in matches_data:
-            payload = dict()
-
-            payload["home_team_id"] = match["homeTeam"]["id"]
-            payload["away_team_id"] = match["awayTeam"]["id"]
-            payload["start_date"] = match["utcDate"]
-
-            matches.append(payload)
-        return matchweek, matches
 
     def get_matches_result(
         self, mw: int, year: int

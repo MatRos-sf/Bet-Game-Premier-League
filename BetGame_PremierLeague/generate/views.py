@@ -69,7 +69,7 @@ class GenerateLeagueView(LoginRequiredMixin, UserPassesTestMixin, View):
 class GenerateTeamsView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         pl = PremierLeague()
-        name_league, teams = pl.get_info_currently_teams_in_league()
+        name_league, teams = pl.get_teams()
 
         if not name_league and not teams:
             messages.error(
