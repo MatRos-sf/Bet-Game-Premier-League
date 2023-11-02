@@ -59,3 +59,12 @@ def set_bet(request, pk: int, choice: str):
     bet.save(update_fields=["choice"])
 
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+
+class UserFinishedBetsListView(LoginRequiredMixin, ListView):
+    model = Bet
+    template_name = "bet/user_finished_bets.html"
+
+    def get_queryset(self):
+        qs = self.model.objects.filter(user=self.request.user, is_active=False)
+        return qs
