@@ -53,7 +53,7 @@
                   <li><a href="{% url 'user-profile-detail' user.username %}" class="nav-link">Profile</a></li>
                   <li><a href="{% url 'bet-home' %}" class="nav-link">Bets</a></li>
                   <li><a href="{% url 'user-profile-list' %}" class="nav-link">Players</a></li>
-                  <li><a href="blog.html" class="nav-link">Blog</a></li>
+                  <li><a href="{% url 'match-season-results' %}" class="nav-link">Results</a></li>
                   <li><a href="contact.html" class="nav-link">Contact</a></li>
                   <li><a href="{% url 'user-logout' %}" class="nav-link">Log Out</a></li>
               {% else %}

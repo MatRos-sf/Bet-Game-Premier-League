@@ -1,0 +1,65 @@
+{% extends 'bet/index.html'%}
+{% load crispy_forms_tags %}
+{% load bet_tags %}
+
+{% block title %}Bets{% endblock %}
+
+{% block bg_section %}
+<div class="col-lg-9 mx-auto text-center" xmlns="http://www.w3.org/1999/html">
+        <h1 class="text-white">Results</h1>
+        <p>Season {{ season_name }}</p>
+    </div>
+
+{% endblock %}
+
+{% block content %}
+    <!-- Upcoming section -->
+    <div class="site-section bg-dark">
+      <div class="container">
+
+        <!-- Finished Matches -->
+        <div class="row">
+          <div class="col-12 title-section">
+            <h2 class="heading">Finished Matches</h2>
+          </div>
+            {% for match in object_list %}
+                <div class="col-lg-6 mb-4">
+                    <a href="{{ match.get_absolute_url }}">
+                    <div class="bg-light p-4 rounded">
+                      <div class="widget-body">
+                          <div class="widget-vs">
+                            <div class="d-flex align-items-center justify-content-around justify-content-between w-100">
+                              <div class="team-1 text-center">
+                                <img src="{{ match.home_team.crest}}" alt="Team">
+                                <h3>{{ match.home_team.short_name}}</h3>
+                              </div>
+
+                              <div class="team-1 text-center score">
+                                <h1 >{{ match.home_goals }}</h1>
+                              </div>
+                              <div class="team-1 text-center score">
+                                <h1 >:</h1>
+                              </div>
+                              <div class="team-1 text-center score">
+                                <h1>{{ match.away_goals }}</h1>
+                              </div>
+
+                              <div class="team-2 text-center">
+                                <img src="{{ match.away_team.crest}}" alt="Team">
+                                <h3>{{ match.away_team.short_name}}</h3>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                    </div>
+                </a>
+                </div>
+
+            {% endfor %}
+
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
