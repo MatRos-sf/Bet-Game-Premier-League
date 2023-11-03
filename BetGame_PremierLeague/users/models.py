@@ -22,11 +22,13 @@ class Profile(models.Model):
     )
     description = models.TextField(max_length=500, blank=True, null=True)
 
+    # TODO to del
     @property
     def all_points(self):
         points = self.points.aggregate(total_points=Sum("points"))["total_points"]
         return points if points else 0
 
+    # TODO to del
     @property
     def current_season_points(self):
         points = self.points.filter(current=True).aggregate(total_points=Sum("points"))[
@@ -67,3 +69,12 @@ class SeasonPoints(models.Model):
 
     def __str__(self):
         return f"Season Points: {self.profile.user.username}, {self.points}"
+
+
+class UserScores(models.Model):
+    profile = models.ForeignKey(
+        Profile, related_name="points", on_delete=models.CASCADE
+    )
+    points = models.IntegerField(default=0)
+    description = models.TextField(max_length=500)
+    got = models.DateTimeField(auto_now_add=True)

@@ -4,13 +4,15 @@ from django.views.generic import DetailView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
-from .models import Profile
+from django.db.models import Avg, Sum, Max, F
+
+from .models import Profile, UserScores
+from .forms import UserRegisterForm
 from league.models import TeamStats
 from match.models import Match
-from .forms import UserRegisterForm
-from .models import SeasonPoints
 from bet.models import Bet
-from django.db.models import Avg, Sum, Max, F
+
+from .models import SeasonPoints
 
 
 def home(request):
