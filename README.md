@@ -1,6 +1,6 @@
-# Bet Game Premier League 
+# Bet Game Premier League
 
-## Opis projektu: 
+## Opis projektu:
 Aplikacja typowania meczy PL to platforma, która umożliwia użytkownikom typowanie wyników meczów w danym sezonie ligowym. Użytkownicy zdobywają punkty za poprawne typy i rywalizują ze znajomymi o pierwsze miejsce na tabeli sezonu oraz wyniki konkretnej kolejki.
 
 ## Główne funkcje projektu:

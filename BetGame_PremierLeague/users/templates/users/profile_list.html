@@ -1,0 +1,132 @@
+{% extends 'bet/index.html'%}
+{% load crispy_forms_tags %}
+{% load bet_tags %}
+
+{% block title %}Home{% endblock %}
+
+
+{% block bg_section %}
+    <div class="col-lg-9 mx-auto text-center">
+        <h1 class="text-white">Players</h1>
+        <p><span>With us {{ amt_players }} player{% if amt_players > 1 %}s{% endif %}</span></p>
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    <div class="latest-news">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 title-section">
+            <h2 class="heading">User Predictions!</h2>
+          </div>
+        </div>
+        <div class="sidebar-box">
+          <form method="GET" class="search-form">
+            <div class="form-group">
+              <span class="icon fa fa-search"></span>
+              <input type="text" name='username' class="form-control" placeholder="Type a username and hit enter">
+            </div>
+          </form>
+        </div>
+          {% for u in object_list %}
+                <h1><a href="{{ u.get_absolute_url }}">{{ u.user.username }}</a></h1>
+          {% endfor %}
+      </div>
+    </div>
+    <div class="site-section bg-dark">
+        <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+              <div class="col-12 title-section">
+                <h2 class="heading">Top 10 users!</h2>
+              </div>
+              <div class="widget-next-match">
+              <table class="table custom-table">
+                <thead>
+                  <tr>
+                    <th>P</th>
+                    <th>User</th>
+                    <th>PTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for u in top_ten %}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong class="text-white">{{ u.profile__user__username }}</strong></td>
+                        <td>{{ u.total_points }}</td>
+                      </tr>
+                  {% endfor %}
+
+                </tbody>
+              </table>
+            </div>
+            </div>
+          <div class="col-lg-6">
+              <div class="col-12 title-section">
+                <h2 class="heading">Top 10 currently users!</h2>
+              </div>
+            <div class="widget-next-match">
+              <table class="table custom-table">
+                <thead>
+                  <tr>
+                    <th>P</th>
+                    <th>User</th>
+                    <th>PTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for u in top_ten_current %}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong class="text-white">{{ u.profile__user__username }}</strong></td>
+                        <td>{{ u.total_points }}</td>
+                      </tr>
+                  {% endfor %}
+
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div> <!-- .site-section -->
+
+    <div class="site-section">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-lg-6">
+              <div class="col-12 title-section">
+                <h2 class="heading">Top 10 currently users!</h2>
+              </div>
+            <div class="widget-next-match">
+              <table class="table custom-table ">
+                <thead>
+                  <tr>
+                    <th>P</th>
+                    <th>User</th>
+                    <th>PTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for u in following %}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong class="text-white">{{ u.username }}</strong></td>
+                        <td>{{ u.profile.all_points }}</td>
+                      </tr>
+                  {% endfor %}
+
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+{% endblock %}
