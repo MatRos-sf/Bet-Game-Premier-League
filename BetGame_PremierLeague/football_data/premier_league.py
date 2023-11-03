@@ -212,10 +212,13 @@ class PremierLeague:
         matches = list()
 
         for match in dataset["matches"]:
+            date = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
+            date = timezone.make_aware(date, timezone=timezone.utc)
+
             match_obj = Match(
                 home_team_id=match["homeTeam"]["id"],
                 away_team_id=match["awayTeam"]["id"],
-                start_date=datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ"),
+                start_date=date,
                 home_goals=match["score"]["fullTime"]["home"],
                 away_goals=match["score"]["fullTime"]["away"],
                 finished=match["status"] == "FINISHED",
@@ -228,7 +231,7 @@ class PremierLeague:
 
     def get_matchweeks(self, matches: List[Match]) -> List[Matchweek]:
         """
-        The method splits a list of matches by Matchweek and returns a list of Matchweeks.        :param matches:
+        The method splits a list of matches by Matchweek and returns a list of Matchweeks.
         """
         from operator import attrgetter
 
@@ -245,7 +248,7 @@ class PremierLeague:
                 start_date=start_date,
                 end_date=end_date,
                 season=self.season,
-                finished=end_date > datetime.now(),
+                finished=end_date < timezone.now(),
                 matches=mw_matches,
             )
             matchweeks.append(matchweek_obj)
@@ -286,6 +289,11 @@ class PremierLeague:
     def convert_season_to_dict(self):
         if not self.season:
             raise AttributeError("The season attribute is None!")
+        return self.season.__dict__
+
+    def convert_league_to_dict(self):
+        if not self.league:
+            raise AttributeError("The league attribute is None!")
         return self.season.__dict__
 
     # below probably delete
