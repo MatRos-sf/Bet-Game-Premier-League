@@ -75,7 +75,7 @@
             <h2 class="mb-1">{{ object.user.username }}</h2>
             <span class="meta">Joined {{ object.user.date_joined }}</span> <!--TODO format date date May 20, 2020 -->
             <h3 class="mb-1">Points:  {{ object.all_points  }}<span class="mx-2">&bullet;</span>{{ object.current_season_points  }}</h3>
-            <h3 class="mb-1">Rank: ?21? </h3> <!-- TODO rank -->
+            <h3 class="mb-1">Rank: {{ rank }} </h3> <!-- TODO rank -->
             <h3 class="mb-1">Following:  {{ amt_following }}</h3>
             <h3 class="mb-1">Followers:  {{ amt_followers }}</h3>
         </div>
@@ -98,7 +98,7 @@
                 <div class="custom-media d-flex">
                   <div class="form-group">
                     <!-- TODO setting -->
-                    <input type="submit" value="Settings" class="btn btn-primary py-3 px-4 text-white">
+                      <a type="submit" href="{% url 'user-profile-edit' object.user.username %}" class="btn btn-primary py-3 px-4 text-white">Setting</a>
                   </div>
 
               </div>

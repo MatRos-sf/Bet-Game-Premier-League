@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import register, ProfileDetailView, ProfileListView, home
+from .views import register, ProfileDetailView, ProfileListView, home, edit_profile
 
 
 urlpatterns = [
@@ -18,4 +18,5 @@ urlpatterns = [
     path(
         "profile/<str:slag>/", ProfileDetailView.as_view(), name="user-profile-detail"
     ),
+    path("profile/<str:username>/edit/", edit_profile, name="user-profile-edit"),
 ]

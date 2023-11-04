@@ -5,14 +5,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.db.models import Avg, Sum, Max, F
+from django.contrib.auth.decorators import login_required
 
 from .models import Profile, UserScores
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, ProfileUpdate
 from league.models import TeamStats
 from match.models import Match
 from bet.models import Bet
-
-from .models import SeasonPoints
 
 
 def home(request):
@@ -74,6 +73,12 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         win_rate = Bet.objects.aggregate(win_rate=Avg("is_won"))["win_rate"]
         context["win_rate"] = round(win_rate * 100, 2)
 
+        profiles = Profile.objects.annotate(
+            total_points=Sum("points__points")
+        ).order_by(F("total_points").desc())
+        rank = list(profiles.values_list("id", flat=True)).index(instance.pk) + 1
+        context["rank"] = rank
+
         return context
 
 
@@ -103,7 +108,7 @@ class ProfileListView(LoginRequiredMixin, ListView):
 
         # top 10 users
         top_ten_user = (
-            SeasonPoints.objects.values("profile__user__username")
+            UserScores.objects.values("profile__user__username")
             .annotate(total_points=Sum("points"))
             .order_by("-total_points")[:10]
         )
@@ -111,8 +116,7 @@ class ProfileListView(LoginRequiredMixin, ListView):
 
         # top 10 currently season user
         top_ten_current_user = (
-            SeasonPoints.objects.filter(current=True)
-            .values("profile__user__username")
+            UserScores.objects.values("profile__user__username")
             .annotate(total_points=Sum("points"))
             .order_by("-total_points")[:10]
         )
@@ -125,4 +129,19 @@ class ProfileListView(LoginRequiredMixin, ListView):
         return context
 
 
-# TODO: setting: edit profile, passsword, picture,
+@login_required
+def edit_profile(request, username):
+    if request.user.username != username:
+        messages.warning(request, "You can only update own profile!")
+        return redirect("user-profile-detail", slag=request.user.username)
+
+    user_profile = get_object_or_404(Profile, user__username=username)
+    form = ProfileUpdate(instance=user_profile)
+
+    if request.method == "POST":
+        form = ProfileUpdate(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect("user-profile-edit", username=username)
+
+    return render(request, "users/edit_form.html", {"form": form})

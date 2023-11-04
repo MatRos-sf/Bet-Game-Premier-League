@@ -80,7 +80,7 @@
                   {% for u in top_ten_current %}
                       <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td><strong class="text-white">{{ u.profile__user__username }}</strong></td>
+                        <td><a href="{% url 'user-profile-detail' u.profile__user__username %}"><strong class="text-white">{{ u.profile__user__username }}</strong></a></td>
                         <td>{{ u.total_points }}</td>
                       </tr>
                   {% endfor %}
@@ -115,7 +115,7 @@
                   {% for u in following %}
                       <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td><strong class="text-white">{{ u.username }}</strong></td>
+                        <td><a href="{{ u.profile.get_absolute_url }}"><strong class="text-white">{{ u.username }}</strong></a></td>
                         <td>{{ u.profile.all_points }}</td>
                       </tr>
                   {% endfor %}

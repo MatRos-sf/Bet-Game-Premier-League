@@ -31,9 +31,7 @@ class Profile(models.Model):
     # TODO to del
     @property
     def current_season_points(self):
-        points = self.points.filter(current=True).aggregate(total_points=Sum("points"))[
-            "total_points"
-        ]
+        points = self.points.aggregate(total_points=Sum("points"))["total_points"]
         return points or 0
 
     @classmethod
@@ -59,16 +57,16 @@ class Profile(models.Model):
         return f"Profile: {self.user.username}"
 
 
-class SeasonPoints(models.Model):
-    profile = models.ForeignKey(
-        Profile, related_name="points", on_delete=models.CASCADE
-    )
-    points = models.IntegerField(default=0)
-    season = models.ForeignKey("league.Season", on_delete=models.CASCADE)
-    current = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"Season Points: {self.profile.user.username}, {self.points}"
+# class SeasonPoints(models.Model):
+#     profile = models.ForeignKey(
+#         Profile, related_name="points", on_delete=models.CASCADE
+#     )
+#     points = models.IntegerField(default=0)
+#     season = models.ForeignKey("league.Season", on_delete=models.CASCADE)
+#     current = models.BooleanField(default=True)
+#
+#     def __str__(self):
+#         return f"Season Points: {self.profile.user.username}, {self.points}"
 
 
 class UserScores(models.Model):
