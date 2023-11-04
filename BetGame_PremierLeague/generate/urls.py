@@ -18,4 +18,5 @@ urlpatterns = [
         v.UpdateCurrentlyMatchweekView.as_view(),
         name="generate-update-currently",
     ),
+    path("bets/", v.generate_bet),
 ]

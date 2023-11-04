@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.generic import DetailView, ListView
@@ -71,7 +73,9 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         context["self"] = self.request.user == instance.user
         context["amt_bets"] = Bet.objects.filter(user=self.request.user).count()
         win_rate = Bet.objects.aggregate(win_rate=Avg("is_won"))["win_rate"]
-        context["win_rate"] = round(win_rate * 100, 2)
+
+        if win_rate:
+            context["win_rate"] = round(win_rate * 100, 2)
 
         profiles = Profile.objects.annotate(
             total_points=Sum("points__points")
@@ -141,7 +145,13 @@ def edit_profile(request, username):
     if request.method == "POST":
         form = ProfileUpdate(request.POST, request.FILES, instance=user_profile)
         if form.is_valid():
+            old_photo = Profile.objects.get(user__username=username)
+            if old_photo.image.url != "/media/default.jpg":
+                old_photo_path = old_photo.image.path
+                if os.path.exists(old_photo_path):
+                    os.remove(old_photo_path)
             form.save()
+
             return redirect("user-profile-edit", username=username)
 
     return render(request, "users/edit_form.html", {"form": form})

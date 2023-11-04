@@ -21,6 +21,9 @@ class Matchweek(models.Model):
 
     finished = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ["start_date"]
+
     @property
     def status(self):
         """

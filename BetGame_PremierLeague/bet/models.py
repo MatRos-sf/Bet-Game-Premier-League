@@ -19,15 +19,15 @@ class Bet(models.Model):
     is_won = models.BooleanField(blank=True, null=True)
 
     # TODO kiedy is_active ma się zmieniać na false ( wtedy  kiedy rozpoczyna się kolejka)
-    def winner(self):
-        if self.is_won:
+    def check_bet(self):
+        if isinstance(self.is_won, bool):
             return self.is_won
-
         won, _ = self.match.winner
         # TODO musi być is_active = False
-        if won:
+        if isinstance(won, str):
             self.is_won = won == self.choice
-            self.save(update_fields=["is_won"])
+            self.is_active = False
+            self.save()
         return self.is_won
 
     class Meta:

@@ -5,13 +5,15 @@ from django.contrib import messages
 from typing import List
 from http import HTTPStatus
 from django.core.exceptions import FieldError
-from django.http import HttpResponseRedirect
+from django.contrib.auth.models import User
 
+import random
 
 from league.models import League, Team, Season, TeamStats
 from league.forms import TeamForm
 from match.models import Matchweek, Match
 from football_data.premier_league import PremierLeague
+from bet.models import Bet
 
 
 def generate(request):
@@ -277,3 +279,22 @@ class UpdateCurrentlyMatchweekView(LoginRequiredMixin, UserPassesTestMixin, View
 
     def test_func(self):
         return self.request.user.is_superuser
+
+
+def generate_bet(request):
+    all_users = User.objects.all()
+    for user in all_users:
+        matchweeks = Matchweek.objects.filter(finished=True)
+
+        for matchweek in matchweeks:
+            matches = matchweek.matches.all()
+
+            for match in matches:
+                bet = Bet.objects.create(
+                    match=match,
+                    user=user,
+                    choice=random.choice(["home", "draw", "away"]),
+                )
+
+                bet.winner()
+    return redirect("bet-home")

@@ -12,13 +12,7 @@ from .models import Bet
 class BetsListView(LoginRequiredMixin, ListView):
     model = Match
     context_object_name = "matches"
-
-    def get_template_names(self):
-        obj = Matchweek.objects.first()
-        # TODO 2 różne template
-        if obj.status == "Now":
-            return ["bet/home.html"]
-        return ["bet/home.html"]
+    template_name = "bet/home.html"
 
     def get_queryset(self):
         matches = Matchweek.objects.filter(finished=False).first()

@@ -76,3 +76,7 @@ class UserScores(models.Model):
     points = models.IntegerField(default=0)
     description = models.TextField(max_length=500)
     got = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def render_description(pt, action):
+        return f"{pt} pt for: {action}."
