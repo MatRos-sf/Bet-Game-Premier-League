@@ -14,6 +14,7 @@ class Bet(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     choice = models.CharField(max_length=20, choices=choices, default="none")
+    risk = models.BooleanField(default=False)
 
     is_active = models.BooleanField(default=True)
     is_won = models.BooleanField(blank=True, null=True)

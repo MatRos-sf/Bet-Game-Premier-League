@@ -55,11 +55,21 @@
                       <strong class="text-primary">New Euro Arena</strong>
                     </p>
                     {% if is_started %}
-                      <div class="form-group">
-                        <a type="submit" class="btn {% if chose == 'home' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" href="{% url 'bet-set' match.id 'home'%}" >{{ match.home_team.short_name}}</a>
-                        <a type="submit" class="btn {% if chose == 'draw' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" href="{% url 'bet-set' match.id 'draw'%}">Draw</a>
-                        <a type="submit" class="btn {% if chose == 'away' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" href="{% url 'bet-set' match.id 'away'%}">{{ match.away_team.short_name}}</a>
-                        </div>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <button type="submit" class="btn {% if chose == 'home' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="home {{ match.id }}">{{ match.home_team.short_name}}</button>
+                                <button type="submit" class="btn {% if chose == 'draw' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="draw {{ match.id }}">Draw</button>
+                                <button type="submit" class="btn {% if chose == 'away' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="away {{ match.id }}">{{ match.away_team.short_name}}</button>
+                            </div>
+                            {% user_risk match user as risk %}
+                                {% if not risk %}
+                                    <input class='form-check-input' type="checkbox" id="id_risk" name="risk" value="True" >
+                                    <label for="id_risk">Risk:></label>
+                                {% endif %}
+
+                        </form>
+
                     {% endif %}
                   </div>
 

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "match",
     "bet",
     "generate",
+    "event",
     "crispy_forms",
     "crispy_bootstrap5",
     "django.contrib.admin",
@@ -142,3 +143,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_REDIRECT_URL = "bet-home"
 LOGIN_URL = "user-login"
+
+API_TOKEN = str(os.getenv("API_TOKEN"))

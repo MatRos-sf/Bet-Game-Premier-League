@@ -7,6 +7,7 @@ from django.contrib import messages
 
 from match.models import Match, Matchweek
 from .models import Bet
+from .forms import RiskForm
 
 
 class BetsListView(LoginRequiredMixin, ListView):
@@ -22,26 +23,44 @@ class BetsListView(LoginRequiredMixin, ListView):
         context = super(BetsListView, self).get_context_data(**kwargs)
 
         mw = context["matches"].first().matchweek
-        matchweek_is_started = mw.is_editable
+        matchweek_is_started = True  # TODO release: mw.is_editable
 
         context["is_started"] = matchweek_is_started
         finished_matches = Match.objects.filter(matchweek=mw, finished=True)
         context["finished_matches"] = finished_matches
 
+        # form = RiskForm(initial={'risk': True})
+        form = RiskForm()
+        context["form"] = form
+
         return context
+
+    def post(self, request, *args, **kwargs):
+        cd = request.POST
+        choice, match_pk = cd.get("bet").split()
+        risk = cd.get("risk", False)
+        bet, _ = Bet.objects.get_or_create(
+            match=Match.objects.get(pk=match_pk), user=request.user
+        )
+
+        bet.choice = choice
+        bet.risk = risk
+        bet.save()
+
+        return self.get(request)
 
 
 @login_required
 def set_bet(request, pk: int, choice: str):
     match = Match.objects.get(id=pk)
-
-    if not match.matchweek.is_editable():
-        messages.error(
-            request,
-            "You cannot change your bet because the matchweek has already started.",
-        )
-        # return redirect("bet-home")
-        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+    # TODO release:
+    # if not match.matchweek.is_editable():
+    #     messages.error(
+    #         request,
+    #         "You cannot change your bet because the matchweek has already started.",
+    #     )
+    #     # return redirect("bet-home")
+    #     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
     bet, created = Bet.objects.get_or_create(user=request.user, match=match)
 

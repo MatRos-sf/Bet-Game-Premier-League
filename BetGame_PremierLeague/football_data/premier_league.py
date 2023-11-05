@@ -1,15 +1,17 @@
 import os
 from dataclasses import dataclass
 import requests
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 from dotenv import load_dotenv
 from datetime import datetime
 from django.utils import timezone
 from time import sleep
+from django.conf import settings
+from http import HTTPStatus
 
 load_dotenv()
 
-HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
+HEADER = {"X-Auth-Token": settings.API_TOKEN}
 # TODO basic Legue gdzie będzie dziedziczone dzięki tej klasie będzie można stworzyć różne ligi
 
 
@@ -102,9 +104,9 @@ class PremierLeague:
         self.url_matchweek: str = "competitions/PL/matches"
         self.headers: Dict[str, str] = HEADER
 
-    def __get_full_url(self, url: str, filter=None):
+    def __get_full_url(self, url: str, filters: Optional[List[str]] = None):
         if filter:
-            return PremierLeague.API + url + "?" + "&".join(filter)
+            return PremierLeague.API + url + "?" + "&".join(filters)
         return PremierLeague.API + url
 
     def __get_response(self, url: str) -> Tuple[bool, requests.Response | None]:
@@ -119,7 +121,7 @@ class PremierLeague:
         url = self.__get_full_url(self.url_current_season)
         succeed, response = self.__get_response(url)
 
-        if not succeed or response.status_code != 200:
+        if not succeed or response.status_code != HTTPStatus.OK:
             return
 
         dataset = response.json()
@@ -358,7 +360,7 @@ class PremierLeague:
         for match in data["matches"]:
             payload = {}
 
-            if match["status"] != "FINISHED":
+            if not match["status"] == "FINISHED":
                 continue
 
             payload["home_team_id"] = match["homeTeam"]["id"]
