@@ -7,7 +7,6 @@ from django.contrib import messages
 
 from match.models import Match, Matchweek
 from .models import Bet
-from .forms import RiskForm
 
 
 class BetsListView(LoginRequiredMixin, ListView):
@@ -28,10 +27,6 @@ class BetsListView(LoginRequiredMixin, ListView):
         context["is_started"] = matchweek_is_started
         finished_matches = Match.objects.filter(matchweek=mw, finished=True)
         context["finished_matches"] = finished_matches
-
-        # form = RiskForm(initial={'risk': True})
-        form = RiskForm()
-        context["form"] = form
 
         return context
 

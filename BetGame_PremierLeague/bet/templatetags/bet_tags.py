@@ -22,6 +22,9 @@ def user_check_bet(**kwargs):
 
 @register.simple_tag
 def user_risk(match, user) -> bool:
+    """
+    The tag which check if user has bet with risk.
+    """
     try:
         bet = Bet.objects.get(user=user, match=match)
         return bet.risk
