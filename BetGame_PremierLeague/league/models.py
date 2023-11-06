@@ -102,12 +102,8 @@ class TeamStats(models.Model):
     # status
 
     @property
-    def goal_difference(self):
+    def goal_difference(self) -> int:
         return int(self.goals_for) - int(self.goals_against)
-
-    def __str__(self):
-        season_date = self.season.start_date.strftime("%y")
-        return f"{self.team.name} {season_date} {self.points}"
 
     @classmethod
     def get_season_table(cls, league: str, season: int = None):
@@ -116,3 +112,27 @@ class TeamStats(models.Model):
         return cls.objects.filter(
             season__start_date__year=season, season__league__name=league
         ).order_by("-points", "-goals_for", "team__name")
+
+    def update_stats(self, team_goal: int, opponent_goal: int) -> None:
+        """
+        Upgrade stats according to give goals.
+        :param team_goal: Goals self.team
+        :param opponent_goal: goals opponent team
+        """
+        if team_goal > opponent_goal:
+            self.points += 3
+            self.won += 1
+        elif team_goal == opponent_goal:
+            self.points += 1
+            self.drawn += 1
+        elif team_goal < opponent_goal:
+            self.lost += 1
+
+        self.played += 1
+        self.goals_for += team_goal
+        self.goals_against += opponent_goal
+        self.save()
+
+    def __str__(self):
+        season_date = self.season.start_date.strftime("%y")
+        return f"{self.team.name} {season_date} {self.points}"

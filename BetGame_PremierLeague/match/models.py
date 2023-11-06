@@ -80,6 +80,9 @@ class Match(models.Model):
     class Meta:
         ordering = ["start_date"]
 
+    def set_score(self, home_goals, away_goals):
+        ...
+
     def get_absolute_url(self):
         return reverse("match-detail", kwargs={"pk": self.pk})
 
