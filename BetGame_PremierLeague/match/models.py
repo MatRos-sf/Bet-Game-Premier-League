@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 from django.urls import reverse
+from django.core.exceptions import ValidationError
 
 
 class Matchweek(models.Model):
@@ -23,6 +24,17 @@ class Matchweek(models.Model):
 
     class Meta:
         ordering = ["start_date"]
+
+    def save(self, *args, **kwargs):
+        super(Matchweek, self).save(*args, **kwargs)
+
+        # check all match finished
+        if self.finished and self.amt_matches != self.matches.filter(finished=True):
+            self.finished = False
+            self.save()
+            raise ValidationError(
+                "The finished field cannot be true unless all matches are finished"
+            )
 
     @property
     def status(self):
@@ -80,8 +92,20 @@ class Match(models.Model):
     class Meta:
         ordering = ["start_date"]
 
-    def set_score(self, home_goals, away_goals):
-        ...
+    def set_score(self, home_goals, away_goals) -> None:
+        """
+        Sets the score and checks all bets relate this match.
+        """
+        if not self.finished:
+            self.home_goals = home_goals
+            self.away_goals = away_goals
+            self.finished = True
+            self.save()
+
+            bets = self.bets.all()
+
+            for bet in bets:
+                bet.check_bet()
 
     def get_absolute_url(self):
         return reverse("match-detail", kwargs={"pk": self.pk})

@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
 import requests
+from requests.exceptions import HTTPError
 from typing import Dict, List, Tuple, Optional
 from dotenv import load_dotenv
 from datetime import datetime
@@ -114,7 +115,7 @@ class PremierLeague:
             return False, None
 
         if response.status_code != HTTPStatus.OK:
-            return False, None
+            raise HTTPError("The status code cannot be different than 200.")
 
         return True, response
 
@@ -142,7 +143,9 @@ class PremierLeague:
         # set current standing
         self.standings = self.get_standings()
 
-    def update_score_matches(self, mw: int, amt_match: int) -> Tuple[List[Match], bool]:
+    def update_score_matches(
+        self, mw: int, amt_match: int
+    ) -> Tuple[List[Match], bool] | Tuple[None, None]:
         """
         Retrieve information on current football matches from football-data. Return provide
         scores feedback and verify if the matchweek is ended.
@@ -153,7 +156,7 @@ class PremierLeague:
         status, response = self.__get_response(url)
 
         if not status:
-            return
+            return None, None
 
         dataset = response.json()
         played_matches = dataset["resultSet"]["played"]

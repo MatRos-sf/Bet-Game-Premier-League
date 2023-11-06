@@ -10,7 +10,9 @@ class Bet(models.Model):
         ("draw", "Draw"),
         ("away", "Away Team"),
     ]
-    match = models.ForeignKey("match.Match", on_delete=models.CASCADE)
+    match = models.ForeignKey(
+        "match.Match", related_name="bets", on_delete=models.CASCADE
+    )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     choice = models.CharField(max_length=20, choices=choices, default="none")
