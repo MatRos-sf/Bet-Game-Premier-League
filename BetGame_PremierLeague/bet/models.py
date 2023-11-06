@@ -17,6 +17,7 @@ class Bet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     choice = models.CharField(max_length=20, choices=choices, default="none")
     risk = models.BooleanField(default=False)
+    risk_date = models.DateTimeField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_won = models.BooleanField(blank=True, null=True)
@@ -32,6 +33,13 @@ class Bet(models.Model):
             self.is_active = False
             self.save()
         return self.is_won
+
+    def save(self, *args, **kwargs):
+        super(Bet, self).save(*args, **kwargs)
+
+        if self.risk and not self.risk_date:
+            self.risk_date = timezone.now()
+            self.save()
 
     class Meta:
         unique_together = ("match", "user")

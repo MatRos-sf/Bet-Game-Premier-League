@@ -19,5 +19,5 @@ urlpatterns = [
         name="generate-update-currently",
     ),
     path("bets/", v.generate_bet),
-    path("updates/", v.update),
+    path("up/", v.update),
 ]

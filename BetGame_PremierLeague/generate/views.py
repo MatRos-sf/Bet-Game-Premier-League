@@ -10,7 +10,6 @@ from django.contrib.auth.models import User
 import random
 
 from league.models import League, Team, Season, TeamStats
-from league.forms import TeamForm
 from match.models import Matchweek, Match
 from football_data.premier_league import PremierLeague
 from bet.models import Bet
@@ -301,13 +300,28 @@ def generate_bet(request):
 
 
 def update(request):
+    from requests.exceptions import HTTPError
+
     matchweek = Matchweek.objects.filter(finished=False).first()
 
     pl = PremierLeague()
-    list_of_matches = pl.update_score_matches(
-        matchweek.matchweek, matchweek.matches.count()
-    )
-    for i in list_of_matches:
-        print(i)
+    try:
+        list_of_matches, _ = pl.update_score_matches(
+            matchweek.matchweek, matchweek.matches.count()
+        )
+    except HTTPError:
+        return HttpResponse("smutno")
 
+    for m in list_of_matches[:6]:
+        # match = Match.objects.get(matchweek=matchweek,
+        #                           home_team__fb_id=m.home_team_id,
+        #                           away_team__fb_id=m.away_team_id)
+        # if match.finished:
+        #     continue
+        #
+        # match.set_score(m.home_goals, m.away_goals)
+        # # update stats
+        # TeamStats.objects.get(team__fb_id=m.home_team_id, season=matchweek.season).update_stats(m.home_goals, m.away_goals)
+        # TeamStats.objects.get(team__fb_id=m.away_team_id, season=matchweek.season).update_stats(m.away_goals, m.home_goals)
+        print(m)
     return HttpResponse("Hello")

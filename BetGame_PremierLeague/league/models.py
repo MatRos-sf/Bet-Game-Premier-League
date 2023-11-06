@@ -23,7 +23,6 @@ class Season(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     league = models.ForeignKey(League, on_delete=models.CASCADE)
-    matchweek = models.PositiveIntegerField(default=1)
 
     is_currently = models.BooleanField(default=True)
 
@@ -31,29 +30,16 @@ class Season(models.Model):
         league = self.league.name
         return f"{league} {self.start_date}"
 
+    @property
+    def matchweek(self) -> int:
+        """
+        Return the number of currently matchweek
+        """
+        return self.current_season.filter(finished=False).first().matchweek
+
     @classmethod
     def get_currently_season(cls, league: str):
         return cls.objects.get(league__name=league, is_currently=True)
-
-    # TODO sprawdzić coś nie działa kiedy próbuje generować sezon pisczy że str nie ma .year
-    # def save(self, *args, **kwargs):
-    #     start_year = self.start_date.year
-    #     end_year = self.end_date.year
-    #     league = self.league
-    #
-    #     if end_year - start_year != 1:
-    #         raise ValidationError(
-    #             "The different between end_data and start_date should equal 0"
-    #         )
-    #
-    #     if Season.objects.filter(
-    #         league=league, start_date__year=start_year, end_date__year=end_year
-    #     ).exists():
-    #         raise ValidationError(
-    #             f"The league {league} already exists in these years ({start_year}-{end_year})."
-    #         )
-    #
-    #     super(Season, self).save(*args, **kwargs)
 
     def get_winner(self):
         pass

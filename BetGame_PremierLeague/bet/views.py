@@ -39,7 +39,10 @@ class BetsListView(LoginRequiredMixin, ListView):
         )
 
         bet.choice = choice
-        bet.risk = risk
+
+        if risk:
+            bet.risk = risk
+
         bet.save()
 
         return self.get(request)

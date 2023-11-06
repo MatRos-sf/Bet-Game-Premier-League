@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass
 import requests
-from requests.exceptions import HTTPError
+from requests.exceptions import HTTPError, Timeout
 from typing import Dict, List, Tuple, Optional
 from dotenv import load_dotenv
 from datetime import datetime
@@ -111,8 +111,8 @@ class PremierLeague:
     def __get_response(self, url: str) -> Tuple[bool, requests.Response | None]:
         try:
             response = requests.get(url=url, headers=self.headers, timeout=5)
-        except requests.exceptions.Timeout:
-            return False, None
+        except Timeout:
+            raise Timeout("Can't connect with server!")
 
         if response.status_code != HTTPStatus.OK:
             raise HTTPError("The status code cannot be different than 200.")
@@ -143,9 +143,7 @@ class PremierLeague:
         # set current standing
         self.standings = self.get_standings()
 
-    def update_score_matches(
-        self, mw: int, amt_match: int
-    ) -> Tuple[List[Match], bool] | Tuple[None, None]:
+    def update_score_matches(self, mw: int) -> List[Match]:
         """
         Retrieve information on current football matches from football-data. Return provide
         scores feedback and verify if the matchweek is ended.
@@ -153,10 +151,7 @@ class PremierLeague:
         url = self.__get_full_url(
             self.url_matchweek, [f"matchday={str(mw)}", "status=FINISHED"]
         )
-        status, response = self.__get_response(url)
-
-        if not status:
-            return None, None
+        _, response = self.__get_response(url)
 
         dataset = response.json()
         played_matches = dataset["resultSet"]["played"]
@@ -167,7 +162,7 @@ class PremierLeague:
             m = self.capture_match(match)
             matches.append(m)
 
-        return matches, played_matches == amt_match
+        return matches
 
     def get_league(self, dataset: dict):
         name = dataset["name"]

@@ -22,20 +22,6 @@ class Matchweek(models.Model):
 
     finished = models.BooleanField(default=False)
 
-    class Meta:
-        ordering = ["start_date"]
-
-    def save(self, *args, **kwargs):
-        super(Matchweek, self).save(*args, **kwargs)
-
-        # check all match finished
-        if self.finished and self.amt_matches != self.matches.filter(finished=True):
-            self.finished = False
-            self.save()
-            raise ValidationError(
-                "The finished field cannot be true unless all matches are finished"
-            )
-
     @property
     def status(self):
         """
@@ -56,6 +42,23 @@ class Matchweek(models.Model):
     @property
     def amt_matches(self) -> int:
         return self.matches.all().count()
+
+    class Meta:
+        ordering = ["start_date"]
+
+    def save(self, *args, **kwargs):
+        super(Matchweek, self).save(*args, **kwargs)
+
+        # check all match finished
+        if (
+            self.finished
+            and self.amt_matches != self.matches.filter(finished=True).count()
+        ):
+            self.finished = False
+            self.save()
+            raise ValidationError(
+                "The finished field cannot be true unless all matches are finished"
+            )
 
     def check_bet_user(self, pk):
         bet = self.bet_set.filter(user_id=pk)
@@ -88,27 +91,6 @@ class Match(models.Model):
     away_goals = models.SmallIntegerField(blank=True, null=True)
 
     finished = models.BooleanField(default=False)
-
-    class Meta:
-        ordering = ["start_date"]
-
-    def set_score(self, home_goals, away_goals) -> None:
-        """
-        Sets the score and checks all bets relate this match.
-        """
-        if not self.finished:
-            self.home_goals = home_goals
-            self.away_goals = away_goals
-            self.finished = True
-            self.save()
-
-            bets = self.bets.all()
-
-            for bet in bets:
-                bet.check_bet()
-
-    def get_absolute_url(self):
-        return reverse("match-detail", kwargs={"pk": self.pk})
 
     @property
     def results(self):
@@ -144,11 +126,26 @@ class Match(models.Model):
     def get_next_matches(cls):
         return cls.objects.filter(finished=False)
 
+    def set_score(self, home_goals, away_goals) -> None:
+        """
+        Sets the score and checks all bets relate this match.
+        """
+        if not self.finished:
+            self.home_goals = home_goals
+            self.away_goals = away_goals
+            self.finished = True
+            self.save()
+
+            bets = self.bets.all()
+
+            for bet in bets:
+                bet.check_bet()
+
+    def get_absolute_url(self):
+        return reverse("match-detail", kwargs={"pk": self.pk})
+
     def has_bet_for_match(self, user):
         return self.bet_set.filter(user=user).exists()
-
-    def winners_bet(self):
-        pass
 
     def get_season_and_league(self) -> Tuple[datetime.date, str]:
         season = self.matchweek.season.start_date
@@ -157,3 +154,6 @@ class Match(models.Model):
 
     def __str__(self):
         return self.results
+
+    class Meta:
+        ordering = ["start_date"]

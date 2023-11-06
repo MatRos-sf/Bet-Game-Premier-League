@@ -26,7 +26,7 @@ def capture_risk_bet(sender, instance: Bet, **kwargs) -> None:
     """
     The signal create UserScore when user click risk.
     """
-    if instance.risk:
+    if instance.risk and not instance.risk_date:
         UserScores.objects.create(
             profile=instance.user.profile,
             points=-1,

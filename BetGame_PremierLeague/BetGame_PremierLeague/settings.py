@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    #'django_q',
+    "django_q",
 ]
 
 MIDDLEWARE = [
@@ -145,3 +145,13 @@ LOGIN_REDIRECT_URL = "bet-home"
 LOGIN_URL = "user-login"
 
 API_TOKEN = str(os.getenv("API_TOKEN"))
+
+Q_CLUSTER = {
+    "name": "DjangORM",
+    "workers": 1,
+    "timeout": 60,
+    "retry": 120,
+    "queue_limit": 50,
+    "bulk": 10,
+    "orm": "default",
+}
