@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
@@ -298,3 +298,16 @@ def generate_bet(request):
 
                 bet.winner()
     return redirect("bet-home")
+
+
+def update(request):
+    matchweek = Matchweek.objects.filter(finished=False).first()
+
+    pl = PremierLeague()
+    list_of_matches = pl.update_score_matches(
+        matchweek.matchweek, matchweek.matches.count()
+    )
+    for i in list_of_matches:
+        print(i)
+
+    return HttpResponse("Hello")

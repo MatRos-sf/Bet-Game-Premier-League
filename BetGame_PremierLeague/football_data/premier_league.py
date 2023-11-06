@@ -12,10 +12,8 @@ from http import HTTPStatus
 load_dotenv()
 
 HEADER = {"X-Auth-Token": settings.API_TOKEN}
+# HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
 # TODO basic Legue gdzie będzie dziedziczone dzięki tej klasie będzie można stworzyć różne ligi
-
-
-# https://reqbin.com/code/python/3zdpeao1/python-requests-timeout-example
 
 
 @dataclass
@@ -90,8 +88,8 @@ class PremierLeague:
     API = "http://api.football-data.org/v4/"
 
     def __init__(self):
-        self.league: League | None = None
-        self.season: Season | None = None
+        self.league: Optional[League] = None
+        self.season: Optional[Season] = None
         self.teams: List[Team] = []
         self.matchweek: List[Matchweek] = []
         self.standings: List[TeamStats] = []
@@ -105,7 +103,7 @@ class PremierLeague:
         self.headers: Dict[str, str] = HEADER
 
     def __get_full_url(self, url: str, filters: Optional[List[str]] = None):
-        if filter:
+        if filters:
             return PremierLeague.API + url + "?" + "&".join(filters)
         return PremierLeague.API + url
 
@@ -115,9 +113,12 @@ class PremierLeague:
         except requests.exceptions.Timeout:
             return False, None
 
+        if response.status_code != HTTPStatus.OK:
+            return False, None
+
         return True, response
 
-    def pull(self):
+    def pull(self) -> None:
         url = self.__get_full_url(self.url_current_season)
         succeed, response = self.__get_response(url)
 
@@ -140,6 +141,30 @@ class PremierLeague:
 
         # set current standing
         self.standings = self.get_standings()
+
+    def update_score_matches(self, mw: int, amt_match: int) -> Tuple[List[Match], bool]:
+        """
+        Retrieve information on current football matches from football-data. Return provide
+        scores feedback and verify if the matchweek is ended.
+        """
+        url = self.__get_full_url(
+            self.url_matchweek, [f"matchday={str(mw)}", "status=FINISHED"]
+        )
+        status, response = self.__get_response(url)
+
+        if not status:
+            return
+
+        dataset = response.json()
+        played_matches = dataset["resultSet"]["played"]
+
+        matches = []
+
+        for match in dataset["matches"]:
+            m = self.capture_match(match)
+            matches.append(m)
+
+        return matches, played_matches == amt_match
 
     def get_league(self, dataset: dict):
         name = dataset["name"]
@@ -214,18 +239,7 @@ class PremierLeague:
         matches = list()
 
         for match in dataset["matches"]:
-            date = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
-            date = timezone.make_aware(date, timezone=timezone.utc)
-
-            match_obj = Match(
-                home_team_id=match["homeTeam"]["id"],
-                away_team_id=match["awayTeam"]["id"],
-                start_date=date,
-                home_goals=match["score"]["fullTime"]["home"],
-                away_goals=match["score"]["fullTime"]["away"],
-                finished=match["status"] == "FINISHED",
-                matchweek=match["matchday"],
-            )
+            match_obj = self.capture_match(match)
 
             matches.append(match_obj)
 
@@ -287,6 +301,22 @@ class PremierLeague:
             teams_standings.append(team)
 
         return teams_standings
+
+    @staticmethod
+    def capture_match(data: dict) -> Match:
+        date = datetime.strptime(data["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
+        date = timezone.make_aware(date, timezone=timezone.utc)
+
+        match_obj = Match(
+            home_team_id=data["homeTeam"]["id"],
+            away_team_id=data["awayTeam"]["id"],
+            start_date=date,
+            home_goals=data["score"]["fullTime"]["home"],
+            away_goals=data["score"]["fullTime"]["away"],
+            finished=data["status"] == "FINISHED",
+            matchweek=data["matchday"],
+        )
+        return match_obj
 
     def convert_season_to_dict(self):
         if not self.season:
