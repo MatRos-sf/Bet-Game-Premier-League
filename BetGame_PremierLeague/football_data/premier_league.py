@@ -154,7 +154,6 @@ class PremierLeague:
         _, response = self.__get_response(url)
 
         dataset = response.json()
-        played_matches = dataset["resultSet"]["played"]
 
         matches = []
 

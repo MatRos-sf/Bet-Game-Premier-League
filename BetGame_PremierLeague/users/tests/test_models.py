@@ -4,20 +4,23 @@ from django.core.files.base import File
 from django.conf import settings
 from django.test import tag
 from parameterized import parameterized, parameterized_class
-
+import factory
 from PIL import Image
 from io import BytesIO
 from typing import Tuple
 import os
 import string
-from unittest import mock
-from unittest.mock import Mock, MagicMock
-
-# import mock
+from django.db.models import signals
 from random import randint, choices
 
 from users.models import Profile
 from league.models import Team
+from .factories.user import (
+    UserFactory,
+    SimpleProfileFactory,
+    ProfileFactory,
+    UserScores,
+)
 
 
 def get_random_name(suffix: str) -> str:
@@ -43,12 +46,21 @@ def get_temporary_image(size: Tuple[int, int], name: str) -> File:
 class ProfileTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        User.objects.create(username="test", password="qjgN2927fQHvs1W")  # nosec
+        user_one = UserFactory(username="JanTest")
+        user_two = UserFactory(username="OlaTest")
+
+        UserScores(profile=user_one.profile, points=100)
+        UserScores(profile=user_one.profile)
+        UserScores(profile=user_two.profile, points=1000)
 
     def setUp(self) -> None:
         self.profile = Profile.objects.get(id=1)
 
-    def test_user_field_is_one_to_one_with_user(self):
+    def test_amt_profiles_should_return_two(self):
+        amt_profile = Profile.objects.count()
+        self.assertEquals(amt_profile, 2)
+
+    def test_user_field_should_one_to_one_with_user(self):
         user = User.objects.get(id=1)
         self.assertEquals(user, self.profile.user)
 
@@ -116,40 +128,68 @@ class ProfileTest(TestCase):
 
         os.remove(os.path.join(settings.BASE_DIR, "media", "profile_pics", name))
 
-    def test_should_add_two_new_friends(self):
-        friend_1 = User.objects.create(
-            username="friend1", password="qjgN2927fQHvs1W"
-        )  # nosec
-        friend_2 = User.objects.create(
-            username="friend2", password="qjgN2927fQHvs1W"
-        )  # nosec
+    @parameterized.expand([301, 325, 3000])
+    def test_image_field_with_factory_boy_should_set_new_default_image_height_when_image_is_too_height(
+        self, height
+    ):
+        p = ProfileFactory(image__height=height)
 
-        self.profile.friends.add(friend_1, friend_2)
+        self.assertLessEqual(p.image.height, height)
+        os.remove(os.path.join(p.image.path))
 
-        self.assertEquals(self.profile.friends.count(), 2)
+    @parameterized.expand([301, 325, 3000])
+    def test_image_field_with_factory_boy_should_set_new_default_width_image_when_image_is_too_width(
+        self, width
+    ):
+        p = ProfileFactory(image__height=width)
 
-    # TODO jeżeli wprowadzę ograniczenia zrobić test czy działa poprawnie
+        self.assertLessEqual(p.image.height, width)
+        os.remove(os.path.join(p.image.path))
 
-    def test_should_set_none_support_team_field_when_user_did_not_set_it(self):
-        self.assertIsNone(self.profile.support_team)
+    def test_following_field_should_add_new_user(self):
+        user_one = User.objects.get(id=1)
+        user_two = User.objects.get(id=2)
 
-    def test_should_set_support_team_field_when_user_sets_one(self):
-        # TODO link: https://dev.to/thedevtimeline/mock-django-models-using-faker-and-factory-boy-3ib0
+        p = ProfileFactory(following=(user_one, user_two))
 
-        team_mock = MagicMock()
-        team_mock.name = "Team Test"
+        self.assertTrue(p.following)
+        self.assertIn(user_one, p.following.all())
+        self.assertEquals(p.following.count(), 2)
+        os.remove(p.image.path)
 
-        self.profile.support_team = team_mock
-        self.profile.save()
+    def test_following_field_should_following_be_empty_when_created(self):
+        profile_obj = ProfileFactory()
 
-        self.assertTrue(self.profile.support_team)
+        self.assertEquals(profile_obj.following.count(), 0)
 
-        team_mock.reset_mock()
+        os.remove(profile_obj.image.path)
 
-    def test_str_method_should_return_username(self):
+    def test_support_team_field_should_none_when_create_profile(self):
+        profile_obj = SimpleProfileFactory()
+        self.assertIsNone(profile_obj.support_team)
+
+    def test_support_team_field_should_set_team_when_user_set_it(self):
+        profile_obj = ProfileFactory()
+        self.assertTrue(profile_obj.support_team)
+
+        team = Team.objects.get(id=1)
+        self.assertEqual(team.fb_id, profile_obj.support_team.fb_id)
+
+        os.remove(profile_obj.image.path)
+
+    def test_get_absolute_url(self):
+        expected = "/profile/JanTest/"
+        self.assertEquals(self.profile.get_absolute_url(), expected)
+
+    def test_object_name_is_username(self):
         expected_obj_name = f"{self.profile.user}"
         self.assertEquals(str(self.profile), expected_obj_name)
 
-    def test_get_absolute_url(self):
-        expected = "/profile/test/"
-        self.assertEquals(self.profile.get_absolute_url(), expected)
+    def test_user_pk_one_should_have_110_points(self):
+        self.assertEquals(self.profile.all_points, 110)
+
+    def test_user_pk_one_should_have_less_points_than_user_pk_two(self):
+        points_user_one = self.profile.all_points
+        points_user_two = User.objects.get(id=2).profile.all_points
+
+        self.assertLess(points_user_one, points_user_two)

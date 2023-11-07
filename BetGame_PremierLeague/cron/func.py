@@ -5,8 +5,8 @@ from football_data.premier_league import PremierLeague
 from league.models import League, Team, Season, TeamStats
 
 
-# TODO change name: check_and_update_matchweek
-def dashboard() -> str:
+# TODO change name: check_and_update_currently_matchweek
+def check_and_update_currently_matchweek() -> str:
     """
     Checks the current matchweek stored in the database and compares it with the data from football-data.api.
     If there are discrepancies, updates the matches and matchweek accordingly.
@@ -38,9 +38,12 @@ def dashboard() -> str:
             team__fb_id=match.away_team_id, season=matchweek.season
         ).update_stats(match.away_goals, match.home_goals)
 
-    if matchweek.matches.filter(finished=True) == matchweek.amt_matches:
+    if matchweek.matches.filter(finished=True).count() == matchweek.amt_matches:
         matchweek.finished = True
         matchweek.save()
         return dashboard()
 
     return f"Matchweek: {matchweek.matchweek}"
+
+
+# TODO sprawdza czy coś zostało zmienione w match i matchweek od aktualnego do końca
