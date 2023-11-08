@@ -23,6 +23,9 @@ from .factories.users_scores import UserScoresFactory
 
 
 def get_random_name(suffix: str) -> str:
+    """
+    Generate random name
+    """
     letters = string.ascii_letters + string.digits
     name = "".join(choices(letters, k=randint(5, 10)))
 
@@ -30,6 +33,10 @@ def get_random_name(suffix: str) -> str:
 
 
 def get_temporary_image(size: Tuple[int, int], name: str) -> File:
+    """
+    Generate temporay image
+
+    """
     name = name if name.endswith(".jpg") else name + ".jpg"
     file_obj = BytesIO()
     color = (256, 0, 0)
@@ -224,7 +231,7 @@ class ProfileTest(TestCase):
         self.assertEquals(qs_of_users_who_follow.count(), 1)
 
 
-@tag("userscores")
+@tag("model_user_scores")
 class UserScoresTest(TestCase):
     @classmethod
     def setUpTestData(cls):
