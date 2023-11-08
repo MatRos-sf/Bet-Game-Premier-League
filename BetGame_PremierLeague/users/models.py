@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import QuerySet
 from django.urls import reverse
 from django.db.models import Sum
 
@@ -22,10 +23,10 @@ class Profile(models.Model):
     )
     description = models.TextField(max_length=500, blank=True, null=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.user.username}"
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         super().save(*args, **kwargs)
 
         img = Image.open(self.image.path)
@@ -34,26 +35,28 @@ class Profile(models.Model):
             img.thumbnail(max_size)
             img.save(self.image.path)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse("user-profile-detail", args=[str(self.user.username)])
 
-    # TODO to del
     @property
     def all_points(self) -> int:
+        """
+        Returns all user points.
+        """
         points = self.points.aggregate(total_points=Sum("points"))["total_points"]
         return points if points else 0
 
-    # TODO to del
-
     @classmethod
-    def followers(cls, user):
+    def followers(cls, user: User) -> QuerySet:
         """
         The method displays a list of all users who are following the specified user.
         """
         return cls.objects.filter(following=user)
 
-    def unfollow(self):
-        pass
+    def unfollow(self, username) -> None:
+        user = User.objects.get(username=username)
+        self.following.remove(user)
+        self.save()
 
 
 class UserScores(models.Model):
@@ -65,5 +68,10 @@ class UserScores(models.Model):
     got = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
-    def render_description(pt, action):
+    def render_description(pt, action) -> str:
+        """
+        This way should be description.
+        pt -> points
+        action -> for what
+        """
         return f"{pt} pt for: {action}."

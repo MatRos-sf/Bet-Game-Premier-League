@@ -3,24 +3,23 @@ from django.contrib.auth.models import User
 from django.core.files.base import File
 from django.conf import settings
 from django.test import tag
-from parameterized import parameterized, parameterized_class
-import factory
+from parameterized import parameterized
 from PIL import Image
 from io import BytesIO
 from typing import Tuple
 import os
 import string
-from django.db.models import signals
 from random import randint, choices
 
-from users.models import Profile
+from users.models import Profile, UserScores
 from league.models import Team
-from .factories.user import (
-    UserFactory,
+from .factories.user import UserFactory
+from .factories.profile import (
     SimpleProfileFactory,
     ProfileFactory,
-    UserScores,
+    ExtendProfileFactory,
 )
+from .factories.users_scores import UserScoresFactory
 
 
 def get_random_name(suffix: str) -> str:
@@ -42,16 +41,16 @@ def get_temporary_image(size: Tuple[int, int], name: str) -> File:
     return File(file_obj, name=name)
 
 
-@tag("profile")
+@tag("model_profile")
 class ProfileTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         user_one = UserFactory(username="JanTest")
         user_two = UserFactory(username="OlaTest")
 
-        UserScores(profile=user_one.profile, points=100)
-        UserScores(profile=user_one.profile)
-        UserScores(profile=user_two.profile, points=1000)
+        UserScoresFactory(profile=user_one.profile, points=100)
+        UserScoresFactory(profile=user_one.profile)
+        UserScoresFactory(profile=user_two.profile, points=1000)
 
     def setUp(self) -> None:
         self.profile = Profile.objects.get(id=1)
@@ -132,7 +131,7 @@ class ProfileTest(TestCase):
     def test_image_field_with_factory_boy_should_set_new_default_image_height_when_image_is_too_height(
         self, height
     ):
-        p = ProfileFactory(image__height=height)
+        p = ExtendProfileFactory(image__height=height)
 
         self.assertLessEqual(p.image.height, height)
         os.remove(os.path.join(p.image.path))
@@ -141,7 +140,7 @@ class ProfileTest(TestCase):
     def test_image_field_with_factory_boy_should_set_new_default_width_image_when_image_is_too_width(
         self, width
     ):
-        p = ProfileFactory(image__height=width)
+        p = ExtendProfileFactory(image__height=width)
 
         self.assertLessEqual(p.image.height, width)
         os.remove(os.path.join(p.image.path))
@@ -150,7 +149,7 @@ class ProfileTest(TestCase):
         user_one = User.objects.get(id=1)
         user_two = User.objects.get(id=2)
 
-        p = ProfileFactory(following=(user_one, user_two))
+        p = ExtendProfileFactory(following=(user_one, user_two))
 
         self.assertTrue(p.following)
         self.assertIn(user_one, p.following.all())
@@ -158,7 +157,7 @@ class ProfileTest(TestCase):
         os.remove(p.image.path)
 
     def test_following_field_should_following_be_empty_when_created(self):
-        profile_obj = ProfileFactory()
+        profile_obj = ExtendProfileFactory()
 
         self.assertEquals(profile_obj.following.count(), 0)
 
@@ -169,7 +168,7 @@ class ProfileTest(TestCase):
         self.assertIsNone(profile_obj.support_team)
 
     def test_support_team_field_should_set_team_when_user_set_it(self):
-        profile_obj = ProfileFactory()
+        profile_obj = ExtendProfileFactory()
         self.assertTrue(profile_obj.support_team)
 
         team = Team.objects.get(id=1)
@@ -193,3 +192,87 @@ class ProfileTest(TestCase):
         points_user_two = User.objects.get(id=2).profile.all_points
 
         self.assertLess(points_user_one, points_user_two)
+
+    def test_should_return_empty_qs_when_user_do_not_have_any_followers(self):
+        qs_of_users_who_follow = Profile.followers(user=self.profile.user)
+        self.assertFalse(qs_of_users_who_follow)
+        self.assertEquals(qs_of_users_who_follow.count(), 0)
+
+    def test_should_return_two_followers_when_some_users_following_them(self):
+        profile_user = ProfileFactory()
+
+        profile_test = ProfileFactory(following=(profile_user.user,))
+        ProfileFactory(following=(profile_user.user,))
+
+        qs_of_users_who_follow = Profile.followers(profile_user.user)
+
+        self.assertTrue(qs_of_users_who_follow)
+        self.assertEquals(qs_of_users_who_follow.count(), 2)
+        self.assertTrue(qs_of_users_who_follow.filter(user=profile_test.user))
+
+    def test_should_unfollow_user(self):
+        profile_user = ProfileFactory()
+
+        profile_test = ProfileFactory(following=(profile_user.user,))
+        ProfileFactory(following=(profile_user.user,))
+
+        profile_test.unfollow(profile_user.user.username)
+
+        qs_of_users_who_follow = Profile.followers(profile_user.user)
+
+        self.assertTrue(qs_of_users_who_follow)
+        self.assertEquals(qs_of_users_who_follow.count(), 1)
+
+
+@tag("userscores")
+class UserScoresTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # set 3 users
+        user_one = UserFactory(username="JanTest")
+        user_two = UserFactory(username="OlaTest")
+        UserFactory()
+
+        # give points
+        ## user one -> 320
+        UserScoresFactory(
+            profile=user_one.profile,
+            points=320,
+            description=UserScores.render_description(320, "WIN BET"),
+        )
+        UserScoresFactory(
+            profile=user_one.profile,
+            description=UserScores.render_description(10, "WIN BET"),
+        )
+        UserScoresFactory(
+            profile=user_one.profile,
+            points=-10,
+            description=UserScores.render_description(-10, "LOSE BET"),
+        )
+
+        ## user two -> 400
+        UserScoresFactory(
+            profile=user_two.profile,
+            points=400,
+            description=UserScores.render_description(400, "WIN BET"),
+        )
+
+    def test_should_create_four_objects(self):
+        self.assertEquals(UserScores.objects.count(), 4)
+
+    @parameterized.expand(
+        [
+            (1, 320, "WIN BET"),
+            (2, 10, "WIN BET"),
+            (3, -10, "LOSE BET"),
+            (4, 400, "WIN BET"),
+        ]
+    )
+    def test_should_create_appropriate_description(self, pk, pt, info):
+        user_scores = UserScores.objects.get(id=pk)
+
+        self.assertEquals(user_scores.description, f"{pt} pt for: {info}.")
+
+
+# https://dev.to/thedevtimeline/mock-django-models-using-faker-and-factory-boy-3ib0
+# https://pythonprogramming.org/how-to-use-factoryboy-to-create-model-instances-in-python-for-testing/
