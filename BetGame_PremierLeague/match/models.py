@@ -6,6 +6,7 @@ from django.core.validators import MinValueValidator
 from django.utils import timezone
 from django.urls import reverse
 from django.core.exceptions import ValidationError
+from django.db.models import QuerySet
 
 
 class Matchweek(models.Model):
@@ -123,7 +124,7 @@ class Match(models.Model):
         return cls.objects.filter(finished=True).order_by("-start_date").first()
 
     @classmethod
-    def get_next_matches(cls):
+    def get_next_matches(cls) -> QuerySet:
         return cls.objects.filter(finished=False)
 
     def set_score(self, home_goals, away_goals) -> None:

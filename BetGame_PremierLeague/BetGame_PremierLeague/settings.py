@@ -142,7 +142,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_REDIRECT_URL = "bet-home"
-LOGIN_URL = "user-login"
+LOGIN_URL = "login"
 
 API_TOKEN = str(os.getenv("API_TOKEN"))
 

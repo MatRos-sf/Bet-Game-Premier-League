@@ -1,5 +1,4 @@
 import os
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.generic import DetailView, ListView
@@ -8,19 +7,34 @@ from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.db.models import Avg, Sum, Max, F
 from django.contrib.auth.decorators import login_required
+from django.http import HttpRequest, HttpResponse
 
 from .models import Profile, UserScores
 from .forms import UserRegisterForm, ProfileUpdate
-from league.models import TeamStats
-from match.models import Match
+from league.models import TeamStats, Season
+from match.models import Match, Matchweek
 from bet.models import Bet
 
 
-def home(request):
-    amt_of_users = User.objects.all().count()
+def home(request: HttpRequest) -> HttpResponse:
+    amt_of_users = User.objects.count()
     table = TeamStats.get_season_table(season=2023, league="Premier League")[:8]
+
     last_match = Match.get_last_match()
     next_match = Match.get_next_matches().first()
+
+    mw = Matchweek.objects.filter(finished=True).last()
+    if mw:
+        last_matchweek_bet_stat = Bet.get_stats_matchweek(mw)
+        last_matchweek_bet_stat["matchweek"] = mw.matchweek
+    else:
+        last_matchweek_bet_stat = {}
+
+    # top 3 players
+    top_players = Profile.objects.annotate(sum=Sum("points__points")).order_by("-sum")[
+        :3
+    ]
+
     return render(
         request,
         "users/home_page.html",
@@ -29,6 +43,8 @@ def home(request):
             "table": table,
             "last_match": last_match,
             "next_match": next_match,
+            "last_bets": last_matchweek_bet_stat,
+            "top_players": top_players,
         },
     )
 
@@ -48,7 +64,6 @@ def register(request):
                 request, f"Dear {username}, you have been successfully signed up!"
             )
             return redirect("login")
-
     form = UserRegisterForm()
     return render(request, "users/register.html", {"form": form})
 

@@ -1,5 +1,5 @@
 from factory.django import DjangoModelFactory
-from factory import Sequence
+from factory import Sequence, PostGenerationMethodCall
 
 from django.contrib.auth.models import User
 
@@ -9,4 +9,4 @@ class UserFactory(DjangoModelFactory):
         model = User
 
     username = Sequence(lambda n: f"user_{n}")
-    password = "passwordTEST"  # nosec
+    password = PostGenerationMethodCall("set_password", "1_test_TEST_!")

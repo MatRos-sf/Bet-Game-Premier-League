@@ -36,7 +36,7 @@ class Profile(models.Model):
             img.save(self.image.path)
 
     def get_absolute_url(self) -> str:
-        return reverse("user-profile-detail", args=[str(self.user.username)])
+        return reverse("profile-detail", args=[str(self.user.username)])
 
     @property
     def all_points(self) -> int:

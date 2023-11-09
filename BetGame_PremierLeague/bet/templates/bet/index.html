@@ -53,15 +53,15 @@
               <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
                   <li class="active"><a href="{% url 'home'%}" class="nav-link">Home</a></li>
                 {% if user.is_authenticated %}
-                  <li><a href="{% url 'user-profile-detail' user.username %}" class="nav-link">Profile</a></li>
+                  <li><a href="{% url 'profile-detail' user.username %}" class="nav-link">Profile</a></li>
                   <li><a href="{% url 'bet-home' %}" class="nav-link">Bets</a></li>
-                  <li><a href="{% url 'user-profile-list' %}" class="nav-link">Players</a></li>
+                  <li><a href="{% url 'profile-list' %}" class="nav-link">Players</a></li>
                   <li><a href="{% url 'match-season-results' %}" class="nav-link">Results</a></li>
                   <li><a href="{% url 'bet-finished' %}" class="nav-link">Finished</a></li>
-                  <li><a href="{% url 'user-logout' %}" class="nav-link">Log Out</a></li>
+                  <li><a href="{% url 'logout' %}" class="nav-link">Log Out</a></li>
               {% else %}
-                  <li><a href="{% url 'user-login' %}" class="nav-link">Log In</a></li>
-                  <li><a href="{% url 'user-register' %}" class="nav-link">Register</a></li>
+                  <li><a href="{% url 'login' %}" class="nav-link">Log In</a></li>
+                  <li><a href="{% url 'register' %}" class="nav-link">Register</a></li>
 
 
               {% endif %}
