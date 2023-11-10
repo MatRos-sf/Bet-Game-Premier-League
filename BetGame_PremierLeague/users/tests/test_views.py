@@ -1,7 +1,6 @@
-from django.test import TestCase, Client, tag
+from django.test import TestCase, tag
 from django.urls import reverse
 from django.contrib.auth.models import User
-from django.contrib import auth
 from faker import Faker
 
 from users.models import Profile
@@ -99,16 +98,82 @@ class RegisterTest(TestCase):
         self.assertEquals(expected_message, message.message)
 
 
+@tag("login")
 class LoginViewTest(TestCase):
-    pass
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory()
+
+    def setUp(self):
+        self.url = "/login/"
+        self.name = "login"
+
+        self.user = User.objects.get(id=1)
+
+    def test_view_url_exist_at_desired_location(self):
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_view_url_accessible_by_name(self):
+        response = self.client.get(reverse(self.name))
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_view_uses_correctly_templates(self):
+        response = self.client.get(reverse(self.name))
+
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertTemplateUsed(response, "users/login.html")
+
+    def test_should_login_when_form_valid(self):
+        payload = {"username": self.user.username, "password": "1_test_TEST_!"}
+        response = self.client.post(reverse(self.name), data=payload, follow=True)
+
+        self.assertRedirects(response, reverse("bet-home"))
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertTrue(response.context["user"].is_authenticated)
+
+    def test_should_not_login_when_form_invalid(self):
+        payload = {"username": self.user.username, "password": ""}
+        response = self.client.post(reverse(self.name), data=payload, follow=True)
+
+        self.assertFalse(response.context["user"].is_authenticated)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
 
 
+@tag("logout")
 class LogoutView(TestCase):
-    pass
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory()
 
+    def setUp(self):
+        self.url = "/logout/"
+        self.name = "logout"
 
-from unittest.mock import patch
-from pprint import pprint
+        self.user = User.objects.get(id=1)
+
+    def test_view_url_exist_at_desired_location(self):
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_view_url_accessible_by_name(self):
+        response = self.client.get(reverse(self.name))
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_view_uses_correctly_templates(self):
+        response = self.client.get(reverse(self.name))
+
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertTemplateUsed(response, "users/logout.html")
+
+    def test_should_logout_user_when_was_login(self):
+        is_login = self.client.login(
+            username=self.user.username, password="1_test_TEST_!"  # nosec
+        )
+        self.assertTrue(is_login)
+
+        response = self.client.get(reverse(self.name))
+        self.assertFalse(response.context["user"].is_authenticated)
 
 
 @tag("user_home")
@@ -142,52 +207,91 @@ class HomeTest(TestCase):
         self.assertFalse(response.context["last_bets"])
         self.assertFalse(response.context["top_players"])
 
-    # def test_should_the_same_context_when_user_is_authenticated_or_is_not(self):
-    #     user = User.objects.create(username='test', password='xD8J4emu8U7mYg1')
-    #     credentials = {
-    #         'username': user.username,
-    #         'password': user.password
-    #     }
-    #     self.client.login(**credentials, follow=True)
 
-    #     print(response.context['user'])
-    #     print(a.status_code)
-
-    # with patch('django.contrib.auth.models.User.objects.count', return_value=200):
-    #     response = self.client.get(reverse(self.name))
-    #
-    #     print(response.context['amt_users'])
-
-
-@tag("xD")
+@tag("profile")
 class ProfileDetailViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        User.objects.create_user(username="test", password="gyBf4kSXb98QUSt")  # nosec
+        UserFactory()
+        UserFactory()
 
     def setUp(self):
         self.name = "profile-detail"
         self.url = lambda x: f"/profile/{x}/"
 
-        self.sample_user = User.objects.get(pk=1)
+        self.user_one = User.objects.get(pk=1)
+        self.user_two = User.objects.get(pk=2)
 
-    def test_view_url_exist_at_desired_location(self):
-        response = self.client.get(
-            reverse(self.name, kwargs={"slag": self.sample_user.username})
-        )
-        self.assertEquals(response.status_code, HTTPStatus.FOUND)
+    def test_view_url_does_not_exist_when_user_is_not_authenticated(self):
+        username = self.user_one.username
+        response = self.client.get(self.url(username))
 
-    def test_view_url_exist_at_desired_location_2(self):
-        u = UserFactory()
-        is_done = self.client.login(
-            username=u.username, password="IhT5JiLnWC7VfrA"
+        self.assertRedirects(response, f"/login/?next={self.url(username)}")
+
+    def test_view_url_exist_at_desired_location_when_user_is_authenticated(self):
+        self.client.login(
+            username=self.user_one.username, password="1_test_TEST_!"
         )  # nosec
 
+        response = self.client.get(self.url(self.user_one.username))
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_view_url_inaccessible_by_name_when_user_is_not_authenticated(self):
+        username = self.user_one.username
+
+        response = self.client.get(reverse(self.name, kwargs={"slag": username}))
+
+        self.assertRedirects(response, f"/login/?next={self.url(username)}")
+
+    def test_view_url_accessible_by_name_when_user_is_authenticated(self):
+        username = self.user_one.username
+        self.client.login(
+            username=self.user_one.username, password="1_test_TEST_!"
+        )  # nosec
+
+        response = self.client.get(reverse(self.name, kwargs={"slag": username}))
+
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_view_uses_should_correctly_templates_when_user_is_authenticated(self):
+        username = self.user_one.username
+        self.client.login(
+            username=self.user_one.username, password="1_test_TEST_!"
+        )  # nosec
+
+        response = self.client.get(reverse(self.name, kwargs={"slag": username}))
+
+        self.assertTemplateUsed(response, "users/profile.html")
+
+    def test_user_can_watch_different_users_when_is_authenticated(self):
+        username = self.user_one.username
+        self.client.login(username=username, password="1_test_TEST_!")  # nosec
+
         response = self.client.get(
-            reverse(self.name, kwargs={"slag": self.sample_user.username})
+            reverse(self.name, kwargs={"slag": self.user_two.username})
         )
-        # self.assertEquals(response.status_code, HTTPStatus.OK)
-        print(is_done)
+
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_should_status_not_found_when_user_want_to_get_non_exist_profile(self):
+        username = self.user_one.username
+        self.client.login(username=username, password="1_test_TEST_!")  # nosec
+
+        response = self.client.get(reverse(self.name, kwargs={"slag": "non_user"}))
+
+        self.assertEquals(response.status_code, HTTPStatus.NOT_FOUND)
+
+    # def test_view_url_exist_at_desired_location_2(self):
+    #     u = UserFactory()
+    #     is_done = self.client.login(
+    #         username=u.username, password="IhT5JiLnWC7VfrA"
+    #     )  # nosec
+    #
+    #     response = self.client.get(
+    #         reverse(self.name, kwargs={"slag": self.sample_user.username})
+    #     )
+    #     # self.assertEquals(response.status_code, HTTPStatus.OK)
+    #     print(is_done)
 
     # def test_view_url_accessible_by_name(self):
     #     response = self.client.get(reverse(self.name))

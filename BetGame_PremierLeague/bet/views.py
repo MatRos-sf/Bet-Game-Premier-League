@@ -15,8 +15,10 @@ class BetsListView(LoginRequiredMixin, ListView):
     template_name = "bet/home.html"
 
     def get_queryset(self):
-        matches = Matchweek.objects.filter(finished=False).first()
-        return matches.matches.filter(finished=False)
+        matches = Matchweek.objects.filter(finished=False)
+        if matches:
+            return matches.first().matches.filter(finished=False)
+        return matches
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(BetsListView, self).get_context_data(**kwargs)
@@ -24,7 +26,7 @@ class BetsListView(LoginRequiredMixin, ListView):
         mw = context["matches"].first()
 
         # season ended
-        if mw:
+        if not mw:
             context["end_season"] = True
             return context
 

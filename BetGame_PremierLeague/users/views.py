@@ -18,7 +18,11 @@ from bet.models import Bet
 
 def home(request: HttpRequest) -> HttpResponse:
     amt_of_users = User.objects.count()
-    table = TeamStats.get_season_table(season=2023, league="Premier League")[:8]
+    currently_season = Season.get_currently_season("Premier League")
+
+    table = TeamStats.get_season_table(
+        season=currently_season.start_date.year, league="Premier League"
+    )[:8]
 
     last_match = Match.get_last_match()
     next_match = Match.get_next_matches().first()
@@ -79,6 +83,7 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         return get_object_or_404(Profile, user__username=username)
 
     def get_context_data(self, **kwargs):
+        username = self.kwargs.get("slag")
         context = super(ProfileDetailView, self).get_context_data(**kwargs)
         instance = context["object"]
 
@@ -97,6 +102,18 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         ).order_by(F("total_points").desc())
         rank = list(profiles.values_list("id", flat=True)).index(instance.pk) + 1
         context["rank"] = rank
+
+        # get info about user stats
+        bet_stats = Bet.get_stats_user(User.objects.get(username=username))
+        context["bet_stats"] = bet_stats
+
+        # get last bets
+        last_bets = (
+            Bet.objects.filter(user__username=username)
+            .exclude(is_won__isnull=True)
+            .order_by("-match__start_date")[:4]
+        )
+        context["bets"] = last_bets
 
         return context
 

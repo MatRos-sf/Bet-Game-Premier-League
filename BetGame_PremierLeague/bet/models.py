@@ -62,3 +62,27 @@ class Bet(models.Model):
         )
 
         return stats
+
+    @classmethod
+    def get_stats_user(cls, user: User) -> Dict[str, str]:
+        risk_bets = Count("id", filter=Q(risk=True))
+        win_bets_risk = Count("id", filter=Q(is_won=True) & Q(risk=True))
+        won_bets = Count("is_won", filter=Q(is_won=True))
+
+        stats = cls.objects.filter(user=user).aggregate(
+            amt_bets=Count("id"),
+            win_rate=Avg("is_won"),
+            won_bets=won_bets,
+            risk_bets=risk_bets,
+            won_bets_risk=win_bets_risk,
+        )
+
+        try:
+            stats["win_rate_risk_bet"] = int(
+                stats["won_bets_risk"] / stats["risk_bets"] * 100
+            )
+        except ZeroDivisionError:
+            stats["win_rate_risk_bet"] = 0
+        stats["win_rate"] = int(stats["win_rate"] * 100)
+
+        return stats
