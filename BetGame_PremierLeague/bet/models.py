@@ -65,7 +65,7 @@ class Bet(models.Model):
 
     @classmethod
     def get_stats_user(cls, user: User) -> Dict[str, str]:
-        risk_bets = Count("id", filter=Q(risk=True))
+        risk_bets = Count("id", filter=Q(risk=True) & Q(match__finished=True))
         win_bets_risk = Count("id", filter=Q(is_won=True) & Q(risk=True))
         won_bets = Count("is_won", filter=Q(is_won=True))
 

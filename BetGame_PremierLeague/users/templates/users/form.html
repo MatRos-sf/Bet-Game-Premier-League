@@ -1,10 +1,22 @@
 {% extends 'bet/index.html'%}
 {% load crispy_forms_tags %}
-{% block title %}Sign up{% endblock %}
+{% block title %}
+{% if title %}
+    {{ title }}
+{% else %}
+    Log In
+{% endif %}
+{% endblock %}
 
 {% block bg_section %}
     <div class="col-lg-9 mx-auto text-center">
-        <h1 class="text-white">Sign Up</h1>
+        <h1 class="text-white">
+            {% if title %}
+                {{ title }}
+            {% else %}
+                Log In
+            {% endif %}
+        </h1>
     </div>
 {% endblock %}
 
@@ -18,7 +30,9 @@
                 {{ form|crispy }}
 
               <div class="form-group text-lg-center">
-                  <button type="submit" class="btn btn-primary py-3 px-5">Register</button>
+                  <button type="submit" class="btn btn-primary py-3 px-5">
+                      {% if button_name %} {{ button_name }} {% else %} Log In {% endif %}
+                  </button>
               </div>
             </form>
           </div>

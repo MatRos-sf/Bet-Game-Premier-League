@@ -53,6 +53,23 @@ class Profile(models.Model):
         """
         return cls.objects.filter(following=user)
 
+    @classmethod
+    def position(cls, profile: str):
+        p = (
+            cls.objects.annotate(total_points=Sum("points__points"))
+            .order_by("-total_points")
+            .values_list("user__username", flat=True)
+        )
+        p = list(p).index(profile)
+
+        return p + 1
+
+    @classmethod
+    def top_players(cls, end: int) -> QuerySet:
+        return cls.objects.annotate(
+            sum_points=Sum("points__points", default=0)
+        ).order_by("-sum_points")[:end]
+
     def unfollow(self, username) -> None:
         user = User.objects.get(username=username)
         self.following.remove(user)

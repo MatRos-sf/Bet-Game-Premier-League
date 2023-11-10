@@ -8,4 +8,6 @@ from .models import Profile
 @receiver(post_save, sender=User)
 def create_profile_and_season_points(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
+        profile = Profile.objects.create(user=instance)
+        profile.following.add(instance)
+        # TODO: test it!

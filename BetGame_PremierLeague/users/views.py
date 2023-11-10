@@ -35,9 +35,7 @@ def home(request: HttpRequest) -> HttpResponse:
         last_matchweek_bet_stat = {}
 
     # top 3 players
-    top_players = Profile.objects.annotate(sum=Sum("points__points")).order_by("-sum")[
-        :3
-    ]
+    top_players = Profile.top_players(3)
 
     return render(
         request,
@@ -69,7 +67,11 @@ def register(request):
             )
             return redirect("login")
     form = UserRegisterForm()
-    return render(request, "users/register.html", {"form": form})
+    return render(
+        request,
+        "users/form.html",
+        {"title": "Sign Up", "button_name": "Create", "form": form},
+    )
 
 
 class ProfileDetailView(LoginRequiredMixin, DetailView):
@@ -92,16 +94,8 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
 
         context["self"] = self.request.user == instance.user
         context["amt_bets"] = Bet.objects.filter(user=self.request.user).count()
-        win_rate = Bet.objects.aggregate(win_rate=Avg("is_won"))["win_rate"]
 
-        if win_rate:
-            context["win_rate"] = round(win_rate * 100, 2)
-
-        profiles = Profile.objects.annotate(
-            total_points=Sum("points__points")
-        ).order_by(F("total_points").desc())
-        rank = list(profiles.values_list("id", flat=True)).index(instance.pk) + 1
-        context["rank"] = rank
+        context["rank"] = Profile.position(username)
 
         # get info about user stats
         bet_stats = Bet.get_stats_user(User.objects.get(username=username))
@@ -126,6 +120,8 @@ class ProfileListView(LoginRequiredMixin, ListView):
         username = self.request.GET.get("username", "")
         if username:
             object_list = self.model.objects.filter(user__username__contains=username)
+            if not object_list.exists():
+                messages.info(self.request, f"User not found!")
         else:
             object_list = self.model.objects.none()
 
@@ -138,25 +134,13 @@ class ProfileListView(LoginRequiredMixin, ListView):
         user = self.request.user
         user_profile = Profile.objects.get(user=user)
         following = user_profile.following.all()
+
         context["following"] = sorted(
             list(following), key=lambda x: x.profile.all_points, reverse=True
         )
 
         # top 10 users
-        top_ten_user = (
-            UserScores.objects.values("profile__user__username")
-            .annotate(total_points=Sum("points"))
-            .order_by("-total_points")[:10]
-        )
-        context["top_ten"] = top_ten_user
-
-        # top 10 currently season user
-        top_ten_current_user = (
-            UserScores.objects.values("profile__user__username")
-            .annotate(total_points=Sum("points"))
-            .order_by("-total_points")[:10]
-        )
-        context["top_ten_current"] = top_ten_current_user
+        context["top_ten"] = Profile.top_players(10)
 
         # amount of players
         amt_of_players = self.model.objects.count()
@@ -186,4 +170,8 @@ def edit_profile(request, username):
 
             return redirect("user-profile-edit", username=username)
 
-    return render(request, "users/edit_form.html", {"form": form})
+    return render(
+        request,
+        "users/form.html",
+        {"title": "Edit Profile", "button_name": "Update", "form": form},
+    )

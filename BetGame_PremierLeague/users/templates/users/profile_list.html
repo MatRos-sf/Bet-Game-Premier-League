@@ -18,7 +18,7 @@
       <div class="container">
         <div class="row">
           <div class="col-12 title-section">
-            <h2 class="heading">User Predictions!</h2>
+            <h2 class="heading">Search!</h2>
           </div>
         </div>
         <div class="sidebar-box">
@@ -51,11 +51,11 @@
                   </tr>
                 </thead>
                 <tbody>
-                  {% for u in top_ten %}
+                  {% for profile in top_ten %}
                       <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td><strong class="text-white">{{ u.profile__user__username }}</strong></td>
-                        <td>{{ u.total_points }}</td>
+                        <td><strong class="text-white">{{ profile.user.username }}</strong></td>
+                        <td>{{ profile.sum_points }}</td>
                       </tr>
                   {% endfor %}
 
@@ -65,42 +65,7 @@
             </div>
           <div class="col-lg-6">
               <div class="col-12 title-section">
-                <h2 class="heading">Top 10 currently users!</h2>
-              </div>
-            <div class="widget-next-match">
-              <table class="table custom-table">
-                <thead>
-                  <tr>
-                    <th>P</th>
-                    <th>User</th>
-                    <th>PTS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for u in top_ten_current %}
-                      <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td><a href="{% url 'profile-detail' u.profile__user__username %}"><strong class="text-white">{{ u.profile__user__username }}</strong></a></td>
-                        <td>{{ u.total_points }}</td>
-                      </tr>
-                  {% endfor %}
-
-                </tbody>
-              </table>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </div> <!-- .site-section -->
-
-    <div class="site-section">
-      <div class="container">
-        <div class="row">
-
-          <div class="col-lg-6">
-              <div class="col-12 title-section">
-                <h2 class="heading">Top 10 currently users!</h2>
+                <h2 class="heading">You and your followers!</h2>
               </div>
             <div class="widget-next-match">
               <table class="table custom-table ">
@@ -115,7 +80,9 @@
                   {% for u in following %}
                       <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td><a href="{{ u.profile.get_absolute_url }}"><strong class="text-white">{{ u.username }}</strong></a></td>
+                        <td><a href="{{ u.profile.get_absolute_url }}"><strong class="{% if user == u %}text-danger{% else %}text-white{% endif %}">
+                            {{ u.username }}
+                        </strong></a></td>
                         <td>{{ u.profile.all_points }}</td>
                       </tr>
                   {% endfor %}
@@ -125,8 +92,8 @@
             </div>
 
           </div>
-
         </div>
       </div>
-    </div>
+    </div> <!-- .site-section -->
+
 {% endblock %}
