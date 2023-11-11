@@ -155,6 +155,19 @@ class Match(models.Model):
 
         return fg
 
+    @classmethod
+    def get_recent_meetings(
+        cls, first_team: Team, second_team: Team, amt: int = 5
+    ) -> QuerySet:
+        """
+        Retrieves the recent meetings between two teams.
+        """
+        return cls.objects.filter(
+            Q(finished=True),
+            Q(home_team=first_team) | Q(away_team=first_team),
+            Q(home_team=second_team) | Q(away_team=second_team),
+        ).order_by("-start_date")[:amt]
+
     def set_score(self, home_goals: int, away_goals: int) -> None:
         """
         Sets the score and checks all bets relate this match.
@@ -177,7 +190,7 @@ class Match(models.Model):
         return self.bet_set.filter(user=user).exists()
 
     def get_season_and_league(self) -> Tuple[datetime.date, str]:
-        season = self.matchweek.season.start_date
+        season = self.matchweek.season
         league = self.league
         return season, league
 

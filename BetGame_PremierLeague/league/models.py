@@ -1,5 +1,16 @@
 from django.db import models
-from django.core.exceptions import ValidationError
+from django.db.models import (
+    Avg,
+    Sum,
+    Count,
+    ExpressionWrapper,
+    F,
+    FloatField,
+    Case,
+    DecimalField,
+    Q,
+)
+from typing import Optional
 
 
 class League(models.Model):
@@ -99,6 +110,18 @@ class TeamStats(models.Model):
         return cls.objects.filter(
             season__start_date__year=season, season__league__name=league
         ).order_by("-points", "-goals_for", "team__name")
+
+    @classmethod
+    def get_season_so_far(cls, season: Season, first_team: Team):
+        stats = cls.objects.filter(season=season, team=first_team)
+
+        stats = stats.annotate(
+            avg_goals_scored=Avg(F("goals_for") / F("played")),
+            avg_goals_conceded=ExpressionWrapper(
+                F("goals_against") / F("played"), output_field=FloatField()
+            ),
+        )
+        return stats.first()
 
     def update_stats(self, team_goal: int, opponent_goal: int) -> None:
         """

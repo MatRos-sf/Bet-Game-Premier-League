@@ -22,6 +22,14 @@
           <div class="col-12 title-section">
             <h2 class="heading">Finished Matches</h2>
           </div>
+            <div class="sidebar-box">
+              <form method="GET" class="search-form">
+                <div class="form-group">
+                  <span class="icon fa fa-search"></span>
+                  <input type="text" name='name_team' class="form-control" placeholder="Type a name team and hit enter">
+                </div>
+              </form>
+            </div>
             {% for match in object_list %}
                 <div class="col-lg-6 mb-4">
                     <a href="{{ match.get_absolute_url }}">
@@ -60,6 +68,27 @@
 
         </div>
       </div>
+        <section id="pagination">
+            <div class="row justify-content-center">
+        <div class="col-lg-7 text-center">
+          <div class="custom-pagination">
+            {% if page_obj.has_previous %}
+              <a href="?page=1">&laquo;</a>
+              <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+            {% endif %}
+            <span>{{ page_obj.number }}</span>
+
+            {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number}}</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+            {% endif %}
+
+          </div>
+        </div>
+      </div>
+        </section>
     </div>
+    </div>
+
 
 {% endblock %}
