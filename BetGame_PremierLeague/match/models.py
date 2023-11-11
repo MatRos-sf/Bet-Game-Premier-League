@@ -1,12 +1,14 @@
 import datetime
-from typing import Tuple
+from typing import Tuple, Optional
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 from django.urls import reverse
 from django.core.exceptions import ValidationError
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q, Case, Value, When, CharField, F
+
+from league.models import Team
 
 
 class Matchweek(models.Model):
@@ -94,11 +96,10 @@ class Match(models.Model):
     finished = models.BooleanField(default=False)
 
     @property
-    def results(self):
+    def score(self) -> Optional[str]:
         if self.finished:
-            return f"{self.home_team.name} {self.home_goals}:{self.away_goals} {self.away_team.name}"
-
-        return f"{self.home_team.name} vs {self.away_team.name}"
+            return f"{self.home_goals}:{self.away_goals}"
+        return
 
     @property
     def winner(self) -> Tuple[None, None] | Tuple[str, object]:
@@ -127,7 +128,34 @@ class Match(models.Model):
     def get_next_matches(cls) -> QuerySet:
         return cls.objects.filter(finished=False)
 
-    def set_score(self, home_goals, away_goals) -> None:
+    @classmethod
+    def get_form_guide_team(cls, team: Team, amt: int) -> QuerySet:
+        """
+        This method returns the information on the last team matches and adds a new field:
+            w: it indicates whether it is an H (home) match or an A (away) match,
+            result: it provides information about the match: W (won), L (lost), D (draw).
+        """
+        fg = cls.objects.filter(
+            Q(finished=True), Q(home_team=team) | Q(away_team=team)
+        ).order_by("-start_date")[:amt]
+        where_played = Case(
+            When(home_team=team, then=Value("H")),
+            default=Value("A"),
+            output_field=CharField(),
+        )
+        result = Case(
+            When(home_goals=F("away_goals"), then=Value("D")),
+            When(Q(home_goals__gt=F("away_goals")) & Q(w="H"), then=Value("W")),
+            When(Q(home_goals__lt=F("away_goals")) & Q(w="A"), then=Value("W")),
+            default=Value("L"),
+            output_field=CharField(),
+        )
+
+        fg = fg.annotate(w=where_played, result=result)
+
+        return fg
+
+    def set_score(self, home_goals: int, away_goals: int) -> None:
         """
         Sets the score and checks all bets relate this match.
         """
@@ -154,7 +182,7 @@ class Match(models.Model):
         return season, league
 
     def __str__(self):
-        return self.results
+        return self.score
 
     class Meta:
         ordering = ["start_date"]

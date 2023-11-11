@@ -17,6 +17,12 @@ class MatchDetailView(LoginRequiredMixin, DetailView):
         table = TeamStats.get_season_table(season=season.year, league=league)
         context["table"] = table
         # TODO takie staty jak tu: https://www.premierleague.com/match/93424
+
+        # form guide
+        home = Match.get_form_guide_team(match.home_team, 5)
+        away = Match.get_form_guide_team(match.away_team, 5)
+        context["form_guide"] = {"home": home, "away": away}
+
         return context
 
 
