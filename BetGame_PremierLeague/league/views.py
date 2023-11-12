@@ -1,90 +1,48 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, UpdateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-
+from django.db.models import Sum
 from typing import List
 
 from .models import League, Team, Season, TeamStats
-from .forms import TeamForm
-from football_data.premier_league import PremierLeague
+from match.models import Match
 
 
-class LeagueListView(LoginRequiredMixin, ListView):
-    model = League
-    template_name = ""
-    context_object_name = "leagues/"
-    # ordering = ['-season']
+# TODO: unlock
+# class LeagueDetailView(LoginRequiredMixin, DetailView):
+#     model = League
+#     template_name = "league/detail.html"
 
 
-class LeagueDetailView(LoginRequiredMixin, DetailView):
-    model = League
-    template_name = "league/"
+# class SeasonDetailView(LoginRequiredMixin, DetailView):
+#     model = Season
+#     template_name = "league/"
 
 
-class LeagueUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = League
-    template_name = "league/"
-    fields = ["name", "country", "emblem"]
-
-    def test_func(self):
-        return self.request.user.is_superuser()
-
-
-class SeasonListView(LoginRequiredMixin, ListView):
-    model = Season
-    template_name = ""
-    context_object_name = "leagues/"
-
-
-class SeasonDetailView(LoginRequiredMixin, DetailView):
-    model = Season
-    template_name = "league/"
-
-
-class SeasonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Season
-    template_name = "league/"
-    fields = ["start_date", "end_date", "league"]
-
-    def test_func(self):
-        return self.request.user.is_superuser()
-
-
-class TeamListView(LoginRequiredMixin, ListView):
-    model = Team
-    template_name = ""
-    context_object_name = "leagues/"
+# class TeamListView(LoginRequiredMixin, ListView):
+#     model = Team
+#     template_name = ""
+#     context_object_name = "leagues/"
 
 
 class TeamDetailView(LoginRequiredMixin, DetailView):
     model = Team
-    template_name = "league/"
+    template_name = "league/team_detail.html"
 
+    def get_context_data(self, **kwargs):
+        context = super(TeamDetailView, self).get_context_data(**kwargs)
+        team = context["object"]
 
-class TeamUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Team
-    template_name = "league/"
-    fields = ["name", "shortcut", "league", "crest"]
+        stats = TeamStats.get_team_stats(team=team)
+        context["stats"] = stats
 
-    def test_func(self):
-        return self.request.user.is_superuser()
+        context["next_match"] = Match.get_next_match(team)
+        context["last_match"] = Match.get_last_match(team)
 
+        fans = team.fans.annotate(sum=Sum("points__points", default=0)).order_by(
+            "-sum"
+        )[:5]
 
-class TeamStatsListView(LoginRequiredMixin, ListView):
-    model = TeamStats
-    template_name = ""
-    context_object_name = "leagues/"
+        context["top_fans"] = fans
 
-
-class TeamStatsDetailView(LoginRequiredMixin, DetailView):
-    model = TeamStats
-    template_name = "league/"
-
-
-class TeamStatsUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = TeamStats
-    template_name = "league/"
-    fields = ["played", "won", "drawn", "goals_for", "goals_against", "points"]
-
-    def test_func(self):
-        return self.request.user.is_superuser()
+        return context

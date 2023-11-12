@@ -25,7 +25,7 @@ def home(request: HttpRequest) -> HttpResponse:
     )[:8]
 
     last_match = Match.get_last_match()
-    next_match = Match.get_next_matches().first()
+    next_match = Match.get_next_match()
 
     mw = Matchweek.objects.filter(finished=True).last()
     if mw:

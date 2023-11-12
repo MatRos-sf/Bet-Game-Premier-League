@@ -2,20 +2,15 @@ from django.db import models
 from django.db.models import (
     Avg,
     Sum,
-    Count,
     ExpressionWrapper,
     F,
     FloatField,
-    Case,
-    DecimalField,
-    Q,
 )
-from typing import Optional
+from django.urls import reverse
 
 
 class League(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    # https://pypi.org/project/django-countries/
     country = models.CharField(max_length=50)
     emblem = models.URLField(blank=True, null=True)
     last_modified = models.DateTimeField(auto_now=True)
@@ -41,6 +36,7 @@ class Season(models.Model):
         league = self.league.name
         return f"{league} {self.start_date}"
 
+    @property
     @property
     def matchweek(self) -> int:
         """
@@ -84,6 +80,9 @@ class Team(models.Model):
     def __str__(self):
         return f"{self.name}"
 
+    def get_absolute_url(self):
+        return reverse("league:team-detail", args=[self.pk])
+
 
 class TeamStats(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="stats")
@@ -122,6 +121,17 @@ class TeamStats(models.Model):
             ),
         )
         return stats.first()
+
+    @classmethod
+    def get_team_stats(cls, team: Team) -> dict:
+        stats = cls.objects.filter(team=team).aggregate(
+            played=Sum("played"),
+            wins=Sum("won"),
+            losses=Sum("lost"),
+            goals=Sum("goals_for"),
+            goals_conceded=Sum("goals_against"),
+        )
+        return stats
 
     def update_stats(self, team_goal: int, opponent_goal: int) -> None:
         """

@@ -121,12 +121,26 @@ class Match(models.Model):
         return self.matchweek.season.league
 
     @classmethod
-    def get_last_match(cls):
-        return cls.objects.filter(finished=True).order_by("-start_date").first()
+    def get_last_match(cls, team: Optional[Team] = None):
+        if team:
+            last_match = cls.objects.filter(
+                Q(finished=True), Q(home_team=team) | Q(away_team=team)
+            )
+        else:
+            last_match = cls.objects.filter(finished=True)
+
+        return last_match.order_by("-start_date").first()
 
     @classmethod
-    def get_next_matches(cls) -> QuerySet:
-        return cls.objects.filter(finished=False)
+    def get_next_match(cls, team: Optional[Team] = None) -> QuerySet:
+        if team:
+            next_match = cls.objects.filter(
+                Q(finished=False), Q(home_team=team) | Q(away_team=team)
+            )
+        else:
+            next_match = cls.objects.filter(finished=False)
+
+        return next_match.first()
 
     @classmethod
     def get_form_guide_team(cls, team: Team, amt: int) -> QuerySet:

@@ -1,0 +1,257 @@
+{% extends 'bet/index.html'%}
+{% load crispy_forms_tags %}
+{% block title %}Profile{% endblock %}
+
+{% block bg_section %}
+    <div class="col-lg-9 mx-auto text-center">
+        <h1 class="text-white">{{ object.name }}</h1>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="latest-news">
+    <div class="container">
+      <div class="row">
+        <div class="col-6 title-section">
+          <h2 class="heading">Detail</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-md-8">
+          <div class="custom-media d-flex">
+            <div class="img mr-4">
+              <img src="{{ object.crest }}" alt="Logo team's" class="img-fluid">
+            </div>
+            <div class="text">
+                <h2 class="mb-1">{{ object.name }}</h2>
+                <span class="meta">Joined {{ object.user.date_joined|date:"M d, Y"}}</span>
+                <h3 class="mb-1">Short Team Name:  {{ object.short_name  }}</h3>
+                <h3 class="mb-1">Shortcut: {{ object.shortcut }} </h3>
+                <h3 class="mb-1">League:  {% if object.currently_league %}{{ object.currently_league }}{% else %}Degraded{% endif %}</h3>
+                <h3 class="mb-1">Shortcut: {{ object.website }} </h3>
+                <h3 class="mb-1">Shortcut: {{ object.club_colours }} </h3>
+                <h3 class="mb-1">Number Of Supporters:  {{ object.fans.count }}</h3>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+</div>
+
+<div class="site-section bg-dark">
+    <div class="container">
+        <div class="row">
+          <div class="col-12 title-section">
+            <h2 class="heading">Stats:</h2>
+          </div>
+          <div class="col-lg-6 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">Matches Played</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ stats.played }}</h2>
+                </div>
+
+            </div>
+          </div>
+          <div class="col-lg-6 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">Wins</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ stats.wins }}</h2>
+                </div>
+
+            </div>
+          </div>
+          <div class="col-lg-6 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">Losses</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ stats.losses }}</h2>
+                </div>
+
+            </div>
+          </div>
+          <div class="col-lg-6 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">Goals</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ stats.goals }}</h2>
+                </div>
+
+            </div>
+          </div>
+          <div class="col-lg-6 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">Goals Conceded</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ stats.goals_conceded }}</h2>
+                </div>
+
+            </div>
+          </div>
+          <div class="col-lg-6 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">Clean Sheets</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ stats.clean_sheets }}</h2>
+                </div>
+
+            </div>
+          </div>
+
+
+        </div>
+    </div>
+</div>
+
+<div class="latest-news">
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-lg-6">
+            <div class="widget-next-match">
+              <div class="widget-title">
+                <h3>Next Match</h3>
+              </div>
+              <div class="widget-body mb-3">
+                <div class="widget-vs">
+                  <div class="d-flex align-items-center justify-content-around justify-content-between w-100">
+                    <div class="team-1 text-center">
+                      <img src="{{ next_match.home_team.crest }}" alt="Home Crest">
+                      <h3>{{ next_match.home_team.short_name }}</h3>
+                    </div>
+                    <div>
+                      <span class="vs"><span>VS</span></span>
+                    </div>
+                    <div class="team-2 text-center">
+                      <img src="{{ next_match.away_team.crest }}" alt="Image">
+                      <h3>{{ next_match.away_team.short_name }}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-center widget-vs-contents mb-4">
+                <h4>Premier League</h4>
+                <p class="mb-5">
+                  <span class="d-block">{{ next_match.start_date|date:"M dS, Y"}}</span>
+                  <span class="d-block">{{ next_match.start_date|date:"fA e"}}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        <div class="col-lg-6">
+            <div class="widget-next-match">
+              <div class="widget-title">
+                <h3>Last Match</h3>
+              </div>
+              <div class="widget-body mb-3">
+                <div class="widget-vs">
+                  <div class="d-flex align-items-center justify-content-around justify-content-between w-100">
+                    <div class="team-1 text-center">
+                      <img src="{{ last_match.home_team.crest }}" alt="Home Crest">
+                      <h3>{{ last.home_team.short_name }}</h3>
+                    </div>
+                    <div>
+                      <span class="vs"><span>{{ last_match.home_goals }} : {{ last_match.away_goals }}</span></span>
+                    </div>
+                    <div class="team-2 text-center">
+                      <img src="{{ last_match.away_team.crest }}" alt="Image">
+                      <h3>{{ last_match.away_team.short_name }}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-center widget-vs-contents mb-4">
+                <h4>Premier League</h4>
+                <p class="mb-5">
+                  <span class="d-block">{{ last_match.start_date|date:"M dS, Y"}}</span>
+                  <span class="d-block">{{ last_match.start_date|date:"fA e"}}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+
+    </div>
+</div>
+</div>
+<!--<div class="site-section bg-dark">-->
+<!--        <div class="container">-->
+<!--          <div class="row">-->
+<!--          <div class="col-12 title-section">-->
+<!--            <h2 class="heading">Next Ma</h2>-->
+<!--          </div>-->
+<!--            {% for bet in bets %}-->
+<!--                <div class="col-lg-6 mb-4">-->
+<!--                    <a href="{{ bet.match.get_absolute_url }}">-->
+<!--                    <div class="bg-light p-4 rounded">-->
+<!--                      <div class="widget-body">-->
+<!--                          <div class="widget-vs">-->
+<!--                            <div class="d-flex align-items-center justify-content-around justify-content-between w-100">-->
+<!--                              <div class="team-1 text-center">-->
+<!--                                <img src="{{ bet.match.home_team.crest }}" alt="Team">-->
+<!--                                <h3>{{ bet.match.home_team.short_name}}</h3>-->
+<!--                              </div>-->
+
+<!--                              <div class="team-1 text-center score">-->
+<!--                                <h1 >{{ bet.match.home_goals }}</h1>-->
+<!--                              </div>-->
+<!--                              <div class="team-1 text-center score">-->
+<!--                                <h1 >:</h1>-->
+<!--                              </div>-->
+<!--                              <div class="team-1 text-center score">-->
+<!--                                <h1>{{ bet.match.away_goals }}</h1>-->
+<!--                              </div>-->
+
+<!--                              <div class="team-2 text-center">-->
+<!--                                <img src="{{ bet.match.away_team.crest}}" alt="Team">-->
+<!--                                <h3>{{ bet.match.away_team.short_name}}</h3>-->
+<!--                              </div>-->
+<!--                            </div>-->
+<!--                          </div>-->
+<!--                        </div>-->
+
+<!--                        <div class="text-center widget-vs-contents mb-4">-->
+<!--                            {% if bet.is_won == True %}<h4>WIN</h4>{% elif bet.is_won == False %}<h4>LOSE</h4>{% endif %}-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </a>-->
+<!--                </div>-->
+
+<!--            {% endfor %}-->
+
+<!--        </div>-->
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'bet/index.html'%}
+{% load crispy_forms_tags %}
+{% block title %}Profile{% endblock %}
+
+{% block bg_section %}
+    <div class="col-lg-9 mx-auto text-center">
+        <div class="vcard bio">
+            <img class="rounded-circle" src="{{ object.emblem }}" alt="League Image">
+        </div>
+        <h1 class="text-white">{{ object.name }}</h1>
+        <p><span>{{ object.country }}</span></p>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+<div class="container site-section">
+  <div class="row">
+    <div class="col-6 title-section">
+      <h2 class="heading">Detail</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6 col-md-8">
+      <div class="custom-media d-flex">
+
+        <div class="text">
+            <h2 class="mb-1">{{ object.name}}</h2>
+            <h3 class="mb-1">Country:  {{ object.country  }}</h3>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

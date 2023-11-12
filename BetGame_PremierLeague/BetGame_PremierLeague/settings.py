@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     "league",
     "match",
     "bet",
-    "generate",
     "event",
     "crispy_forms",
     "crispy_bootstrap5",
