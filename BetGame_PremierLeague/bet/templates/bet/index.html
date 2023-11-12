@@ -56,7 +56,8 @@
                   <li><a href="{% url 'profile-detail' user.username %}" class="nav-link">Profile</a></li>
                   <li><a href="{% url 'bet-home' %}" class="nav-link">Bets</a></li>
                   <li><a href="{% url 'profile-list' %}" class="nav-link">Players</a></li>
-                  <li><a href="{% url 'match-season-results' %}" class="nav-link">Results</a></li>
+                  <li><a href="{% url 'match:results' %}" class="nav-link">Results</a></li>
+                  <li><a href="{% url 'match:fixtures' %}" class="nav-link">Fixtures</a></li>
                   <li><a href="{% url 'bet-finished' %}" class="nav-link">Finished</a></li>
                   <li><a href="{% url 'logout' %}" class="nav-link">Log Out</a></li>
               {% else %}

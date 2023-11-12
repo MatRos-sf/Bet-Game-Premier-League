@@ -2,25 +2,24 @@
 {% load crispy_forms_tags %}
 {% load bet_tags %}
 
-{% block title %}Bets{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block bg_section %}
 <div class="col-lg-9 mx-auto text-center" xmlns="http://www.w3.org/1999/html">
-        <h1 class="text-white">Results</h1>
+        <h1 class="text-white">{{ title }}</h1>
         <p>Season {{ season_name }}</p>
     </div>
 
 {% endblock %}
 
 {% block content %}
-    <!-- Upcoming section -->
     <div class="site-section bg-dark">
       <div class="container">
 
         <!-- Finished Matches -->
         <div class="row">
           <div class="col-12 title-section">
-            <h2 class="heading">Finished Matches</h2>
+            <h2 class="heading">Matches</h2>
           </div>
             <div class="sidebar-box">
               <form method="GET" class="search-form">
@@ -41,16 +40,22 @@
                                 <img src="{{ match.home_team.crest}}" alt="Team">
                                 <h3>{{ match.home_team.short_name}}</h3>
                               </div>
-
-                              <div class="team-1 text-center score">
+                              {% if match.finished %}
+                                 <div class="team-1 text-center score">
                                 <h1 >{{ match.home_goals }}</h1>
                               </div>
-                              <div class="team-1 text-center score">
+                                 <div class="team-1 text-center score">
                                 <h1 >:</h1>
                               </div>
-                              <div class="team-1 text-center score">
+                                 <div class="team-1 text-center score">
                                 <h1>{{ match.away_goals }}</h1>
                               </div>
+                              {% else %}
+                                <div>
+                                   <span class="vs"><span>VS</span></span>
+                                </div>
+                              {% endif %}
+
 
                               <div class="team-2 text-center">
                                 <img src="{{ match.away_team.crest}}" alt="Team">
@@ -60,9 +65,20 @@
                           </div>
                         </div>
 
+                          {% if not match.finished %}
+
+                    <div class="text-center widget-vs-contents mb-4">
+                      <p class="mb-5">
+                        <span class="d-block">{{ match.start_date|date:"M dS, Y"}}</span>
+                        <span class="d-block">{{ match.start_date|date:"fA e"}}</span>
+                      </p>
+
                     </div>
-                </a>
-                </div>
+                          {% endif %}
+
+                        </div>
+                    </a>
+                    </div>
 
             {% endfor %}
 
@@ -73,14 +89,14 @@
         <div class="col-lg-7 text-center">
           <div class="custom-pagination">
             {% if page_obj.has_previous %}
-              <a href="?page=1">&laquo;</a>
-              <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+              <a href="?page=1{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">&laquo;</a>
+              <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">{{ page_obj.previous_page_number }}</a>
             {% endif %}
             <span>{{ page_obj.number }}</span>
 
             {% if page_obj.has_next %}
-              <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number}}</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+              <a href="?page={{ page_obj.next_page_number }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">{{ page_obj.next_page_number}}</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">&raquo;</a>
             {% endif %}
 
           </div>

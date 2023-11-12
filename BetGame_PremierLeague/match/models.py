@@ -184,7 +184,7 @@ class Match(models.Model):
                 bet.check_bet()
 
     def get_absolute_url(self):
-        return reverse("match-detail", kwargs={"pk": self.pk})
+        return reverse("match:detail", kwargs={"pk": self.pk})
 
     def has_bet_for_match(self, user):
         return self.bet_set.filter(user=user).exists()

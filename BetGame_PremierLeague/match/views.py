@@ -1,9 +1,8 @@
-from django.shortcuts import render
 from django.views.generic import DetailView, ListView
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.contrib import messages
-from .models import Match, Matchweek
+from .models import Match
 from league.models import TeamStats, Team
 
 
@@ -40,7 +39,7 @@ class MatchDetailView(LoginRequiredMixin, DetailView):
 
 class ResultsSeasonListView(LoginRequiredMixin, ListView):
     model = Match
-    template_name = "match/results.html"
+    template_name = "match/match_list_view.html"
     paginate_by = 10
 
     def get_queryset(self):
@@ -48,8 +47,8 @@ class ResultsSeasonListView(LoginRequiredMixin, ListView):
         if name_team:
             queryset = self.model.objects.filter(
                 Q(finished=True),
-                Q(home_team__name__contains=name_team)
-                | Q(away_team__name__contains=name_team),
+                Q(home_team__name__icontains=name_team)
+                | Q(away_team__name__icontains=name_team),
             )
             if not queryset.exists():
                 messages.info(self.request, f"The Team: {name_team} not found!")
@@ -65,5 +64,29 @@ class ResultsSeasonListView(LoginRequiredMixin, ListView):
         match = context["object_list"].first()
         season_name = f"{match.matchweek.season.start_date.strftime('%Y')}/{match.matchweek.season.end_date.strftime('%y')}"
         context["season_name"] = season_name
+
+        context["title"] = "Results"
+        return context
+
+
+class FixturesSeasonListView(ResultsSeasonListView):
+    def get_queryset(self):
+        name_team = self.request.GET.get("name_team", "")
+        if name_team:
+            queryset = self.model.objects.filter(
+                Q(finished=False),
+                Q(home_team__name__icontains=name_team)
+                | Q(away_team__name__icontains=name_team),
+            )
+            if not queryset.exists():
+                messages.info(self.request, f"The Team: {name_team} not found!")
+                queryset = self.model.objects.filter(finished=False)
+        else:
+            queryset = self.model.objects.filter(finished=False)
+        return queryset
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(FixturesSeasonListView, self).get_context_data(*kwargs)
+        context["title"] = "Fixtures"
 
         return context
