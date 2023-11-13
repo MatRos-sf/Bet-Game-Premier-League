@@ -41,7 +41,7 @@ def check_and_update_currently_matchweek() -> str:
     if matchweek.matches.filter(finished=True).count() == matchweek.amt_matches:
         matchweek.finished = True
         matchweek.save()
-        return dashboard()
+        return check_and_update_currently_matchweek()
 
     return f"Matchweek: {matchweek.matchweek}"
 

@@ -204,9 +204,7 @@ class Match(models.Model):
         return self.bet_set.filter(user=user).exists()
 
     def get_season_and_league(self) -> Tuple[datetime.date, str]:
-        season = self.matchweek.season
-        league = self.league
-        return season, league
+        return self.matchweek.season, self.league
 
     def __str__(self):
         return self.score

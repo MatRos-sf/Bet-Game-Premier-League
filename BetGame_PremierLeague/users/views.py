@@ -20,9 +20,12 @@ def home(request: HttpRequest) -> HttpResponse:
     amt_of_users = User.objects.count()
     currently_season = Season.get_currently_season("Premier League")
 
-    table = TeamStats.get_season_table(
-        season=currently_season.start_date.year, league="Premier League"
-    )[:8]
+    if currently_season:
+        table = TeamStats.get_season_table(
+            season=currently_season.start_date.year, league="Premier League"
+        )[:8]
+    else:
+        table = []
 
     last_match = Match.get_last_match()
     next_match = Match.get_next_match()

@@ -6,6 +6,7 @@ from django.db.models import (
     F,
     FloatField,
 )
+from django.db.models.functions import Cast
 from django.urls import reverse
 
 
@@ -36,7 +37,9 @@ class Season(models.Model):
         league = self.league.name
         return f"{league} {self.start_date}"
 
-    @property
+    class Meta:
+        ordering = ["start_date"]
+
     @property
     def matchweek(self) -> int:
         """
@@ -46,13 +49,14 @@ class Season(models.Model):
 
     @classmethod
     def get_currently_season(cls, league: str):
-        return cls.objects.get(league__name=league, is_currently=True)
+        try:
+            c_s = cls.objects.get(league__name=league, is_currently=True)
+        except cls.DoesNotExist:
+            return None
+        return c_s
 
     def get_winner(self):
         pass
-
-    class Meta:
-        ordering = ["start_date"]
 
 
 class Team(models.Model):
@@ -96,7 +100,10 @@ class TeamStats(models.Model):
     goals_against = models.SmallIntegerField(default=0)
 
     points = models.SmallIntegerField(default=0)
-    # status
+
+    def __str__(self):
+        season_date = self.season.start_date.strftime("%y")
+        return f"{self.team.name} {season_date} {self.points}"
 
     @property
     def goal_difference(self) -> int:
@@ -112,12 +119,13 @@ class TeamStats(models.Model):
 
     @classmethod
     def get_season_so_far(cls, season: Season, first_team: Team):
-        stats = cls.objects.filter(season=season, team=first_team)
+        stats = cls.objects.filter(season=season, teameam=first_team)
 
-        stats = stats.annotate(
+        y = stats.annotate(
             avg_goals_scored=Avg(F("goals_for") / F("played")),
             avg_goals_conceded=ExpressionWrapper(
-                F("goals_against") / F("played"), output_field=FloatField()
+                Cast("goals_against", FloatField()) / Cast("played", FloatField()),
+                output_field=FloatField(),
             ),
         )
         return stats.first()
@@ -152,7 +160,3 @@ class TeamStats(models.Model):
         self.goals_for += team_goal
         self.goals_against += opponent_goal
         self.save()
-
-    def __str__(self):
-        season_date = self.season.start_date.strftime("%y")
-        return f"{self.team.name} {season_date} {self.points}"

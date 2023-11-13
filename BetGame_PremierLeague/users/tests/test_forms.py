@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 
 from users.forms import UserRegisterForm
 from .factories.user import UserFactory
+from users.models import Profile
 from .factories.profile import ProfileFactory, ExtendProfileFactory
 
 
@@ -73,6 +74,4 @@ class UserRegisterFormTest(TestCase):
         self.assertEquals(User.objects.count(), 1)
 
 
-# @tag("form_profile_update")
 # class ProfileUpdateTest(TestCase):
-#     #TODO test this form

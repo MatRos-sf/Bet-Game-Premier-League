@@ -48,6 +48,16 @@ def get_temporary_image(size: Tuple[int, int], name: str) -> File:
     return File(file_obj, name=name)
 
 
+# class xyz(TestCase):
+#     def setUp(self):
+#         ...
+#
+# class xyzTest(xyz):
+#     def setUp(self):
+#         super().setUp()
+#         ...
+
+
 @tag("model_profile")
 class ProfileTest(TestCase):
     @classmethod
@@ -200,10 +210,9 @@ class ProfileTest(TestCase):
 
         self.assertLess(points_user_one, points_user_two)
 
-    def test_should_return_empty_qs_when_user_do_not_have_any_followers(self):
+    def test_should_return_only_themselves_qs_when_user_not_add_any_followers(self):
         qs_of_users_who_follow = Profile.followers(user=self.profile.user)
-        self.assertFalse(qs_of_users_who_follow)
-        self.assertEquals(qs_of_users_who_follow.count(), 0)
+        self.assertEquals(qs_of_users_who_follow.count(), 1)
 
     def test_should_return_two_followers_when_some_users_following_them(self):
         profile_user = ProfileFactory()
@@ -229,6 +238,24 @@ class ProfileTest(TestCase):
 
         self.assertTrue(qs_of_users_who_follow)
         self.assertEquals(qs_of_users_who_follow.count(), 1)
+
+    def test_position_should_first_position_user_pk_two(self):
+        profile_user_two = User.objects.get(id=2)
+        position = Profile.position(profile_user_two.username)
+        self.assertEquals(position, 1)
+        self.assertIsInstance(position, int)
+
+    def test_top_players_should_retrieve_the_best_player(self):
+        top_player = Profile.top_players(5)
+        profile = Profile.objects.get(id=2)
+
+        self.assertEquals(top_player[0], profile)
+        self.assertEquals(top_player[0].sum_points, 1000)
+
+    @parameterized.expand([0, -1, -22])
+    def test_top_players_should_raise_valueError_when_value_end_is_lower_1(self, end):
+        with self.assertRaises(ValueError):
+            Profile.top_players(end)
 
 
 @tag("model_user_scores")

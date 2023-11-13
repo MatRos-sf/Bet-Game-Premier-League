@@ -66,6 +66,9 @@ class Profile(models.Model):
 
     @classmethod
     def top_players(cls, end: int) -> QuerySet:
+        if end < 1:
+            raise ValueError("End cannot be lower than 1.")
+
         return cls.objects.annotate(
             sum_points=Sum("points__points", default=0)
         ).order_by("-sum_points")[:end]
