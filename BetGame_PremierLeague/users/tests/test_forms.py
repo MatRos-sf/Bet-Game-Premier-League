@@ -5,8 +5,6 @@ from django.contrib.auth.models import User
 
 from users.forms import UserRegisterForm
 from .factories.user import UserFactory
-from users.models import Profile
-from .factories.profile import ProfileFactory, ExtendProfileFactory
 
 
 @tag("form_registration")

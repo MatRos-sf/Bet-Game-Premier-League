@@ -4,16 +4,8 @@ from factory import Faker, SubFactory, Sequence
 import factory
 
 from .user import UserFactory
+from league.tests.factories.models_factory import TeamFactory
 from users.models import Profile, UserScores
-from league.models import Team
-
-
-class TeamFactory(DjangoModelFactory):
-    class Meta:
-        model = Team
-
-    fb_id = Sequence(lambda n: f"fb_id_{n}")
-    name = Sequence(lambda n: f"Team{n}")
 
 
 @factory.django.mute_signals(signals.pre_save, signals.post_save)
