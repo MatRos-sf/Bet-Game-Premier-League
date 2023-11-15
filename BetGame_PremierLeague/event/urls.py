@@ -1,5 +1,10 @@
 from django.urls import path, include
 
-from .views import create
+from .views import create, EventDetailView
 
-urlpatterns = [path("create/", create)]
+app_name = "event"
+
+urlpatterns = [
+    path("create/", create, name="create"),
+    path("detail/<int:pk>/", EventDetailView.as_view(), name="detail"),
+]

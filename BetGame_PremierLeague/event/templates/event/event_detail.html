@@ -1,0 +1,99 @@
+{% extends 'bet/index.html'%}
+{% load crispy_forms_tags %}
+{% block title %}Profile{% endblock %}
+
+{% block bg_section %}
+    <div class="col-lg-9 mx-auto text-center">
+        <h1 class="text-white">{{ object.name }}</h1>
+        <h2><span>Event</span></h2>
+    </div>
+{% endblock %}
+
+{% block content %}
+{% if is_start %}
+<h1>XdDDDDDDDDDDDDDDD</h1>
+{% endif %}
+<div class="container site-section">
+  <div class="row">
+    <div class="col-6 title-section">
+      <h2 class="heading">Detail</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6 col-md-8">
+      <div class="custom-media d-flex">
+        <div class="text">
+            <h2 class="mb-1">{% if object.name %}{{ object.name }}{% else %}Event{% endif %}</h2>
+            <h3 class="mb-2">Amount of Members:  {{ object.amt_members  }}</h3>
+            <h3 class="mb-1">Start: {{ object.start_date|date:"M d, Y" }} </h3>
+            <h3 class="mb-1">End:  {{ object.end_date|date:"M d, Y" }}</h3>
+            <h3 class="mb-1">Fee:  {{ object.fee }}</h3>
+
+        </div>
+      </div>
+    </div>
+
+      <div class="col-6 col-md-4">
+
+            <div class="custom-media d-flex">
+            <div class="text">
+                <h2 class="mb-1">Price:</h2>
+                <h3 class="mb-2">First Place: {{ object.first_place }} </h3>
+                <h3 class="mb-2">Second Place: {{ object.second_place }} </h3>
+                <h3 class="mb-2">Third Place: {{ object.third_place }} </h3>
+
+            </div>
+
+          </div>
+        </div>
+  </div>
+</div>
+
+<!-- Description section -->
+{% if object.description %}
+    <div class="site-section bg-dark">
+        <div class="container">
+          <div class="row">
+            <div class="col-6 title-section">
+              <h2 class="heading">Description</h2>
+            </div>
+          </div>
+            <div class="text">
+                <p> {{ object.description }} </p>
+        </div>
+      </div>
+    </div>
+
+{% endif %}
+
+<div class="site-section bg-dark">
+        <div class="container justify-content-around">
+          <div class="row">
+          <div class="col-12 title-section">
+            <h2 class="heading">Table:</h2>
+          </div>
+              <table class="table custom-table ">
+                <thead>
+                  <tr>
+                    <th>P</th>
+                    <th>User</th>
+                    <th>PTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for u in object.rank %}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><a href="{{ u.profile.get_absolute_url }}"><strong class="{% if user == u %}text-danger{% else %}text-white{% endif %}">
+                            {{ u.username }}
+                        </strong></a></td>
+                        <td>{{ u.total_points }}</td>
+                      </tr>
+                  {% endfor %}
+
+                </tbody>
+              </table>
+          </div>
+        </div>
+</div>
+{% endblock %}
