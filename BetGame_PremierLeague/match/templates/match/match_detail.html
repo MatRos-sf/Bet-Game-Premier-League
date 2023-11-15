@@ -21,13 +21,13 @@
             {% if match.finished %}<span class="score">{{ match.home_goals}}-{{ match.away_goals}}</span>{% endif %}
             <div class="team-1 w-50">
               <div class="team-details w-100 text-center">
-                <img src="{{ match.home_team.crest }}" alt="Image" class="img-fluid">
+                <a href="{{ match.home_team.get_absolute_url  }}"><img src="{{ match.home_team.crest }}" alt="Image" class="img-fluid"></a>
                 <h3>{{ match.home_team.short_name }}</h3>
               </div>
             </div>
             <div class="team-2 w-50">
               <div class="team-details w-100 text-center">
-                <img src="{{ match.away_team.crest }}" alt="Image" class="img-fluid">
+                <a href="{{ match.away_team.get_absolute_url }}"><img src="{{ match.away_team.crest }}" alt="Image" class="img-fluid"></a>
                 <h3>{{ match.away_team.short_name }}</h3>
               </div>
             </div>
@@ -147,10 +147,10 @@
                     {% for m in form_home %}
                         <p>
                             ({{m.w}})
-                            {% if m.home_team != object.home_team %}
-                            {{ m.home_team.short_name }}
-                            {% else %}
+                            {% if m.home_team == object.home_team %}
                             {{ m.away_team.short_name }}
+                            {% else %}
+                            {{ m.home_team.short_name }}
                             {% endif %}
                             {{ m.score }} {{ m.result }}
                         </p>
@@ -163,7 +163,13 @@
                     <h4> {{ match.away_team.short_name}} </h4>
                     {% for m in form_away %}
                         <p>
-                            ({{m.w}}) {{ m.score }} {{ m.result }}
+                            ({{m.w}})
+                            {% if m.home_team == object.away_team %}
+                            {{ m.away_team.short_name }}
+                            {% else %}
+                            {{ m.home_team.short_name }}
+                            {% endif %}
+                            {{ m.score }} {{ m.result }}
                         </p>
                     {% endfor %}
                 </div>

@@ -35,6 +35,7 @@ class TeamDetailView(LoginRequiredMixin, DetailView):
 
         stats = TeamStats.get_team_stats(team=team)
         context["stats"] = stats
+        context["stats"]["clean_sheets"] = Match.get_clean_sheets(team)
 
         context["next_match"] = Match.get_next_match(team)
         context["last_match"] = Match.get_last_match(team)

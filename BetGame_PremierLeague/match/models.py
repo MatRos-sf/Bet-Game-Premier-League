@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.db.models import QuerySet, Q, Case, Value, When, CharField, F, Sum
 
-from league.models import Team
+from league.models import Team, Season
 
 
 class Matchweek(models.Model):
@@ -142,7 +142,10 @@ class Match(models.Model):
         return finished_matches.order_by("-start_date")
 
     @classmethod
-    def get_clean_sheets(cls, team, season):
+    def get_clean_sheets(cls, team, season: Optional[Season] = None):
+        if not season:
+            season = Season.objects.filter(is_currently=True).first()
+
         finished_matches = cls.get_season_finished_matches(team, season)
         is_clean_sheet = Case(
             When(Q(home_team=team) & Q(away_goals=0), then=True),

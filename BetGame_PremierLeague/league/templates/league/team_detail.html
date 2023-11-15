@@ -24,11 +24,10 @@
             </div>
             <div class="text">
                 <h2 class="mb-1">{{ object.name }}</h2>
-                <span class="meta">Joined {{ object.user.date_joined|date:"M d, Y"}}</span>
                 <h3 class="mb-1">Short Team Name:  {{ object.short_name  }}</h3>
                 <h3 class="mb-1">Shortcut: {{ object.shortcut }} </h3>
                 <h3 class="mb-1">League:  {% if object.currently_league %}{{ object.currently_league }}{% else %}Degraded{% endif %}</h3>
-                <h3 class="mb-1">Shortcut: {{ object.website }} </h3>
+                <h3 class="mb-1">Shortcut: <a href="{{ object.website }}">{{ object.website }}</a> </h3>
                 <h3 class="mb-1">Shortcut: {{ object.club_colours }} </h3>
                 <h3 class="mb-1">Number Of Supporters:  {{ object.fans.count }}</h3>
             </div>
@@ -180,7 +179,7 @@
                   <div class="d-flex align-items-center justify-content-around justify-content-between w-100">
                     <div class="team-1 text-center">
                       <img src="{{ last_match.home_team.crest }}" alt="Home Crest">
-                      <h3>{{ last.home_team.short_name }}</h3>
+                      <h3>{{ last_match.home_team.short_name }}</h3>
                     </div>
                     <div>
                       <span class="vs"><span>{{ last_match.home_goals }} : {{ last_match.away_goals }}</span></span>
@@ -207,6 +206,46 @@
     </div>
 </div>
 </div>
+
+{% if top_fans %}
+<div class="site-section bg-dark">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+              <div class="col-12 title-section">
+                <h2 class="heading">Top fans!</h2>
+              </div>
+              <div class="widget-next-match justify-content-around">
+              <table class="table custom-table ">
+                <thead>
+                  <tr>
+                    <th>P</th>
+                    <th>User</th>
+                    <th>PTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for profile in top_fans %}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <a href="{{ profile.get_absolute_url }}">
+                               <strong class="text-white">{{ profile.user.username }}</strong></td>
+                            </a>
+                        <td>{{ profile.sum }}</td>
+                      </tr>
+                  {% endfor %}
+
+                </tbody>
+              </table>
+            </div>
+            </div>
+        </div>
+      </div>
+
+</div>
+{% endif %}
+
 <!--<div class="site-section bg-dark">-->
 <!--        <div class="container">-->
 <!--          <div class="row">-->
