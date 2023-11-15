@@ -6,6 +6,28 @@ from .models import Match
 from league.models import TeamStats, Team
 
 
+def count_different(match, team) -> int:
+    if match.home_team == team:
+        return match.home_goals - match.away_goals
+    return match.away_goals - match.home_goals
+
+
+def find_biggest_win_and_worst_defeat(qs_match, main_team):
+    biggest_win, worst_defeat = None, None
+    score_win, score_defeat = 0, 0
+
+    for match in qs_match:
+        diff = count_different(match, main_team)
+        if diff > score_win:
+            score_win = diff
+            biggest_win = match
+        elif diff < score_defeat:
+            score_defeat = diff
+            worst_defeat = match
+
+    return biggest_win, worst_defeat
+
+
 class MatchDetailView(LoginRequiredMixin, DetailView):
     model = Match
     template_name = "match/match_detail.html"
@@ -16,6 +38,10 @@ class MatchDetailView(LoginRequiredMixin, DetailView):
         season, league = match.get_season_and_league()
         table = TeamStats.get_season_table(season=season.start_date.year, league=league)
         context["table"] = table
+        position_home = table.filter(team=match.home_team).first().get_position
+        position_away = table.filter(team=match.away_team).first().get_position
+
+        context["position"] = {"home": position_home, "away": position_away}
         # TODO takie staty jak tu: https://www.premierleague.com/match/93424
 
         # form guide
@@ -33,6 +59,36 @@ class MatchDetailView(LoginRequiredMixin, DetailView):
 
         context["so_far_home"] = so_far_home
         context["so_far_away"] = so_far_away
+
+        # count biggest and worst match
+        matches_so_far_home = Match.get_season_finished_matches(
+            match.home_team, match.matchweek.season
+        )
+        biggest_win_and_worst_defeat_home = find_biggest_win_and_worst_defeat(
+            matches_so_far_home, match.home_team
+        )
+
+        matches_so_far_away = Match.get_season_finished_matches(
+            match.away_team, match.matchweek.season
+        )
+        biggest_win_and_worst_defeat_away = find_biggest_win_and_worst_defeat(
+            matches_so_far_away, match.away_team
+        )
+
+        context["home"] = {
+            "bw": biggest_win_and_worst_defeat_home[0],
+            "wd": biggest_win_and_worst_defeat_home[1],
+        }
+
+        context["away"] = {
+            "bw": biggest_win_and_worst_defeat_away[0],
+            "wd": biggest_win_and_worst_defeat_away[1],
+        }
+
+        context["clean_sheets"] = {
+            "home": Match.get_clean_sheets(match.home_team, match.matchweek.season),
+            "away": Match.get_clean_sheets(match.away_team, match.matchweek.season),
+        }
 
         return context
 

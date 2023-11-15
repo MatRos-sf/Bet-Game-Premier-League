@@ -6,7 +6,7 @@ from django.core.validators import MinValueValidator
 from django.utils import timezone
 from django.urls import reverse
 from django.core.exceptions import ValidationError
-from django.db.models import QuerySet, Q, Case, Value, When, CharField, F
+from django.db.models import QuerySet, Q, Case, Value, When, CharField, F, Sum
 
 from league.models import Team
 
@@ -130,6 +130,28 @@ class Match(models.Model):
             last_match = cls.objects.filter(finished=True)
 
         return last_match.order_by("-start_date").first()
+
+    @classmethod
+    def get_season_finished_matches(cls, team: Team, season):
+        finished_matches = cls.objects.filter(
+            Q(finished=True),
+            Q(home_team=team) | Q(away_team=team),
+            Q(matchweek__season=season),
+        )
+
+        return finished_matches.order_by("-start_date")
+
+    @classmethod
+    def get_clean_sheets(cls, team, season):
+        finished_matches = cls.get_season_finished_matches(team, season)
+        is_clean_sheet = Case(
+            When(Q(home_team=team) & Q(away_goals=0), then=True),
+            When(Q(away_team=team) & Q(home_goals=0), then=True),
+            default=False,
+        )
+        return finished_matches.annotate(is_clean_sheet=is_clean_sheet).aggregate(
+            clean_sheets=Sum("is_clean_sheet", default=0)
+        )["clean_sheets"]
 
     @classmethod
     def get_next_match(cls, team: Optional[Team] = None) -> QuerySet:

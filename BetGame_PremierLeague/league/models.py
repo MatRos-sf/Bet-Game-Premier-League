@@ -1,11 +1,5 @@
 from django.db import models
-from django.db.models import (
-    Avg,
-    Sum,
-    ExpressionWrapper,
-    F,
-    FloatField,
-)
+from django.db.models import Avg, Sum, ExpressionWrapper, F, FloatField, Case, When, Q
 from django.db.models.functions import Cast
 from django.urls import reverse
 
@@ -54,9 +48,6 @@ class Season(models.Model):
         except cls.DoesNotExist:
             return None
         return c_s
-
-    def get_winner(self):
-        pass
 
 
 class Team(models.Model):
@@ -109,6 +100,14 @@ class TeamStats(models.Model):
     def goal_difference(self) -> int:
         return int(self.goals_for) - int(self.goals_against)
 
+    @property
+    def get_position(self):
+        table = TeamStats.get_season_table(
+            self.season.league, self.season.start_date.year
+        )
+        p = list(table).index(self)
+        return p + 1
+
     @classmethod
     def get_season_table(cls, league: str, season: int = None):
         # TODO ma szukać w League aktualny sezon
@@ -119,10 +118,13 @@ class TeamStats(models.Model):
 
     @classmethod
     def get_season_so_far(cls, season: Season, first_team: Team):
-        stats = cls.objects.filter(season=season, teameam=first_team)
+        stats = cls.objects.filter(season=season, team=first_team)
 
-        y = stats.annotate(
-            avg_goals_scored=Avg(F("goals_for") / F("played")),
+        stats = stats.annotate(
+            avg_goals_scored=ExpressionWrapper(
+                Cast("goals_for", FloatField()) / Cast("played", FloatField()),
+                output_field=FloatField(),
+            ),
             avg_goals_conceded=ExpressionWrapper(
                 Cast("goals_against", FloatField()) / Cast("played", FloatField()),
                 output_field=FloatField(),
