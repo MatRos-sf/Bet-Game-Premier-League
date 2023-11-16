@@ -14,7 +14,6 @@ load_dotenv()
 
 HEADER = {"X-Auth-Token": settings.API_TOKEN}
 # HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
-# TODO basic Legue gdzie będzie dziedziczone dzięki tej klasie będzie można stworzyć różne ligi
 
 
 @dataclass
