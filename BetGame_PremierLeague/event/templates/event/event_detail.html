@@ -10,12 +10,10 @@
 {% endblock %}
 
 {% block content %}
-{% if is_start %}
-<h1>XdDDDDDDDDDDDDDDD</h1>
-{% endif %}
+
 <div class="container site-section">
   <div class="row">
-    <div class="col-6 title-section">
+      <div class="col-6 title-section">
       <h2 class="heading">Detail</h2>
     </div>
   </div>
@@ -38,14 +36,26 @@
             <div class="custom-media d-flex">
             <div class="text">
                 <h2 class="mb-1">Price:</h2>
-                <h3 class="mb-2">First Place: {{ object.first_place }} </h3>
-                <h3 class="mb-2">Second Place: {{ object.second_place }} </h3>
-                <h3 class="mb-2">Third Place: {{ object.third_place }} </h3>
+                <h3 class="mb-2">First Place: {{ object.calculate_first_place_points }} </h3>
+                <h3 class="mb-2">Second Place: {{ object.calculate_second_place_points }} </h3>
+                <h3 class="mb-2">Third Place: {{ object.calculate_third_place_points }} </h3>
 
             </div>
 
           </div>
         </div>
+      {% if is_start and user == object.owner %}
+            <div class="sidebar-box">
+              <form method="POST" class="search-form">
+                <div class="form-group">
+                  <span class="icon fa fa-search"></span>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                </div>
+              </form>
+            </div>
+
+        {% endif %}
   </div>
 </div>
 

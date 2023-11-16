@@ -1,0 +1,79 @@
+{% extends 'bet/index.html'%}
+{% load crispy_forms_tags %}
+{% load bet_tags %}
+
+{% block title %}Requests{% endblock %}
+
+{% block bg_section %}
+<div class="col-lg-9 mx-auto text-center" xmlns="http://www.w3.org/1999/html">
+        <h1 class="text-white">Events</h1>
+    </div>
+
+{% endblock %}
+
+{% block content %}
+
+    <!-- Events section -->
+    <div class="site-section bg-dark">
+
+      <div class="container">
+        <ul class="nav mb-5">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'event:requests' %}">Invitation</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">Finished</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'event:create' %}">Create</a>
+          </li>
+        </ul>
+        <div class="row mb-5">
+          <div class="col-12 title-section">
+            <h2 class="heading">Events:</h2>
+          </div>
+            {% for event in object_list %}
+                 <div class="col-lg-12 mb-4">
+                  <div class="widget-next-match">
+                  <div class="widget-title">
+                    <a href="{{ event.get_absolute_url }}"><h3>{{ event.name }}</h3></a>
+                  </div>
+
+                  <div class="widget-body mb-3 ">
+                    <div class="widget-vs">
+                      <table class="table custom-table ">
+                <thead>
+                  <tr>
+                    <th>P</th>
+                    <th>User</th>
+                    <th>PTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for u in event.rank|slice:":3" %}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><a href="{{ u.profile.get_absolute_url }}"><strong class="{% if user == u %}text-danger{% else %}text-white{% endif %}">
+                            {{ u.username }}
+                        </strong></a></td>
+                        <td>{{ u.total_points }}</td>
+                      </tr>
+                  {% endfor %}
+
+                </tbody>
+              </table>
+
+
+                    </div>
+                  </div>
+                  </div>
+              </div>
+            {% empty %}
+            <h1> Join to any event and achieve more points! </h1>
+            {% endfor %}
+
+        </div>
+      </div>
+    </div>
+
+{% endblock %}

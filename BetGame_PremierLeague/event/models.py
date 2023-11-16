@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.urls import reverse
 from django.db.models import Sum, Q
+from typing import Optional
 
 
 class Event(models.Model):
@@ -29,6 +30,7 @@ class Event(models.Model):
         default=10,
         help_text="The field that specifies the percentage win for 3rd place.",
     )
+    is_finished = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -68,8 +70,23 @@ class Event(models.Model):
         )
         return rank
 
-    def info_fee(self):
-        return f"The entrance fee is {self.fee} pts."
+    @property
+    def calculate_first_place_points(self):
+        points = self.members.count() * self.fee
+        return points * self.first_place // 100
+
+    @property
+    def calculate_second_place_points(self):
+        points = self.members.count() * self.fee
+        return points * self.first_place // 100
+
+    @property
+    def calculate_third_place_points(self):
+        points = self.members.count() * self.fee
+        return points * self.first_place // 100
+
+    def info_fee(self) -> Optional[str]:
+        return f"The entrance fee is {self.fee} pts." if self.fee else None
 
 
 class EventRequest(models.Model):
@@ -86,3 +103,33 @@ class EventRequest(models.Model):
 
     canceled = models.BooleanField(default=False)
     is_accept = models.BooleanField(default=False)
+
+    def add_to_event(self) -> None:
+        if self.event.start_date > timezone.now():
+            if self.receiver.profile.all_points - self.event.fee >= 0:
+                self.event.members.add(self.receiver)
+                self.is_accept = True
+                self.save()
+            else:
+                raise ValidationError("You don't have enough points!")
+        else:
+            self.canceled = True
+            self.save()
+            raise ValidationError(
+                "You cannot join the event because it has already started!"
+            )
+
+    def remove_to_event(self) -> None:
+        if self.is_accept and self.event.start_date > timezone.now():
+            self.event.members.remove(self.receiver)
+            self.is_accept = False
+            self.canceled = True
+            self.save()
+        else:
+            raise ValidationError(
+                "You cannot quit the event because it has already started!"
+            )
+
+    def cancel(self):
+        self.canceled = True
+        self.save()

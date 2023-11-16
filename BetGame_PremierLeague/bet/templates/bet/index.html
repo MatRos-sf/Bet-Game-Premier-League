@@ -59,7 +59,9 @@
                   <li><a href="{% url 'match:results' %}" class="nav-link">Results</a></li>
                   <li><a href="{% url 'match:fixtures' %}" class="nav-link">Fixtures</a></li>
                   <li><a href="{% url 'bet-finished' %}" class="nav-link">Finished</a></li>
+                  <li><a href="{% url 'event:list' %}" class="nav-link">Events</a></li>
                   <li><a href="{% url 'logout' %}" class="nav-link">Log Out</a></li>
+
               {% else %}
                   <li><a href="{% url 'login' %}" class="nav-link">Log In</a></li>
                   <li><a href="{% url 'register' %}" class="nav-link">Register</a></li>

@@ -71,7 +71,7 @@ class Bet(models.Model):
 
         stats = cls.objects.filter(user=user).aggregate(
             amt_bets=Count("id"),
-            win_rate=Avg("is_won"),
+            win_rate=Avg("is_won", default=0),
             won_bets=won_bets,
             risk_bets=risk_bets,
             won_bets_risk=win_bets_risk,

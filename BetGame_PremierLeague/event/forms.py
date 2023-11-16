@@ -1,6 +1,7 @@
 from django import forms
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 from .models import Event, EventRequest
 
@@ -39,3 +40,14 @@ class EventForm(forms.ModelForm):
     #     fee = self.cleaned_data['fee']
     #     if user_points - fee < 0:
     #         raise ValidationError("You don't have enough points to create event!")
+
+
+class SearchUsernameForm(forms.Form):
+    username = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Type the username and press Enter to send an invitation to the event."
+            }
+        ),
+    )
