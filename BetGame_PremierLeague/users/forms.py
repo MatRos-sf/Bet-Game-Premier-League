@@ -16,4 +16,4 @@ class UserRegisterForm(UserCreationForm):
 class ProfileUpdate(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ["image", "description"]
+        fields = ["image", "description", "support_team"]

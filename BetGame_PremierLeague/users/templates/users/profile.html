@@ -49,7 +49,8 @@
       <h2 class="heading">Detail</h2>
     </div>
   </div>
-  <div class="row">
+
+    <div class="row">
     <div class="col-sm-6 col-md-8">
       <div class="custom-media d-flex">
         <div class="img mr-4">
@@ -113,41 +114,71 @@
 
 <div class="latest-news">
       <div class="container">
-        <div class="row">
+          <div class="row">
           <div class="col-12 title-section">
-            <h2 class="heading">Stats</h2>
+            <h2 class="heading">Stats:</h2>
           </div>
+          <div class="col-lg-6 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">Bets</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ bet_stats.amt_bets }}</h2>
+                </div>
+
+            </div>
+          </div>
+          <div class="col-lg-6 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">Win Rate</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ bet_stats.win_rate }}%</h2>
+                </div>
+
+            </div>
+          </div>
+          <div class="col-lg-6 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">Risk bets</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ bet_stats.risk_bets }}</h2>
+                </div>
+
+            </div>
+          </div>
+          <div class="col-lg-6 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">Win rate of risk bets.</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ bet_stats.win_rate_risk_bet }}%</h2>
+                </div>
+
+            </div>
+          </div>
+
+
+
         </div>
 
-        <div class="row justify-content-around">
-          <div class="col-4 ">
-            <h1>Bets</h1>
-            <div class="caption p-5">
-              <h3 class="mb-3">{{ bet_stats.amt_bets }}</h3>
-            </div>
-          </div>
-          <div class="col-4">
-            <h1>Win rate</h1>
-            <div class="caption p-5">
-              <h3 class="mb-3">{{ bet_stats.win_rate }}</h3>
-            </div>
-          </div>
-        </div>
-
-        <div class="row justify-content-around">
-          <div class="col-4">
-            <h1>Risk bets</h1>
-            <div class="caption p-5">
-              <h3 class="mb-3">{{ bet_stats.risk_bets }}</h3>
-            </div>
-          </div>
-          <div class="col-4">
-            <h1>Win rate of risk bets.</h1>
-            <div class="caption p-5">
-              <h3 class="mb-3 text-center">{{ bet_stats.win_rate_risk_bet }}</h3>
-            </div>
-          </div>
-        </div>
 
       </div>
 

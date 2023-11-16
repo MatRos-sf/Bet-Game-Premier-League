@@ -156,7 +156,7 @@ class ProfileListView(LoginRequiredMixin, ListView):
 def edit_profile(request, username):
     if request.user.username != username:
         messages.warning(request, "You can only update own profile!")
-        return redirect("user-profile-detail", slag=request.user.username)
+        return redirect("profile-detail", slag=request.user.username)
 
     user_profile = get_object_or_404(Profile, user__username=username)
     form = ProfileUpdate(instance=user_profile)
@@ -170,8 +170,8 @@ def edit_profile(request, username):
                 if os.path.exists(old_photo_path):
                     os.remove(old_photo_path)
             form.save()
-
-            return redirect("user-profile-edit", username=username)
+            messages.success(request, "Saved")
+            return redirect("profile-edit", username=username)
 
     return render(
         request,

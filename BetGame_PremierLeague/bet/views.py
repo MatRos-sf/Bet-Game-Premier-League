@@ -41,20 +41,35 @@ class BetsListView(LoginRequiredMixin, ListView):
         return context
 
     def post(self, request, *args, **kwargs):
+        """
+        Method:
+           1. Firstly, get or create bets.
+           2. Secondly, assign a choice.
+           3. Thirdly, check when the user presses risk. If yes, then check:
+               * Enough points to play with risk.
+               * Check if bet.risk is equal to False.
+        """
+
         cd = request.POST
         choice, match_pk = cd.get("bet").split()
         risk = cd.get("risk", False)
+
         bet, _ = Bet.objects.get_or_create(
             match=Match.objects.get(pk=match_pk), user=request.user
         )
 
         bet.choice = choice
-
         if risk:
-            bet.risk = risk
+            if not bet.risk and self.request.user.profile.all_points - 1 >= 0:
+                bet.risk = risk
+            else:
+                messages.info(
+                    request,
+                    "You don't have enough points or you have already checked this option.",
+                )
+                return self.get(request)
 
         bet.save()
-
         return self.get(request)
 
 
@@ -85,7 +100,10 @@ def set_bet(request, pk: int, choice: str):
 class UserFinishedBetsListView(LoginRequiredMixin, ListView):
     model = Bet
     template_name = "bet/user_finished_bets.html"
+    paginate_by = 10
 
     def get_queryset(self):
-        qs = self.model.objects.filter(user=self.request.user, is_active=False)
+        qs = self.model.objects.filter(
+            user=self.request.user, is_active=False
+        ).order_by("-match__start_date")
         return qs

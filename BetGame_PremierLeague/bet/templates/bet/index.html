@@ -51,20 +51,19 @@
           <div class="ml-auto">
             <nav class="site-navigation position-relative text-right" role="navigation">
               <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
-                  <li class="active"><a href="{% url 'home'%}" class="nav-link">Home</a></li>
+                  <li class="{% if request.path == '/' %}active{% endif %}"><a href="{% url 'home'%}" class="nav-link">Home</a></li>
                 {% if user.is_authenticated %}
                   <li><a href="{% url 'profile-detail' user.username %}" class="nav-link">Profile</a></li>
-                  <li><a href="{% url 'bet-home' %}" class="nav-link">Bets</a></li>
-                  <li><a href="{% url 'profile-list' %}" class="nav-link">Players</a></li>
-                  <li><a href="{% url 'match:results' %}" class="nav-link">Results</a></li>
-                  <li><a href="{% url 'match:fixtures' %}" class="nav-link">Fixtures</a></li>
-                  <li><a href="{% url 'bet-finished' %}" class="nav-link">Finished</a></li>
-                  <li><a href="{% url 'event:list' %}" class="nav-link">Events</a></li>
-                  <li><a href="{% url 'logout' %}" class="nav-link">Log Out</a></li>
+                  <li class="{% if request.path == '/bet/' %}active{% endif %}"><a href="{% url 'bet-home' %}" class="nav-link">Bets</a></li>
+                  <li class="{% if request.path == '/profiles/' %}active{% endif %}"><a href="{% url 'profile-list' %}" class="nav-link">Players</a></li>
+                  <li class="{% if request.path == '/match/results/' %}active{% endif %}"><a href="{% url 'match:results' %}" class="nav-link">Results</a></li>
+                  <li class="{% if request.path == '/match/fixtures/' %}active{% endif %}"><a href="{% url 'match:fixtures' %}" class="nav-link">Fixtures</a></li>
+                  <li class="{% if request.path == '/event/' %}active{% endif %}"><a href="{% url 'event:list' %}" class="nav-link">Events</a></li>
+                  <li class="{% if request.path == '/logout/' %}active{% endif %}"><a href="{% url 'logout' %}" class="nav-link">Log Out</a></li>
 
               {% else %}
-                  <li><a href="{% url 'login' %}" class="nav-link">Log In</a></li>
-                  <li><a href="{% url 'register' %}" class="nav-link">Register</a></li>
+                  <li class="{% if request.path == '/login/' %}active{% endif %}"><a href="{% url 'login' %}" class="nav-link">Log In</a></li>
+                  <li class="{% if request.path == '/register/' %}active{% endif %}"><a href="{% url 'register' %}" class="nav-link">Register</a></li>
 
 
               {% endif %}

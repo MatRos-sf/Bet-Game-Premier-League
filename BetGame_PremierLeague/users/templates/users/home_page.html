@@ -58,29 +58,50 @@
           <div class="col-12 title-section">
             <h2 class="heading">About bets from Matchweek {{ last_bets.matchweek }}!</h2>
           </div>
-        </div>
+          <div class="col-lg-4 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">The amount of bets</h1>
+                  </div>
+                </div>
 
-        <div class="row no-gutters">
-          <div class="col-md-4 text-lg-center">
-            <h1>The amount of bets</h1>
-            <div class="caption p-5">
-              <h3 class="mb-3">{{ last_bets.amt_bets }}</h3>
-            </div>
-          </div>
-          <div class="col-md-4 text-lg-center">
-            <h1>The win rate of bets.</h1>
-            <div class="caption p-5">
-              <h3 class="mb-3">{{ last_bets.won }}</h3>
-            </div>
-          </div>
-          <div class="col-md-4 text-lg-center">
-            <h1>The amount of risk bet.</h1>
-            <div class="caption p-5">
-              <h3 class="mb-3">{{ last_bets.risk_win }}</h3>
-            </div>
-          </div>
-        </div>
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ last_bets.amt_bets }}</h2>
+                </div>
 
+            </div>
+          </div>
+          <div class="col-lg-4 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">The win rate of bets.</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ last_bets.won }}</h2>
+                </div>
+
+            </div>
+          </div>
+          <div class="col-lg-4 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">The amount of risk bet.</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ last_bets.risk_win }}</h2>
+                </div>
+
+            </div>
+          </div>
+
+        </div>
 
       </div>
     </div>
@@ -115,7 +136,6 @@
                 <p class="mb-5">
                   <span class="d-block">{{next_match.start_date|date:"F jS, Y"}}</span>
                   <span class="d-block">{{next_match.start_date|date:"P T"}}</span>
-                  <strong class="text-primary">New Euro Arena</strong>
                 </p>
               </div>
             </div>
