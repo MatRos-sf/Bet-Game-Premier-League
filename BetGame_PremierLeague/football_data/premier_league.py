@@ -6,14 +6,13 @@ from typing import Dict, List, Tuple, Optional
 from dotenv import load_dotenv
 from datetime import datetime
 from django.utils import timezone
-from time import sleep
 from django.conf import settings
 from http import HTTPStatus
 
 load_dotenv()
 
-HEADER = {"X-Auth-Token": settings.API_TOKEN}
-# HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
+# HEADER = {"X-Auth-Token": settings.API_TOKEN}
+HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
 
 
 @dataclass
@@ -55,7 +54,7 @@ class Team:
 class Match:
     home_team_id: int
     away_team_id: int
-    start_date: datetime.date
+    start_date: datetime
     home_goals: int
     away_goals: int
     finished: bool
@@ -65,8 +64,8 @@ class Match:
 @dataclass
 class Matchweek:
     matchweek: int
-    start_date: datetime.date
-    end_date: datetime.date
+    start_date: datetime
+    end_date: datetime
     season: Season
     finished: bool
     matches: List[Match]
@@ -122,7 +121,7 @@ class PremierLeague:
         url = self.__get_full_url(self.url_current_season)
         succeed, response = self.__get_response(url)
 
-        if not succeed or response.status_code != HTTPStatus.OK:
+        if not succeed:
             return
 
         dataset = response.json()
@@ -264,7 +263,6 @@ class PremierLeague:
                 matches=mw_matches,
             )
             matchweeks.append(matchweek_obj)
-
         return matchweeks
 
     def get_standings(self) -> List[TeamStats] | None:
@@ -301,7 +299,7 @@ class PremierLeague:
     @staticmethod
     def capture_match(data: dict) -> Match:
         date = datetime.strptime(data["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
-        date = timezone.make_aware(date, timezone=timezone.utc)
+        # date = timezone.make_aware(date, timezone=timezone.utc)
 
         match_obj = Match(
             home_team_id=data["homeTeam"]["id"],
@@ -324,76 +322,16 @@ class PremierLeague:
             raise AttributeError("The league attribute is None!")
         return self.season.__dict__
 
-    # below probably delete
-    def get_info_currently_league(self) -> Dict[str, str] | None:
-        url = self.__get_full_url(self.url_competitions)
-        succeed, response = self.__get_response(url)
-
-        if not succeed:
-            return
-
-        response_league_ino = response.json()["competition"]
-        league = {
-            "name": response_league_ino["name"],
-            "emblem": response_league_ino["emblem"],
-            "country": "England",
-        }
-
-        return league
-
-    def get_info_current_season(self) -> Dict[str, str] | None:
+    def check_new_season(self, season: int) -> Optional[bool]:
         url = self.__get_full_url(self.url_current_season)
         succeed, response = self.__get_response(url)
 
-        if not succeed:
+        if not succeed or response.status_code != HTTPStatus.OK:
             return
 
-        data = response.json()
-
-        season = {
-            "league": data["name"],
-            "fb_id": data["currentSeason"]["id"],
-            "start_date": data["currentSeason"]["startDate"],
-            "end_date": data["currentSeason"]["endDate"],
-            "matchweek": data["currentSeason"]["currentMatchday"],
-        }
-
-        return season
-
-    def get_matches_result(
-        self, mw: int, year: int
-    ) -> Tuple[Dict[str, str], List[Dict[str, str]]] | Tuple[None, None]:
-        """
-        Return only finished matches
-        """
-        url = self.__get_full_url(
-            self.url_matchweek, [f"matchday={str(mw)}", f"season={str(year)}"]
+        dataset = response.json()
+        start_new_season = datetime.strptime(
+            dataset["currentSeason"]["startDate"], "%Y-%m-%d"
         )
-        succeed, response = self.__get_response(url)
 
-        if not succeed:
-            return None, None
-
-        data = response.json()
-
-        info = {
-            "all": data["resultSet"]["count"],
-            "played": data["resultSet"]["played"],
-        }
-
-        matches = []
-
-        for match in data["matches"]:
-            payload = {}
-
-            if not match["status"] == "FINISHED":
-                continue
-
-            payload["home_team_id"] = match["homeTeam"]["id"]
-            payload["away_team_id"] = match["awayTeam"]["id"]
-            payload["home_goals"] = match["score"]["fullTime"]["home"]
-            payload["away_goals"] = match["score"]["fullTime"]["away"]
-
-            matches.append(payload)
-
-        return info, matches
+        return start_new_season.year != season

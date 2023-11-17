@@ -76,6 +76,7 @@ class BetsListView(LoginRequiredMixin, ListView):
 @login_required
 def set_bet(request, pk: int, choice: str):
     match = Match.objects.get(id=pk)
+    print("here")
     # TODO release:
     # if not match.matchweek.is_editable():
     #     messages.error(

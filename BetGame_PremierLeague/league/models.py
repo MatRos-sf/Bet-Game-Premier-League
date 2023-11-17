@@ -41,6 +41,14 @@ class Season(models.Model):
         """
         return self.current_season.filter(finished=False).first().matchweek
 
+    @property
+    def amt_matchweeks(self) -> int:
+        """
+        The method returns the total number of matchweeks in particular season
+        """
+        amt_teams = self.teamstats_set.count()
+        return amt_teams * 2 - 2
+
     @classmethod
     def get_currently_season(cls, league: str):
         try:
@@ -58,14 +66,6 @@ class Team(models.Model):
     # TODO: will change name currently_league -> league
     currently_league = models.ForeignKey(
         League, on_delete=models.CASCADE, related_name="teams", blank=True, null=True
-    )
-    # TODO delete
-    last_league = models.ForeignKey(
-        League,
-        blank=True,
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="previous_season_teams",
     )
 
     crest = models.URLField(blank=True, null=True)

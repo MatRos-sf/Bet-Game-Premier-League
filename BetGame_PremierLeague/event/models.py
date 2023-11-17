@@ -8,6 +8,7 @@ from typing import Optional
 
 
 class Event(models.Model):
+    choices = [("before", "Before"), ("now", "Now"), ("finished", "finished")]
     name = models.CharField(max_length=200, blank=True, null=True)
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -31,6 +32,7 @@ class Event(models.Model):
         help_text="The field that specifies the percentage win for 3rd place.",
     )
     is_finished = models.BooleanField(default=False)
+    status = models.CharField(max_length=25, choices=choices, default="before")
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

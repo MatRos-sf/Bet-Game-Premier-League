@@ -43,8 +43,15 @@ class Matchweek(models.Model):
             return "After"
 
     @property
-    def amt_matches(self) -> int:
+    def matches_count(self) -> int:
         return self.matches.all().count()
+
+    @property
+    def matches_played(self) -> int:
+        return self.matches.filter(finished=True).count()
+
+    def is_finished(self) -> True:
+        return self.matches_count == self.matches_played
 
     class Meta:
         ordering = ["start_date"]
@@ -53,10 +60,7 @@ class Matchweek(models.Model):
         super(Matchweek, self).save(*args, **kwargs)
 
         # check all match finished
-        if (
-            self.finished
-            and self.amt_matches != self.matches.filter(finished=True).count()
-        ):
+        if self.finished and not self.is_finished():
             self.finished = False
             self.save()
             raise ValidationError(
