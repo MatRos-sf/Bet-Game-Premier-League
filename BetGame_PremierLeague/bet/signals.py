@@ -1,18 +1,34 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
-from django.db.models import F
-
+from typing import Type
 
 from .models import Bet
-from users.models import SeasonPoints
+from users.models import UserScores
 
 
 @receiver(post_save, sender=Bet)
-def allocation_point_for_won_bet(sender, instance, **kwargs):
-    # TODO bet should be is_active = False
-    if instance.is_won == True:  #
-        sp = SeasonPoints.objects.get(
-            profile=instance.user.profile, season=instance.match.matchweek.season
+def allocation_point_for_won_bet(sender, instance: Bet, **kwargs) -> None:
+    """
+    Give points if user win Bet
+    """
+
+    if instance.is_won:
+        points = 4 if instance.risk else 1
+        UserScores.objects.create(
+            profile=instance.user.profile,
+            points=points,
+            description=UserScores.render_description(points, f"WON bet {instance.pk}"),
         )
-        sp.points = F("points") + 1
-        sp.save()
+
+
+@receiver(post_save, sender=Bet)
+def capture_risk_bet(sender, instance: Bet, **kwargs) -> None:
+    """
+    The signal create UserScore when user click risk.
+    """
+    if instance.risk and not instance.risk_date:
+        UserScores.objects.create(
+            profile=instance.user.profile,
+            points=-1,
+            description=UserScores.render_description(-1, f"risk bet {instance.pk}"),
+        )

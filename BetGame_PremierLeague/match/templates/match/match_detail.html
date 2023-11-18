@@ -16,17 +16,18 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-12">
-          <div class="d-flex team-vs">
-            <span class="score">{{ match.home_goals}}-{{ match.away_goals}}</span>
+
+            <div class="d-flex team-vs">
+            {% if match.finished %}<span class="score">{{ match.home_goals}}-{{ match.away_goals}}</span>{% endif %}
             <div class="team-1 w-50">
               <div class="team-details w-100 text-center">
-                <img src="{{ match.home_team.crest }}" alt="Image" class="img-fluid">
+                <a href="{{ match.home_team.get_absolute_url  }}"><img src="{{ match.home_team.crest }}" alt="Image" class="img-fluid"></a>
                 <h3>{{ match.home_team.short_name }}</h3>
               </div>
             </div>
             <div class="team-2 w-50">
               <div class="team-details w-100 text-center">
-                <img src="{{ match.away_team.crest }}" alt="Image" class="img-fluid">
+                <a href="{{ match.away_team.get_absolute_url }}"><img src="{{ match.away_team.crest }}" alt="Image" class="img-fluid"></a>
                 <h3>{{ match.away_team.short_name }}</h3>
               </div>
             </div>
@@ -37,52 +38,248 @@
 {% endblock %}
 
 {% block content %}
+    <!-- Bet section -->
+    {% if match.finished %}
+        <!--#TODO: win_bet, amt_home, amt_draw, amt_home, amt_risk -->
+    {% else %}
+    {% user_bet user=user match=match as chose %}
 
-      <div class="container py-4">
+    <div class="container py-4">
         <div class="row text-center">
           <div class="col-lg-12 ">
-            <a type="submit" class="btn {% if chose == 'home' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5 bg-transparent" href="{% url 'bet-set' match.id 'home'%}" >{{ match.home_team.short_name}}</a>
-            <a type="submit" class="btn {% if chose == 'draw' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" href="{% url 'bet-set' match.id 'draw'%}">Draw</a>
-            <a type="submit" class="btn {% if chose == 'away' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" href="{% url 'bet-set' match.id 'away'%}">{{ match.away_team.short_name}}</a>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <button type="submit" class="btn {% if chose == 'home' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="home {{ match.id }}">{{ match.home_team.short_name}}</button>
+                    <button type="submit" class="btn {% if chose == 'draw' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="draw {{ match.id }}">Draw</button>
+                    <button type="submit" class="btn {% if chose == 'away' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="away {{ match.id }}">{{ match.away_team.short_name}}</button>
+                </div>
+                {% user_risk match user as risk %}
+                    {% if not risk %}
+                        <input class='form-check-input' type="checkbox" id="id_risk" name="risk" value="True" >
+                        <label for="id_risk">Risk: </label>
+                    {% endif %}
+
+            </form>
+          </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!--#TODO: Head to Head
+    Head-To-Head section
+    -->
+<!--    <div class="site-section bg-dark">-->
+<!--        <div class="container">-->
+<!--        <div class="row">-->
+<!--            <div class="col-12 title-section">-->
+<!--                <h2 class="heading">Head-To-Head</h2>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+
+    <!-- Recent Meeting section -->
+    <div class="latest-news">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 title-section">
+            <h2 class="heading">Recent Meeting</h2>
           </div>
         </div>
 
+        <div class="row no-gutters">
+          {% for last_match in recent_meetings %}
+             <div class="col-lg-10 mb-4">
+                  <div class="widget-next-match">
+                    <a href="{{ last_match.get_absolute_url }}">
+                  <div class="widget-title">
+                    <h3>Next Match</h3>
+                  </div>
+                    </a>
+                  <div class="widget-body mb-3">
+                    <div class="widget-vs">
+                      <div class="d-flex align-items-center justify-content-around justify-content-between w-100">
+                        <div class="team-1 text-center">
+                          <img src="{{ last_match.home_team.crest}}" alt="Image">
+                          <h3>{{ match.home_team.short_name }}</h3>
+                        </div>
+                        <div>
+                          <h1 class="vs">{{ last_match.home_goals }} : {{ last_match.away_goals }}</h1>
+                        </div>
+                        <div class="team-2 text-center">
+                          <img src="{{ last_match.away_team.crest}}" alt="Image">
+                          <h3>{{ match.away_team.short_name}}</h3>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-center widget-vs-contents mb-4">
+                    <h4>{{ match.league }}</h4>
+                    <p class="mb-5">
+                      <span class="d-block">{{ match.start_date|date:"F jS, Y"}}</span>
+                      <span class="d-block">{{ match.start_date|date:"f A e"}}</span>
+                      <strong class="text-primary">New Euro Arena</strong>
+                    </p>
+                  </div>
+
+                  </div>
+              </div>
+          {% endfor %}
+        </div>
+
+
       </div>
+    </div>
+
+    <!-- Form Guide -->
     <div class="site-section bg-dark">
         <div class="container">
         <div class="row">
-          <div class="col-lg-6">
-
-            <div class="widget-next-match">
-              <table class="table custom-table">
-                <thead>
-                  <tr>
-                    <th>P</th>
-                    <th>Team</th>
-                    <th>W</th>
-                    <th>D</th>
-                    <th>L</th>
-                    <th>PTS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for team in table %}
-                      <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td><strong class="text-white">{{ team.team.name }}</strong></td>
-                        <td>{{ team.won }}</td>
-                        <td>{{ team.drawn }}</td>
-                        <td>{{ team.lost }}</td>
-                        <td>{{ team.points }}</td>
-                      </tr>
-                  {% endfor %}
-
-                </tbody>
-              </table>
-            </div>
-
+          <div class="col-12 title-section">
+            <h2 class="heading">Form Guide</h2>
           </div>
         </div>
+        <div class="row justify-content-around">
+            {% with form_guide.home as form_home %}
+                <div class="col-4">
+                    <h4> {{match.home_team.short_name}} </h4>
+                    {% for m in form_home %}
+                        <p>
+                            ({{m.w}})
+                            {% if m.home_team == object.home_team %}
+                            {{ m.away_team.short_name }}
+                            {% else %}
+                            {{ m.home_team.short_name }}
+                            {% endif %}
+                            {{ m.score }} {{ m.result }}
+                        </p>
+                    {% endfor %}
+                </div>
+            {% endwith %}
+
+            {% with form_guide.away as form_away %}
+                <div class="col-4">
+                    <h4> {{ match.away_team.short_name}} </h4>
+                    {% for m in form_away %}
+                        <p>
+                            ({{m.w}})
+                            {% if m.home_team == object.away_team %}
+                            {{ m.away_team.short_name }}
+                            {% else %}
+                            {{ m.home_team.short_name }}
+                            {% endif %}
+                            {{ m.score }} {{ m.result }}
+                        </p>
+                    {% endfor %}
+                </div>
+            {% endwith %}
+        </div>
       </div>
-    </div> <!-- .site-section -->
+    </div>
+
+    <!-- TODO: dokończyć staty -->
+    <!-- Season so Far -->
+    {% with home_team=match.home_team away_team=match.away_team %}
+    <div class="latest-news">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 title-section">
+            <h2 class="heading">Season So Far</h2>
+          </div>
+        </div>
+
+      <table class="table table-striped table text-center ">
+          <thead>
+            <tr>
+              <th scope="col">{{ match.home_team }}</th>
+              <th scope="col"></th>
+              <th scope="col">{{ match.away_team }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+
+              <td>{{ position.home }}</td>
+              <td>Position</td>
+              <td>{{ position.away }}</td>
+            </tr>
+            <tr>
+              <td>{{ so_far_home.won }}</td>
+              <td>Won</td>
+              <td>{{ so_far_away.won }}</td>
+            </tr>
+            <tr>
+              <td>{{ so_far_home.drawn }}</td>
+              <td>Drawn</td>
+              <td>{{ so_far_away.drawn }}</td>
+            </tr>
+            <tr>
+              <td>{{ so_far_home.lost }}</td>
+              <td>Lost</td>
+              <td>{{ so_far_away.lost }}</td>
+            </tr>
+            <tr>
+              <td>{{ so_far_home.avg_goals_scored|floatformat:2 }}</td>
+              <td>Avg Goals Scored Per Match</td>
+              <td>{{ so_far_away.avg_goals_scored|floatformat:2 }}</td>
+            </tr>
+            <tr>
+              <td>{{ so_far_home.avg_goals_conceded|floatformat:2 }}</td>
+              <td>Avg Goals Conceded Per Match</td>
+              <td>{{ so_far_away.avg_goals_conceded|floatformat:2 }}</td>
+            </tr>
+            <tr>
+              <td>{{ clean_sheets.home }}</td>
+              <td>Clean sheets</td>
+              <td>{{ clean_sheets.away }}</td>
+            </tr>
+            <tr>
+              <td>
+                  <a href="{{ home.bw.get_absolute_url }}" class="acti">
+                      {% if home.bw.home_team == home_team %}
+                      {{ home.bw.home_goals }} - {{ home.bw.away_goals }} v {{ home.bw.away_team.short_name }} (H)
+                      {% else %}
+                      {{ home.bw.home_goals }} - {{ home.bw.away_goals }} v {{ home.bw.home_team.short_name }} (A)
+                      {% endif %}
+                  </a>
+              </td>
+              <td>Biggest Win</td>
+              <td>
+                  <a href="{{away.bw.get_absolute_url}}">
+                      {% if away.bw.home_team == away_team %}
+                      {{ away.bw.home_goals }} - {{ away.bw.away_goals }} v {{ away.bw.away_team.short_name }} (H)
+                      {% else %}
+                      {{ away.bw.home_goals }} - {{ away.bw.away_goals }} v {{ away.bw.home_team.short_name }} (A)
+                      {% endif %}
+                  </a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                  <a href="{{ home.wd.get_absolute_url }}">
+                      {% if home.wd.home_team == home_team %}
+                      {{ home.wd.home_goals }} - {{ home.wd.away_goals }} v {{ home.wd.away_team.short_name }} (H)
+                      {% else %}
+                      {{ home.wd.home_goals }} - {{ home.wd.away_goals }} v {{ home.wd.home_team.short_name }} (A)
+                      {% endif %}
+                  </a>
+              </td>
+              <td>Worst Defeat</td>
+              <td>
+                  <a href="{{ away.wd.get_absolute_url }}">
+                      {% if away.wd.home_team == away_team %}
+                      {{ away.wd.home_goals }} - {{ away.wd.away_goals }} v {{ away.wd.away_team.short_name }} (H)
+                      {% else %}
+                      {{ away.wd.home_goals }} - {{ away.wd.away_goals }} v {{ away.wd.home_team.short_name }} (A)
+                      {% endif %}
+                  </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+    {% endwith %}
 {% endblock %}

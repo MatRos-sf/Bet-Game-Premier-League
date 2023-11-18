@@ -6,20 +6,25 @@
 
 
 {% block bg_section %}
-
-<div class="col-lg-5 ml-auto">
-            <h1 class="text-white">Are you ready for an exciting journey?</h1>
-            <p>
-                Our website is the place where you can test your match prediction skills, track scores, get thrilled by matches,
-                and compete with {{ amt_users }} of other users, all without the risk of losing money. Whether you're a die-hard
-                Premier League fan or just enjoy an extra dose of adrenaline, we're here to provide you with the best
-                experience in sports event prediction.
-            </p>
-            <p>
-              <a href="{% url 'user-login' %}" class="btn btn-primary py-3 px-4 mr-3">Log In</a>
-              <a href="{% url 'user-register' %}" class="more light">Create new account</a>
-            </p>
-          </div>
+{% if user.is_authenticated %}
+    <div class="col-lg-9 mx-auto text-center">
+        <h1 class="text-white">Home</h1>
+    </div>
+{% else %}
+  <div class="col-lg-5 ml-auto">
+    <h1 class="text-white">Are you ready for an exciting journey?</h1>
+    <p>
+        Our website is the place where you can test your match prediction skills, track scores, get thrilled by matches,
+        and compete with {{ amt_users }} of other users, all without the risk of losing money. Whether you're a die-hard
+        Premier League fan or just enjoy an extra dose of adrenaline, we're here to provide you with the best
+        experience in sports event prediction.
+    </p>
+    <p>
+      <a href="{% url 'login' %}" class="btn btn-primary py-3 px-4 mr-3">Log In</a>
+      <a href="{% url 'register' %}" class="more light">Create new account</a>
+    </p>
+  </div>
+{% endif %}
 {% endblock %}
 
 {% block between_section %}
@@ -32,28 +37,12 @@
               <div class="team-details w-100 text-center">
                 <img src="{{ last_match.home_team.crest }}" alt="Image" class="img-fluid">
                 <h3>{{ last_match.home_team.short_name }}</h3>
-                <!--
-                  <ul class="list-unstyled">
-                  <li>Anja Landry (7)</li>
-                  <li>Eadie Salinas (12)</li>
-                  <li>Ashton Allen (10)</li>
-                  <li>Baxter Metcalfe (5)</li>
-                </ul>
-                -->
               </div>
             </div>
             <div class="team-2 w-50">
               <div class="team-details w-100 text-center">
                 <img src="{{ last_match.away_team.crest }}" alt="Image" class="img-fluid">
                 <h3>{{ last_match.away_team.short_name }}</h3>
-                  <!-- Who scored
-                  <ul class="list-unstyled">
-                  <li>Macauly Green (3)</li>
-                  <li>Arham Stark (8)</li>
-                  <li>Stephan Murillo (9)</li>
-                  <li>Ned Ritter (5)</li>
-                </ul>
-                -->
               </div>
             </div>
           </div>
@@ -61,81 +50,58 @@
       </div>
     </div>
 {% endblock %}
-<div class="alert ale"
 
 {% block content %}
     <div class="latest-news">
       <div class="container">
         <div class="row">
           <div class="col-12 title-section">
-            <h2 class="heading">User Predictions!</h2>
+            <h2 class="heading">About bets from Matchweek {{ last_bets.matchweek }}!</h2>
           </div>
+          <div class="col-lg-4 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">The amount of bets</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ last_bets.amt_bets }}</h2>
+                </div>
+
+            </div>
+          </div>
+          <div class="col-lg-4 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">The win rate of bets.</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ last_bets.won }}</h2>
+                </div>
+
+            </div>
+          </div>
+          <div class="col-lg-4 mb-4">
+            <div class="bg-light p-4 rounded text-center">
+              <div class="widget-body">
+                  <div class="widget-vs">
+                    <h1 class="heading">The amount of risk bet.</h1>
+                  </div>
+                </div>
+
+                <div class="widget-vs-contents mb-4">
+                  <h2>{{ last_bets.risk_win }}</h2>
+                </div>
+
+            </div>
+          </div>
+
         </div>
-<!--        <div class="row no-gutters">-->
-<!--          <div class="col-md-4">-->
-<!--            <div class="post-entry">-->
-<!--              <a href="#">-->
-<!--                <img src="images/img_1.jpg" alt="Image" class="img-fluid">-->
-<!--              </a>-->
-<!--              <div class="caption">-->
-<!--                <div class="caption-inner">-->
-<!--                  <h3 class="mb-3">Romolu to stay at Real Nadrid?</h3>-->
-<!--                  <div class="author d-flex align-items-center">-->
-<!--                    <div class="img mb-2 mr-3">-->
-<!--                      <img src="images/person_1.jpg" alt="">-->
-<!--                    </div>-->
-<!--                    <div class="text">-->
-<!--                      <h4>Mellissa Allison</h4>-->
-<!--                      <span>May 19, 2020 &bullet; Sports</span>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="col-md-4">-->
-<!--            <div class="post-entry">-->
-<!--              <a href="#">-->
-<!--                <img src="images/img_3.jpg" alt="Image" class="img-fluid">-->
-<!--              </a>-->
-<!--              <div class="caption">-->
-<!--                <div class="caption-inner">-->
-<!--                  <h3 class="mb-3">Kai Nets Double To Secure Comfortable Away Win</h3>-->
-<!--                  <div class="author d-flex align-items-center">-->
-<!--                    <div class="img mb-2 mr-3">-->
-<!--                      <img src="images/person_1.jpg" alt="">-->
-<!--                    </div>-->
-<!--                    <div class="text">-->
-<!--                      <h4>Mellissa Allison</h4>-->
-<!--                      <span>May 19, 2020 &bullet; Sports</span>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="col-md-4">-->
-<!--            <div class="post-entry">-->
-<!--              <a href="#">-->
-<!--                <img src="images/img_2.jpg" alt="Image" class="img-fluid">-->
-<!--              </a>-->
-<!--              <div class="caption">-->
-<!--                <div class="caption-inner">-->
-<!--                  <h3 class="mb-3">Dogba set for Juvendu return?</h3>-->
-<!--                  <div class="author d-flex align-items-center">-->
-<!--                    <div class="img mb-2 mr-3">-->
-<!--                      <img src="images/person_1.jpg" alt="">-->
-<!--                    </div>-->
-<!--                    <div class="text">-->
-<!--                      <h4>Mellissa Allison</h4>-->
-<!--                      <span>May 19, 2020 &bullet; Sports</span>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
 
       </div>
     </div>
@@ -170,7 +136,6 @@
                 <p class="mb-5">
                   <span class="d-block">{{next_match.start_date|date:"F jS, Y"}}</span>
                   <span class="d-block">{{next_match.start_date|date:"P T"}}</span>
-                  <strong class="text-primary">New Euro Arena</strong>
                 </p>
               </div>
             </div>
@@ -209,4 +174,35 @@
         </div>
       </div>
     </div> <!-- .site-section -->
+
+    <div class="latest-news">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 title-section">
+            <h2 class="heading">The Best Players!</h2>
+          </div>
+        </div>
+
+        <div class="row no-gutters">
+          {% for player in top_players %}
+              <div class="col-md-4 text-lg-center">
+              <div class="vcard bio">
+                    <a href="{% url 'profile-detail' player.user.username %}">
+                      <img class="rounded-circle" src="{{ player.image.url }}" alt="Image placeholder">
+                    </a>
+              </div>
+              <div class="caption p-5">
+                <h3 class="mb-3">{{ player.sum_points }}</h3>
+              </div>
+            </div>
+          {% empty %}
+            <h1>Don't waste time and be the best player!</h1>
+          {% endfor %}
+
+        </div>
+
+      </div>
+    </div>
+
+
 {% endblock %}

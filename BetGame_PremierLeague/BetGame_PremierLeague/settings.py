@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     "league",
     "match",
     "bet",
-    "generate",
+    "event",
     "crispy_forms",
     "crispy_bootstrap5",
     "django.contrib.admin",
@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    #'django_q',
+    "django_q",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -141,4 +142,16 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_REDIRECT_URL = "bet-home"
-LOGIN_URL = "user-login"
+LOGIN_URL = "login"
+
+API_TOKEN = str(os.getenv("API_TOKEN"))
+
+Q_CLUSTER = {
+    "name": "DjangORM",
+    "workers": 1,
+    "timeout": 60,
+    "retry": 120,
+    "queue_limit": 50,
+    "bulk": 10,
+    "orm": "default",
+}

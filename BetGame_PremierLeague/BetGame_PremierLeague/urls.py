@@ -23,7 +23,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("users.urls")),
     path("league/", include("league.urls")),
-    path("generate/", include("generate.urls")),
     path("bet/", include("bet.urls")),
     path("match/", include("match.urls")),
+    path("event/", include("event.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

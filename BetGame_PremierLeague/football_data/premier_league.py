@@ -1,19 +1,18 @@
 import os
 from dataclasses import dataclass
 import requests
-from typing import Dict, List, Tuple
+from requests.exceptions import HTTPError, Timeout
+from typing import Dict, List, Tuple, Optional
 from dotenv import load_dotenv
 from datetime import datetime
 from django.utils import timezone
-from time import sleep
+from django.conf import settings
+from http import HTTPStatus
 
 load_dotenv()
 
+# HEADER = {"X-Auth-Token": settings.API_TOKEN}
 HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
-# TODO basic Legue gdzie będzie dziedziczone dzięki tej klasie będzie można stworzyć różne ligi
-
-
-# https://reqbin.com/code/python/3zdpeao1/python-requests-timeout-example
 
 
 @dataclass
@@ -55,7 +54,7 @@ class Team:
 class Match:
     home_team_id: int
     away_team_id: int
-    start_date: datetime.date
+    start_date: datetime
     home_goals: int
     away_goals: int
     finished: bool
@@ -65,8 +64,8 @@ class Match:
 @dataclass
 class Matchweek:
     matchweek: int
-    start_date: datetime.date
-    end_date: datetime.date
+    start_date: datetime
+    end_date: datetime
     season: Season
     finished: bool
     matches: List[Match]
@@ -88,8 +87,8 @@ class PremierLeague:
     API = "http://api.football-data.org/v4/"
 
     def __init__(self):
-        self.league: League | None = None
-        self.season: Season | None = None
+        self.league: Optional[League] = None
+        self.season: Optional[Season] = None
         self.teams: List[Team] = []
         self.matchweek: List[Matchweek] = []
         self.standings: List[TeamStats] = []
@@ -102,24 +101,27 @@ class PremierLeague:
         self.url_matchweek: str = "competitions/PL/matches"
         self.headers: Dict[str, str] = HEADER
 
-    def __get_full_url(self, url: str, filter=None):
-        if filter:
-            return PremierLeague.API + url + "?" + "&".join(filter)
+    def __get_full_url(self, url: str, filters: Optional[List[str]] = None):
+        if filters:
+            return PremierLeague.API + url + "?" + "&".join(filters)
         return PremierLeague.API + url
 
     def __get_response(self, url: str) -> Tuple[bool, requests.Response | None]:
         try:
             response = requests.get(url=url, headers=self.headers, timeout=5)
-        except requests.exceptions.Timeout:
-            return False, None
+        except Timeout:
+            raise Timeout("Can't connect with server!")
+
+        if response.status_code != HTTPStatus.OK:
+            raise HTTPError("The status code cannot be different than 200.")
 
         return True, response
 
-    def pull(self):
+    def pull(self) -> None:
         url = self.__get_full_url(self.url_current_season)
         succeed, response = self.__get_response(url)
 
-        if not succeed or response.status_code != 200:
+        if not succeed:
             return
 
         dataset = response.json()
@@ -138,6 +140,26 @@ class PremierLeague:
 
         # set current standing
         self.standings = self.get_standings()
+
+    def update_score_matches(self, mw: int) -> List[Match]:
+        """
+        Retrieve information on current football matches from football-data. Return provide
+        scores feedback and verify if the matchweek is ended.
+        """
+        url = self.__get_full_url(
+            self.url_matchweek, [f"matchday={str(mw)}", "status=FINISHED"]
+        )
+        _, response = self.__get_response(url)
+
+        dataset = response.json()
+
+        matches = []
+
+        for match in dataset["matches"]:
+            m = self.capture_match(match)
+            matches.append(m)
+
+        return matches
 
     def get_league(self, dataset: dict):
         name = dataset["name"]
@@ -212,18 +234,7 @@ class PremierLeague:
         matches = list()
 
         for match in dataset["matches"]:
-            date = datetime.strptime(match["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
-            date = timezone.make_aware(date, timezone=timezone.utc)
-
-            match_obj = Match(
-                home_team_id=match["homeTeam"]["id"],
-                away_team_id=match["awayTeam"]["id"],
-                start_date=date,
-                home_goals=match["score"]["fullTime"]["home"],
-                away_goals=match["score"]["fullTime"]["away"],
-                finished=match["status"] == "FINISHED",
-                matchweek=match["matchday"],
-            )
+            match_obj = self.capture_match(match)
 
             matches.append(match_obj)
 
@@ -252,7 +263,6 @@ class PremierLeague:
                 matches=mw_matches,
             )
             matchweeks.append(matchweek_obj)
-
         return matchweeks
 
     def get_standings(self) -> List[TeamStats] | None:
@@ -286,6 +296,22 @@ class PremierLeague:
 
         return teams_standings
 
+    @staticmethod
+    def capture_match(data: dict) -> Match:
+        date = datetime.strptime(data["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
+        # date = timezone.make_aware(date, timezone=timezone.utc)
+
+        match_obj = Match(
+            home_team_id=data["homeTeam"]["id"],
+            away_team_id=data["awayTeam"]["id"],
+            start_date=date,
+            home_goals=data["score"]["fullTime"]["home"],
+            away_goals=data["score"]["fullTime"]["away"],
+            finished=data["status"] == "FINISHED",
+            matchweek=data["matchday"],
+        )
+        return match_obj
+
     def convert_season_to_dict(self):
         if not self.season:
             raise AttributeError("The season attribute is None!")
@@ -296,76 +322,16 @@ class PremierLeague:
             raise AttributeError("The league attribute is None!")
         return self.season.__dict__
 
-    # below probably delete
-    def get_info_currently_league(self) -> Dict[str, str] | None:
-        url = self.__get_full_url(self.url_competitions)
-        succeed, response = self.__get_response(url)
-
-        if not succeed:
-            return
-
-        response_league_ino = response.json()["competition"]
-        league = {
-            "name": response_league_ino["name"],
-            "emblem": response_league_ino["emblem"],
-            "country": "England",
-        }
-
-        return league
-
-    def get_info_current_season(self) -> Dict[str, str] | None:
+    def check_new_season(self, season: int) -> Optional[bool]:
         url = self.__get_full_url(self.url_current_season)
         succeed, response = self.__get_response(url)
 
-        if not succeed:
+        if not succeed or response.status_code != HTTPStatus.OK:
             return
 
-        data = response.json()
-
-        season = {
-            "league": data["name"],
-            "fb_id": data["currentSeason"]["id"],
-            "start_date": data["currentSeason"]["startDate"],
-            "end_date": data["currentSeason"]["endDate"],
-            "matchweek": data["currentSeason"]["currentMatchday"],
-        }
-
-        return season
-
-    def get_matches_result(
-        self, mw: int, year: int
-    ) -> Tuple[Dict[str, str], List[Dict[str, str]]] | Tuple[None, None]:
-        """
-        Return only finished matches
-        """
-        url = self.__get_full_url(
-            self.url_matchweek, [f"matchday={str(mw)}", f"season={str(year)}"]
+        dataset = response.json()
+        start_new_season = datetime.strptime(
+            dataset["currentSeason"]["startDate"], "%Y-%m-%d"
         )
-        succeed, response = self.__get_response(url)
 
-        if not succeed:
-            return None, None
-
-        data = response.json()
-
-        info = {
-            "all": data["resultSet"]["count"],
-            "played": data["resultSet"]["played"],
-        }
-
-        matches = []
-
-        for match in data["matches"]:
-            payload = {}
-
-            if match["status"] != "FINISHED":
-                continue
-
-            payload["home_team_id"] = match["homeTeam"]["id"]
-            payload["away_team_id"] = match["awayTeam"]["id"]
-            payload["home_goals"] = match["score"]["fullTime"]["home"]
-            payload["away_goals"] = match["score"]["fullTime"]["away"]
-
-            matches.append(payload)
-
-        return info, matches
+        return start_new_season.year != season

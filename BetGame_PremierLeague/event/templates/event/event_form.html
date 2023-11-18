@@ -1,0 +1,36 @@
+{% extends 'bet/index.html'%}
+{% load crispy_forms_tags %}
+{% block title %}
+Create Event
+{% endblock %}
+
+{% block bg_section %}
+    <div class="col-lg-9 mx-auto text-center">
+        <h1 class="text-white">
+            Create Event
+        </h1>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="site-section">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-7">
+            <form method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+
+              <div class="form-group text-lg-center">
+                  <button type="submit" class="btn btn-primary py-3 px-5">
+                     Create
+                  </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
