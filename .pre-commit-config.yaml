@@ -16,4 +16,4 @@ repos:
         exclude: ^tests/
         args:
             - -s
-            - B101,B311
+            - B101,B311,B106

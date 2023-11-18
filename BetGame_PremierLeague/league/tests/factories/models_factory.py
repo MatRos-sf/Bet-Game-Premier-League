@@ -8,7 +8,7 @@ class LeagueFactory(DjangoModelFactory):
     class Meta:
         model = League
 
-    name = Sequence(lambda n: f"test_name_{n}")
+    name = "Premier League"
     country = "test_country"
 
 

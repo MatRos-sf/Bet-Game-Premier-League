@@ -63,10 +63,6 @@ class Team(models.Model):
     name = models.CharField(max_length=100)
     short_name = models.CharField(max_length=50, blank=True, null=True)
     shortcut = models.CharField(max_length=5, blank=True, null=True)
-    # TODO: will change name currently_league -> league
-    currently_league = models.ForeignKey(
-        League, on_delete=models.CASCADE, related_name="teams", blank=True, null=True
-    )
 
     crest = models.URLField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
