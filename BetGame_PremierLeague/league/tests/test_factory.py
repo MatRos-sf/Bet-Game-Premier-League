@@ -25,7 +25,7 @@ class LeagueFactoryTest(TestCase):
     def test_set_default_field(self):
         league = League.objects.first()
 
-        self.assertEquals(league.name, "test_name_0")
+        self.assertEquals(league.name, "Premier League")
         self.assertEquals(league.country, "test_country")
 
 
@@ -50,7 +50,7 @@ class SeasonFactoryTest(TestCase):
         season = Season.objects.first()
 
         self.assertEquals(
-            (season.fb_id, season.league.name), ("test_fb_id_0", "test_name_1")
+            (season.fb_id, season.league.name), ("test_fb_id_0", "Premier League")
         )
 
         self.assertIsInstance(season.start_date, date)
