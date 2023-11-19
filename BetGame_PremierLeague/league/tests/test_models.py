@@ -12,6 +12,7 @@ from .factories.models_factory import (
     TeamStatsFactory,
 )
 from match.tests.factories.models_factory import MatchweekFactory, MatchFactory
+from users.tests.factories.user import UserFactory
 from league.models import League, Season, Team, TeamStats
 
 
@@ -38,6 +39,8 @@ class SimpleDB(TestCase):
         |   4  | team_0  |    3  |   0  |   0   |   3  |       1   |       8       |   0   |
         +------+---------+--------------+--------+-------+--------+---------------+---------
         """
+        #
+        UserFactory.create_batch(3)
         # create League
         league = LeagueFactory()
 
@@ -58,7 +61,7 @@ class SimpleDB(TestCase):
 
         # 6 Matchweeks:
         # first matchweek: team_0 0-3 team_1       team_2 5-1 team_3
-        start_end_date = today - timedelta(weeks=-3)
+        start_end_date = today - timedelta(weeks=3)
         mw = MatchweekFactory(
             matchweek=1,
             start_date=start_end_date,
@@ -87,7 +90,7 @@ class SimpleDB(TestCase):
         mw.save()
 
         # second matchweek: team_0 0-1 team_2       team_1 0-1 team_3
-        start_end_date = today - timedelta(weeks=-2)
+        start_end_date = today - timedelta(weeks=2)
         mw = MatchweekFactory(
             matchweek=2,
             start_date=start_end_date,
@@ -116,7 +119,7 @@ class SimpleDB(TestCase):
         mw.save()
 
         # third matchweek: team_3 4-1 team_0       team_1 1-1 team_2
-        start_end_date = today - timedelta(weeks=-1)
+        start_end_date = today - timedelta(weeks=1)
         mw = MatchweekFactory(
             matchweek=3,
             start_date=start_end_date,

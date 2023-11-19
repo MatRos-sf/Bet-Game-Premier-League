@@ -25,36 +25,12 @@ class Matchweek(models.Model):
 
     finished = models.BooleanField(default=False)
 
-    @property
-    def status(self):
-        """
-        3 differents status: before, now, after
-        """
-        # TODO zastanowić się czy to jest potrzebne
-        if self.canceled:
-            return "Canceled"
-
-        time_now = timezone.now().date()
-        if self.start_date <= time_now <= self.end_date:
-            return "Now"
-        elif time_now <= self.start_date:
-            return "Before"
-        else:
-            return "After"
-
-    @property
-    def matches_count(self) -> int:
-        return self.matches.all().count()
-
-    @property
-    def matches_played(self) -> int:
-        return self.matches.filter(finished=True).count()
-
-    def is_finished(self) -> True:
-        return self.matches_count == self.matches_played
-
     class Meta:
         ordering = ["start_date"]
+
+    def __str__(self):
+        start = self.season.start_date.strftime("%y")
+        return f"Matchweek {self.matchweek}/{start}"
 
     def save(self, *args, **kwargs):
         super(Matchweek, self).save(*args, **kwargs)
@@ -67,18 +43,20 @@ class Matchweek(models.Model):
                 "The finished field cannot be true unless all matches are finished"
             )
 
-    def check_bet_user(self, pk):
-        bet = self.bet_set.filter(user_id=pk)
+    @property
+    def matches_count(self) -> int:
+        """
+        Return all matches in this matchweek
+        :return:
+        """
+        return self.matches.all().count()
 
-        return bet.first().choice if bet.exists() else False
+    @property
+    def matches_played(self) -> int:
+        return self.matches.filter(finished=True).count()
 
-    def is_editable(self) -> bool:
-        now = timezone.now().date()
-        return now < self.start_date
-
-    def __str__(self):
-        start = self.season.start_date.strftime("%y")
-        return f"Matchweek {self.matchweek}/{start}"
+    def is_finished(self) -> True:
+        return self.matches_count == self.matches_played
 
 
 class Match(models.Model):
@@ -99,6 +77,15 @@ class Match(models.Model):
 
     finished = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ["start_date"]
+
+    def __str__(self):
+        return f"{self.pk}: {self.home_team} vs {self.away_team} {self.score}"
+
+    def get_absolute_url(self):
+        return reverse("match:detail", kwargs={"pk": self.pk})
+
     @property
     def score(self) -> Optional[str]:
         if self.finished:
@@ -112,7 +99,7 @@ class Match(models.Model):
 
         if self.home_goals > self.away_goals:
             return "home", self.home_team
-        elif self.home_team == self.away_team:
+        elif self.home_goals == self.away_goals:
             return "draw", True
         else:
             return "away", self.away_team
@@ -226,17 +213,8 @@ class Match(models.Model):
             for bet in bets:
                 bet.check_bet()
 
-    def get_absolute_url(self):
-        return reverse("match:detail", kwargs={"pk": self.pk})
-
     def has_bet_for_match(self, user):
         return self.bet_set.filter(user=user).exists()
 
     def get_season_and_league(self) -> Tuple[datetime.date, str]:
         return self.matchweek.season, self.league
-
-    def __str__(self):
-        return self.score
-
-    class Meta:
-        ordering = ["start_date"]

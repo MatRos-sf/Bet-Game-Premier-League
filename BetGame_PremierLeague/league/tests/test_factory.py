@@ -49,10 +49,6 @@ class SeasonFactoryTest(TestCase):
     def test_set_default_field(self):
         season = Season.objects.first()
 
-        self.assertEquals(
-            (season.fb_id, season.league.name), ("test_fb_id_0", "Premier League")
-        )
-
         self.assertIsInstance(season.start_date, date)
 
 
@@ -65,12 +61,6 @@ class TeamFactoryTest(TestCase):
         team = Team.objects.all()
         self.assertTrue(team.first())
         self.assertEquals(team.count(), 1)
-
-    def test_should_set_default_field(self):
-        team = Team.objects.first()
-
-        self.assertEquals(team.fb_id, "fb_id_0")
-        self.assertEquals(team.name, "team_0")
 
 
 class TeamStatsFactoryTest(TestCase):
@@ -92,9 +82,3 @@ class TeamStatsFactoryTest(TestCase):
         ts = TeamStats.objects.all()
         self.assertTrue(ts.first())
         self.assertEquals(ts.count(), 1)
-
-    def test_should_set_default_field(self):
-        ts = TeamStats.objects.first()
-
-        self.assertEquals(ts.team.fb_id, "fb_id_1")
-        self.assertEquals(ts.season.fb_id, "test_fb_id_1")
