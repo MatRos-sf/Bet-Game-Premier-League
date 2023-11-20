@@ -128,7 +128,7 @@ class Match(models.Model):
             Q(finished=True),
             Q(home_team=team) | Q(away_team=team),
             Q(matchweek__season=season),
-        )
+        ).prefetch_related("home_team", "away_team")
 
         return finished_matches.order_by("-start_date")
 
@@ -165,9 +165,11 @@ class Match(models.Model):
             w: it indicates whether it is an H (home) match or an A (away) match,
             result: it provides information about the match: W (won), L (lost), D (draw).
         """
-        fg = cls.objects.filter(
-            Q(finished=True), Q(home_team=team) | Q(away_team=team)
-        ).order_by("-start_date")[:amt]
+        fg = (
+            cls.objects.filter(Q(finished=True), Q(home_team=team) | Q(away_team=team))
+            .prefetch_related("home_team", "away_team")
+            .order_by("-start_date")[:amt]
+        )
         where_played = Case(
             When(home_team=team, then=Value("H")),
             default=Value("A"),
@@ -216,5 +218,5 @@ class Match(models.Model):
     def has_bet_for_match(self, user):
         return self.bet_set.filter(user=user).exists()
 
-    def get_season_and_league(self) -> Tuple[datetime.date, str]:
+    def get_season_and_league(self):
         return self.matchweek.season, self.league

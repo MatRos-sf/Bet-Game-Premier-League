@@ -84,7 +84,6 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
 
     def get_object(self, queryset=None):
         username = self.kwargs.get("slag")
-
         return get_object_or_404(Profile, user__username=username)
 
     def get_context_data(self, **kwargs):
@@ -108,6 +107,7 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         last_bets = (
             Bet.objects.filter(user__username=username)
             .exclude(is_won__isnull=True)
+            .prefetch_related("match", "match__home_team", "match__away_team")
             .order_by("-match__start_date")[:4]
         )
         context["bets"] = last_bets

@@ -7,4 +7,4 @@ from .models import Event
 @receiver(post_save, sender=Event)
 def add_owner_to_members(sender, instance, created, **kwargs):
     if created:
-        instance.members.add(instance.owner)
+        instance.members.add(instance.owner)  # do save()

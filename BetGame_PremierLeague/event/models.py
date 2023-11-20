@@ -8,7 +8,15 @@ from typing import Optional
 
 
 class Event(models.Model):
-    choices = [("before", "Before"), ("now", "Now"), ("finished", "finished")]
+    BEFORE = "before"
+    NOW = "now"
+    FINISHED = "finished"
+    CHOICES = [
+        (BEFORE, "Before"),
+        (NOW, "Now"),
+        (FINISHED, "finished"),
+    ]
+
     name = models.CharField(max_length=200, blank=True, null=True)
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -32,7 +40,7 @@ class Event(models.Model):
         help_text="The field that specifies the percentage win for 3rd place.",
     )
     is_finished = models.BooleanField(default=False)
-    status = models.CharField(max_length=25, choices=choices, default="before")
+    status = models.CharField(max_length=25, choices=CHOICES, default="before")
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -72,20 +80,21 @@ class Event(models.Model):
         )
         return rank
 
-    @property
-    def calculate_first_place_points(self):
+    def _calculate_points(self, place) -> int:
         points = self.members.count() * self.fee
-        return points * self.first_place // 100
+        return points * place // 100
 
     @property
-    def calculate_second_place_points(self):
-        points = self.members.count() * self.fee
-        return points * self.first_place // 100
+    def calculate_first_place_points(self) -> int:
+        return self._calculate_points(place=self.first_place)
 
     @property
-    def calculate_third_place_points(self):
-        points = self.members.count() * self.fee
-        return points * self.first_place // 100
+    def calculate_second_place_points(self) -> int:
+        return self._calculate_points(place=self.second_place)
+
+    @property
+    def calculate_third_place_points(self) -> int:
+        return self._calculate_points(place=self.third_place)
 
     def info_fee(self) -> Optional[str]:
         return f"The entrance fee is {self.fee} pts." if self.fee else None

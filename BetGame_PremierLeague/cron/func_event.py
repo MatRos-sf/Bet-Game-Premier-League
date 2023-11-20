@@ -15,16 +15,16 @@ def provide_user_points(user: User, points: int, info: str) -> None:
 
 def start_event() -> None:
     """
-    Search for events, change their status to 'now,' and cancel all requests because the time has expired.    :return:
+    Search for events, change their status to 'now,' and cancel all requests because the time has expired.
     """
-    events = Event.objects.filter(start_date__lte=timezone.now(), status="before")
-    events.update(status="now")
+    events = Event.objects.filter(
+        start_date__lte=timezone.now(), status=Event.BEFORE
+    ).update(status=Event.NOW)
 
-    if events.exists():
+    if events.exists():  # probably if events wystarczy
         no_accept_request = EventRequest.objects.filter(
             event__in=events, is_accept=False, canceled=False
-        )
-        no_accept_request.update(canceled=True)
+        ).update(canceled=True)
 
 
 def finish_event() -> None:
@@ -40,7 +40,7 @@ def finish_event() -> None:
             if event.fee == 0:
                 continue
 
-            rank = event.rank[:3]
+            rank = event.rank[:3]  # place_1, place_2, place_3 = event.rank[:3]
             number_of_members = event.amt_members
 
             if number_of_members > 0:

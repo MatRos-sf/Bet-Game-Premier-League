@@ -15,5 +15,5 @@ urlpatterns = [
     path("create/", create, name="create"),
     path("detail/<int:pk>/", EventDetailView.as_view(), name="detail"),
     path("requests/", RequestListViews.as_view(), name="requests"),
-    path("requests/answer/<int:pk>/", answer_to_request, name="answer_to_request"),
+    path("requests/<int:pk>/answer/", answer_to_request, name="answer_to_request"),
 ]

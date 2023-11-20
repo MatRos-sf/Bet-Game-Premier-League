@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.db.models import QuerySet
 
 from .models import Event, EventRequest
 from .forms import EventForm, SearchUsernameForm
@@ -79,7 +80,7 @@ class EventListView(LoginRequiredMixin, ListView):
     model = Event
     template_name = "event/event_list.html"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Event]:
         qs = self.model.objects.filter(members=self.request.user, is_finished=False)
         return qs
 
@@ -88,23 +89,22 @@ class RequestListViews(LoginRequiredMixin, ListView):
     model = EventRequest
     template_name = "event/request_list.html"
 
-    def get_queryset(self):
-        qs = self.model.objects.filter(
+    def get_queryset(self) -> QuerySet[EventRequest]:
+        return self.model.objects.filter(
             receiver=self.request.user, canceled=False, is_accept=False
         )
-        return qs
 
 
 def answer_to_request(request, pk):
     if request.method == "POST":
-        answer = request.POST.get("answer")
+        answer = request.POST.get("answer") in {"True"}
         rq_event = get_object_or_404(EventRequest, pk=pk, receiver=request.user)
 
-        if answer == "true":
+        if answer:
             try:
                 rq_event.add_to_event()
             except ValidationError as e:
                 messages.info(request, e.messages[0])
-        elif answer == "false":
+        else:
             rq_event.cancel()
     return redirect("event:requests")

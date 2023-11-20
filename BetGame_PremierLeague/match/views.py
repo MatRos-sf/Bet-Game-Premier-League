@@ -42,7 +42,6 @@ class MatchDetailView(LoginRequiredMixin, DetailView):
         position_away = table.filter(team=match.away_team).first().get_position
 
         context["position"] = {"home": position_home, "away": position_away}
-        # TODO takie staty jak tu: https://www.premierleague.com/match/93424
 
         # form guide
         home = Match.get_form_guide_team(match.home_team, 5)
