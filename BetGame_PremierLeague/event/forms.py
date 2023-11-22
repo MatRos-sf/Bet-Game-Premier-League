@@ -32,7 +32,6 @@ class EventForm(forms.ModelForm):
         start_date = self.cleaned_data["start_date"]
         if timezone.now() > start_date:
             raise ValidationError("The start date of the event must be after today.")
-
         return start_date
 
     # def clean_fee(self):

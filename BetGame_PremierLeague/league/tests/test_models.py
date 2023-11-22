@@ -3,7 +3,7 @@ from django.utils import timezone
 from datetime import timedelta
 from parameterized import parameterized
 from django.urls import reverse
-
+from django.contrib.auth.models import User
 
 from .factories.models_factory import (
     LeagueFactory,
@@ -13,22 +13,33 @@ from .factories.models_factory import (
 )
 from match.tests.factories.models_factory import MatchweekFactory, MatchFactory
 from users.tests.factories.user import UserFactory
+from users.tests.factories.users_scores import UserScoresFactory
 from league.models import League, Season, Team, TeamStats
+from bet.tests.factories.model_factory import BetFactory
+from event.tests.factories.models_factory import EventFactory
 
 
 class SimpleDB(TestCase):
     @classmethod
     def setUpTestData(cls):
         """
-        4 teams in Season
-        resulted Match:
-        team_0 0-3 team_1       team_2 5-1 team_3
-        team_0 0-1 team_2       team_1 0-1 team_3
-        team_3 4-1 team_0       team_1 1-1 team_2
+        * Creat 3 different Users
+        * Create 2 Events:
+            1st:
+                Started: 1st Matchweek and end the same time
+                Fee: 3
+                Members: 3
+                Price: 60/25/15
 
-        team_0 - team_3         team_2 - team_1
-        team_2 - team_0         team_3 - team_1
-        team_1 - team_0         team_3 - team_2
+        * 4 teams in Season
+            resulted Match:
+            team_0 0-3 team_1       team_2 5-1 team_3
+            team_0 0-1 team_2       team_1 0-1 team_3
+            team_3 4-1 team_0       team_1 1-1 team_2
+
+            team_0 - team_3         team_2 - team_1
+            team_2 - team_0         team_3 - team_1
+            team_1 - team_0         team_3 - team_2
 
         +-------+--------+--------------+--------+-------+--------+---------------+-----------
         | Place | team   | played | Won | drawn | lost | goals_for | goals_against | points |
@@ -38,9 +49,29 @@ class SimpleDB(TestCase):
         |   3  | team_1  |    3  |   1  |   1   |   1  |       4   |       2       |   4   |
         |   4  | team_0  |    3  |   0  |   0   |   3  |       1   |       8       |   0   |
         +------+---------+--------------+--------+-------+--------+---------------+---------
+
+        * bets:
+            team_0 0-3 team_1:
+                user_one = 'home'
+                user_two = 'draw'
+                user_three = 'away'     +1
+            team_2 5-1 team_3:
+                user_one = 'home'       +1
+                user_two = 'draw'
+                user_three = 'away'
+            team_0 0-1 team_2:
+                user_one = 'home' + risk        -1
+                user_two = 'draw' + risk        -1
+                user_three = 'away' + risk      +4
+
         """
-        #
+        # Create Users
         UserFactory.create_batch(3)
+        user_one, user_two, user_three = User.objects.all()[:3]
+
+        # Add 10 points
+        for user in (user_one, user_two, user_three):
+            UserScoresFactory(profile=user.profile, points=10, description="test")
         # create League
         league = LeagueFactory()
 
@@ -61,31 +92,51 @@ class SimpleDB(TestCase):
 
         # 6 Matchweeks:
         # first matchweek: team_0 0-3 team_1       team_2 5-1 team_3
+        # bets
+        # events
         start_end_date = today - timedelta(weeks=3)
+        event = EventFactory(
+            name="First event test",
+            owner=user_one,
+            start_date=start_end_date,
+            end_date=start_end_date + timedelta(days=1),
+            fee=3,
+            first_place=60,
+            second_place=25,
+            third_place=15,
+        )
+        event.members.add(user_two, user_three)
+        event.save()
+
         mw = MatchweekFactory(
             matchweek=1,
             start_date=start_end_date,
             end_date=start_end_date,
             season=season,
         )
-        MatchFactory(
+        match = MatchFactory(
             home_team=team_0,
             away_team=team_1,
             start_date=start_end_date,
             matchweek=mw,
-            home_goals=0,
-            away_goals=3,
-            finished=True,
         )
-        MatchFactory(
-            home_team=team_2,
-            away_team=team_3,
-            start_date=start_end_date,
-            matchweek=mw,
-            home_goals=5,
-            away_goals=1,
-            finished=True,
+
+        for user, choice in zip(
+            [user_one, user_two, user_three], ["home", "draw", "away"]
+        ):
+            BetFactory(match=match, user=user, choice=choice)
+        match.set_score(home_goals=0, away_goals=3)
+
+        match = MatchFactory(
+            home_team=team_2, away_team=team_3, start_date=start_end_date, matchweek=mw
         )
+
+        for user, choice in zip(
+            [user_one, user_two, user_three], ["home", "draw", "away"]
+        ):
+            BetFactory(match=match, user=user, choice=choice)
+        match.set_score(home_goals=5, away_goals=1)
+
         mw.finished = True
         mw.save()
 
@@ -97,15 +148,18 @@ class SimpleDB(TestCase):
             end_date=start_end_date,
             season=season,
         )
-        MatchFactory(
+        match = MatchFactory(
             home_team=team_0,
             away_team=team_2,
             start_date=start_end_date,
             matchweek=mw,
-            home_goals=0,
-            away_goals=1,
-            finished=True,
         )
+        for user, choice in zip(
+            [user_one, user_two, user_three], ["home", "draw", "away"]
+        ):
+            BetFactory(match=match, user=user, choice=choice, risk=True)
+        match.set_score(home_goals=0, away_goals=1)
+
         MatchFactory(
             home_team=team_1,
             away_team=team_3,
@@ -239,6 +293,7 @@ class SimpleDB(TestCase):
         )
 
 
+@tag("league")
 class LeagueTest(SimpleDB):
     def test_object_name(self):
         league = League.objects.first()

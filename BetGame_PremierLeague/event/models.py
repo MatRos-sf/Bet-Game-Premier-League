@@ -40,10 +40,14 @@ class Event(models.Model):
         help_text="The field that specifies the percentage win for 3rd place.",
     )
     is_finished = models.BooleanField(default=False)
-    status = models.CharField(max_length=25, choices=CHOICES, default="before")
+    status = models.CharField(max_length=25, choices=CHOICES, default=BEFORE)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+        if not self.id:
+            super().save(*args, **kwargs)
+            self.members.add(self.owner)
+        else:
+            super().save(*args, **kwargs)
 
         # check award
         first_place = self.first_place

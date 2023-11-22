@@ -22,7 +22,7 @@ class BetsListView(LoginRequiredMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(BetsListView, self).get_context_data(**kwargs)
 
-        mw = context["matches"].first()
+        mw = context["matches"]
 
         # season ended
         if not mw:
