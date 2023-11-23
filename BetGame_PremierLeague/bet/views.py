@@ -2,6 +2,7 @@ from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import QuerySet
+from django.utils import timezone
 
 from match.models import Match, Matchweek
 from .models import Bet
@@ -15,7 +16,6 @@ class BetsListView(LoginRequiredMixin, ListView):
     def get_queryset(self) -> QuerySet[Match]:
         matchweek = Matchweek.objects.filter(finished=False).first()
         if matchweek:
-            # return matchweeks.first().matches.filter(finished=False)
             return matchweek.matches.filter(finished=False)
         return matchweek
 
@@ -30,7 +30,7 @@ class BetsListView(LoginRequiredMixin, ListView):
             return context
 
         mw = context["matches"].first().matchweek
-        matchweek_is_started = True
+        matchweek_is_started = timezone.now().date() < mw.start_date
 
         context["is_started"] = matchweek_is_started
         finished_matches = Match.objects.filter(matchweek=mw, finished=True)

@@ -36,10 +36,14 @@ class EventFormTest(TestCase):
         form = EventForm(data=payload)
         self.assertTrue(form.is_valid())
 
-    # @parameterized.expand([0, 1, 2, 3])
-    # def test_should_expectation_when_start_date_is_before_today(self, back_day):
-    #     start_date = timezone.now() - timedelta(days=back_day)
-    #     payload = self.__create_payload(start_date=start_date, end_date=start_date + timedelta(days=back_day))
-    #
-    #     event = EventForm(data=payload)
-    #     self.assertTrue(event.is_valid())
+    @parameterized.expand([0, 1, 2, 3, 4, 5])
+    def test_should_expectation_when_start_date_is_before_today(self, back_day):
+        start_date = timezone.now() - timedelta(days=back_day)
+        payload = self.__create_payload(
+            start_date=start_date, end_date=start_date + timedelta(days=back_day)
+        )
+
+        event_form = EventForm(data=payload)
+        self.assertFormError(
+            event_form, "start_date", "The start date of the event must be after today."
+        )

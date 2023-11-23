@@ -21,12 +21,14 @@ class EventForm(forms.ModelForm):
         ]
 
     def clean(self):
-        start_date = self.cleaned_data["start_date"]
-        end_date = self.cleaned_data["end_date"]
-        if start_date > end_date:
-            raise ValidationError("Start Date cannot be great than End Date")
-        elif start_date == end_date:
-            raise ValidationError("The dates must be different.")
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date", None)
+        end_date = cleaned_data["end_date"]
+        if start_date:
+            if start_date > end_date:
+                raise ValidationError("Start Date cannot be great than End Date")
+            elif start_date == end_date:
+                raise ValidationError("The dates must be different.")
 
     def clean_start_date(self):
         start_date = self.cleaned_data["start_date"]
