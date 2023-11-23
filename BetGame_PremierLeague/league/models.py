@@ -106,9 +106,13 @@ class TeamStats(models.Model):
 
     @classmethod
     def get_season_table(cls, league: str, season: int = None):
-        return cls.objects.filter(
-            season__start_date__year=season, season__league__name=league
-        ).order_by("-points", "-goals_for", "team__name")
+        return (
+            cls.objects.filter(
+                season__start_date__year=season, season__league__name=league
+            )
+            .select_related("season", "team")
+            .order_by("-points", "-goals_for", "team__name")
+        )
 
     @classmethod
     def get_season_so_far(cls, season: Season, first_team: Team):

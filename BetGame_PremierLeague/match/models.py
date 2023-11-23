@@ -113,6 +113,9 @@ class Match(models.Model):
 
     @classmethod
     def get_last_match(cls, team: Optional[Team] = None):
+        """
+        Get the details of the last finished match for the specified team or all teams.
+        """
         if team:
             last_match = cls.objects.filter(
                 Q(finished=True), Q(home_team=team) | Q(away_team=team)
@@ -120,7 +123,11 @@ class Match(models.Model):
         else:
             last_match = cls.objects.filter(finished=True)
 
-        return last_match.order_by("-start_date").first()
+        return (
+            last_match.select_related("home_team", "away_team", "matchweek")
+            .order_by("-start_date")
+            .first()
+        )
 
     @classmethod
     def get_season_finished_matches(cls, team: Team, season):
@@ -156,7 +163,7 @@ class Match(models.Model):
         else:
             next_match = cls.objects.filter(finished=False)
 
-        return next_match.first()
+        return next_match.select_related("home_team", "away_team", "matchweek").first()
 
     @classmethod
     def get_form_guide_team(cls, team: Team, amt: int) -> QuerySet:

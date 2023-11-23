@@ -136,7 +136,7 @@ class ProfileListView(LoginRequiredMixin, ListView):
         # user following
         user = self.request.user
         user_profile = Profile.objects.get(user=user)
-        following = user_profile.following.all()
+        following = user_profile.following.all().prefetch_related("profile")
 
         context["following"] = sorted(
             list(following), key=lambda x: x.profile.all_points, reverse=True

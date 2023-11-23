@@ -16,24 +16,30 @@ class BetsListView(LoginRequiredMixin, ListView):
     def get_queryset(self) -> QuerySet[Match]:
         matchweek = Matchweek.objects.filter(finished=False).first()
         if matchweek:
-            return matchweek.matches.filter(finished=False)
+            return matchweek.matches.filter(finished=False).select_related(
+                "home_team",
+                "away_team",
+                "matchweek",
+                "matchweek__season",
+                "matchweek__season__league",
+            )
         return matchweek
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(BetsListView, self).get_context_data(**kwargs)
 
-        mw = context["matches"]
+        matchweek = context["matches"]
 
         # season ended
-        if not mw:
+        if not matchweek:
             context["end_season"] = True
             return context
 
-        mw = context["matches"].first().matchweek
-        matchweek_is_started = timezone.now().date() < mw.start_date
+        matchweek = context["matches"].first().matchweek
+        matchweek_is_started = timezone.now().date() < matchweek.start_date
 
         context["is_started"] = matchweek_is_started
-        finished_matches = Match.objects.filter(matchweek=mw, finished=True)
+        finished_matches = Match.objects.filter(matchweek=matchweek, finished=True)
 
         context["finished_matches"] = finished_matches
 
