@@ -24,9 +24,11 @@
         <div class="row mb-5">
           <div class="col-12 title-section">
             <h2 class="heading">Upcoming Match</h2>
+            {% get_user_matchweek_bets user matchweek as user_bets %}
+
           </div>
             {% for match in matches %}
-                {% user_bet user=user match=match as chose %}
+                {% check_user_choice match.pk user_bets as chose %}
                  <div class="col-lg-12 mb-4">
                   <div class="widget-next-match">
                     <a href="{{ match.get_absolute_url }}">
@@ -61,12 +63,11 @@
                         <form method="POST">
                             {% csrf_token %}
                             <div class="form-group">
-                                <button type="submit" class="btn {% if chose == 'home' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="home {{ match.id }}">{{ match.home_team.short_name}}</button>
-                                <button type="submit" class="btn {% if chose == 'draw' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="draw {{ match.id }}">Draw</button>
-                                <button type="submit" class="btn {% if chose == 'away' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="away {{ match.id }}">{{ match.away_team.short_name}}</button>
+                                <button type="submit" class="btn {% if chose.0 == 'home' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="home {{ match.id }}">{{ match.home_team.short_name}}</button>
+                                <button type="submit" class="btn {% if chose.0 == 'draw' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="draw {{ match.id }}">Draw</button>
+                                <button type="submit" class="btn {% if chose.0 == 'away' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="away {{ match.id }}">{{ match.away_team.short_name}}</button>
                             </div>
-                            {% user_risk match user as risk %}
-                                {% if not risk %}
+                                {% if not chose.1 %}
                                     <input class='form-check-input' type="checkbox" id="id_risk" name="risk" value="True" >
                                     <label for="id_risk">Risk</label>
                                 {% endif %}
