@@ -9,7 +9,6 @@ from typing import Optional
 
 from league.tests.test_models import SimpleDB
 from event.models import Event, EventRequest
-from event.forms import SearchUsernameForm
 from .factories.models_factory import EventFactory, EventRequestFactory
 from users.tests.factories.user import UserFactory
 
@@ -186,7 +185,7 @@ class EventDetailViewTest(SimpleDB):
         )
         old_request.cancel()
 
-        expect_message = f"The user has canceled your request"
+        expect_message = "The user has canceled your request"
         response = self.client.post(
             self.url(new_event.pk), {"username": new_user.username}
         )
@@ -200,11 +199,9 @@ class EventDetailViewTest(SimpleDB):
         self.__login_user()
         new_event = self.__create_default_event()
         new_user = UserFactory()
-        old_request = EventRequestFactory(
-            sender=self.sample_user, receiver=new_user, event=new_event
-        )
+        EventRequestFactory(sender=self.sample_user, receiver=new_user, event=new_event)
 
-        expect_message = f"Your request has already been sent!"
+        expect_message = "Your request has already been sent!"
         response = self.client.post(
             self.url(new_event.pk), {"username": new_user.username}
         )
