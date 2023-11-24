@@ -36,12 +36,6 @@ class EventForm(forms.ModelForm):
             raise ValidationError("The start date of the event must be after today.")
         return start_date
 
-    # def clean_fee(self):
-    #     user_points = self.request.user.profile.all_points
-    #     fee = self.cleaned_data['fee']
-    #     if user_points - fee < 0:
-    #         raise ValidationError("You don't have enough points to create event!")
-
 
 class SearchUsernameForm(forms.Form):
     username = forms.CharField(

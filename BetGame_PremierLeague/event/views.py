@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import QuerySet
+from django.contrib import messages
 
 from .models import Event, EventRequest
 from .forms import EventForm, SearchUsernameForm
@@ -20,12 +21,14 @@ def create(request):
         if form.is_valid():
             cd = form.cleaned_data
             if request.user.profile.all_points - cd["fee"] < 0:
-                raise ValidationError("You don't have enough points to create event!")
-
-            cd["owner"] = request.user
-            event = Event.objects.create(**cd)
-
-            return redirect(event)
+                # raise ValidationError("You don't have enough points to create event!")
+                messages.warning(
+                    request, "You don't have enough points to create event!"
+                )
+            else:
+                cd["owner"] = request.user
+                event = Event.objects.create(**cd)
+                return redirect(event)
 
     return render(request, "event/event_form.html", {"form": form})
 
@@ -37,9 +40,8 @@ class EventDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(EventDetailView, self).get_context_data(**kwargs)
         event = context["object"]
-        context["is_start"] = event.start_date > timezone.now()
-
-        context["form"] = SearchUsernameForm()
+        if event.start_date > timezone.now():
+            context["form"] = SearchUsernameForm()
 
         return context
 

@@ -21,3 +21,12 @@ class EventFactory(DjangoModelFactory):
             return
 
         self.members.add(*extracted)
+
+
+class EventRequestFactory(DjangoModelFactory):
+    class Meta:
+        model = EventRequest
+
+    sender = SubFactory(UserFactory)
+    receiver = SubFactory(UserFactory)
+    event = SubFactory(EventFactory)

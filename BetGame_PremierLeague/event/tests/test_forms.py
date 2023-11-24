@@ -47,3 +47,33 @@ class EventFormTest(TestCase):
         self.assertFormError(
             event_form, "start_date", "The start date of the event must be after today."
         )
+
+    @parameterized.expand([1, 2, 3, 4, 5])
+    def test_should_form_error_when_start_date_is_after_end_date(self, back_day):
+        test_data = timezone.now() + timedelta(weeks=2)
+        end_date = test_data - timedelta(days=back_day)
+        payload = self.__create_payload(start_date=test_data, end_date=end_date)
+
+        event_form = EventForm(data=payload)
+        self.assertFalse(event_form.is_valid())
+        self.assertIsInstance(
+            event_form.errors.as_data()["__all__"][0], ValidationError
+        )
+        self.assertEquals(
+            event_form.errors.as_data()["__all__"][0].message,
+            "Start Date cannot be great than End Date",
+        )
+
+    def test_should_form_error_when_start_date_is_the_same_end_date(self):
+        test_data = timezone.now() + timedelta(weeks=2)
+        payload = self.__create_payload(start_date=test_data, end_date=test_data)
+
+        event_form = EventForm(data=payload)
+        self.assertFalse(event_form.is_valid())
+        self.assertIsInstance(
+            event_form.errors.as_data()["__all__"][0], ValidationError
+        )
+        self.assertEquals(
+            event_form.errors.as_data()["__all__"][0].message,
+            "The dates must be different.",
+        )

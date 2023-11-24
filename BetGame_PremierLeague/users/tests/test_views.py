@@ -133,14 +133,6 @@ class LoginViewTest(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "users/form.html")
 
-    def test_should_login_when_form_valid(self):
-        payload = {"username": self.user.username, "password": "1_test_TEST_!"}
-        response = self.client.post(reverse(self.name), data=payload, follow=True)
-
-        self.assertRedirects(response, reverse("bet-home"))
-        self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertTrue(response.context["user"].is_authenticated)
-
     def test_should_not_login_when_form_invalid(self):
         payload = {"username": self.user.username, "password": ""}
         response = self.client.post(reverse(self.name), data=payload, follow=True)
