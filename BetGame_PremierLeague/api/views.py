@@ -1,47 +1,28 @@
-from django.shortcuts import render
-from django.contrib.auth import get_user_model
-
-from rest_framework.generics import RetrieveAPIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import serializers
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
-from .serializers import UserSerializer, ProfileSerializer
-from rest_framework import viewsets
-from rest_framework.response import Response
+from .serializers import UserSerializer, ProfileSerializer, BetSerializer
 from rest_framework import generics
 
 from users.models import Profile
+from bet.models import Bet
 
 
-class ProfileList(generics.ListAPIView):
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class ProfileView(generics.RetrieveAPIView):
     queryset = Profile.objects.select_related("user")
     serializer_class = ProfileSerializer
+    lookup_field = "user__username"
 
 
-class UserViewSet(viewsets.ViewSet):
-    def list(self, request):
-        queryset = User.objects.all()
-        serializer = UserSerializer(queryset, many=True)
-        return Response(serializer.data)
+class BetView(generics.ListAPIView):
+    serializer_class = BetSerializer
+    lookup_field = "user__username"
 
-    def retrieve(self, request, pk=None):
-        queryset = User.objects.all()
-        user = get_object_or_404(queryset, pk=pk)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-
-
-# class UserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = get_user_model()
-#         fields = ('id', 'username')
-#
-#
-# class UserAPIView(RetrieveAPIView):
-#     permission_classes = (IsAuthenticated, )
-#     serializer_class = UserSerializer
-#
-#     def get_object(self):
-#         return self.request.user
+    def get_queryset(self):
+        username = self.kwargs.get(self.lookup_field)
+        return Bet.objects.filter(user__username=username).select_related(
+            "user", "match", "match__home_team", "match__away_team"
+        )

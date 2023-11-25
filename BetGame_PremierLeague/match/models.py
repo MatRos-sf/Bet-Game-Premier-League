@@ -81,7 +81,7 @@ class Match(models.Model):
         ordering = ["start_date"]
 
     def __str__(self):
-        return f"{self.pk}: {self.home_team} vs {self.away_team} {self.score}"
+        return f"{self.pk}: {self.home_team} vs {self.away_team} {self.score or '' }"
 
     def get_absolute_url(self):
         return reverse("match:detail", kwargs={"pk": self.pk})

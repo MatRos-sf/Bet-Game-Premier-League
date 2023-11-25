@@ -4,25 +4,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Sum
 from typing import List
 
-from .models import League, Team, Season, TeamStats
+from .models import Team, TeamStats
 from match.models import Match
-
-
-# TODO: unlock
-# class LeagueDetailView(LoginRequiredMixin, DetailView):
-#     model = League
-#     template_name = "league/detail.html"
-
-
-# class SeasonDetailView(LoginRequiredMixin, DetailView):
-#     model = Season
-#     template_name = "league/"
-
-
-# class TeamListView(LoginRequiredMixin, ListView):
-#     model = Team
-#     template_name = ""
-#     context_object_name = "leagues/"
 
 
 class TeamDetailView(LoginRequiredMixin, DetailView):

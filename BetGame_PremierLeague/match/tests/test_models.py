@@ -57,7 +57,7 @@ class MatchTest(SimpleDB):
     @parameterized.expand([7, 8, 9, 10, 11, 12])
     def test_model_str_when_match_finished(self, pk):
         match = Match.objects.get(pk=pk)
-        expected = f"{pk}: {match.home_team} vs {match.away_team} None"
+        expected = f"{pk}: {match.home_team} vs {match.away_team} "
         self.assertEquals(str(match), expected)
 
     @parameterized.expand([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])

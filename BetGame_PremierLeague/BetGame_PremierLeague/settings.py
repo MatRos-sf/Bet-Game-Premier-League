@@ -164,21 +164,18 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-# REST_FRAMEWORK = {
-#
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.DjangoModelPermissions'
-#     ],
-#     # 'DEFAULT_AUTHENTICATION_CLASSES': (
-#     #     'rest_framework_simplejwt.authentication.JWTAuthentication',
-#     # )
-# }
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
 
-# from datetime import timedelta
-#
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-#     'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
-#     'ROTATE_REFRESH_TOKEN': True,
-#     'BLACKLIST_AFTER_ROTATION': True,
-# }
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=2),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
+    # 'ROTATE_REFRESH_TOKEN': True,
+    # 'BLACKLIST_AFTER_ROTATION': True,
+}
