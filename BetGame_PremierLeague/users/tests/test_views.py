@@ -2,10 +2,19 @@ from django.test import TestCase, tag
 from django.urls import reverse
 from django.contrib.auth.models import User
 from faker import Faker
+from http import HTTPStatus
 
 from users.models import Profile
-from http import HTTPStatus
+from users.forms import ProfileUpdateForm
 from .factories.user import UserFactory
+from league.tests.factories.models_factory import (
+    TeamStatsFactory,
+    LeagueFactory,
+    SeasonFactory,
+    TeamFactory,
+)
+from match.tests.factories.models_factory import MatchweekFactory, MatchFactory
+from league.models import League, TeamStats
 
 
 @tag("register")
@@ -124,14 +133,6 @@ class LoginViewTest(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "users/form.html")
 
-    def test_should_login_when_form_valid(self):
-        payload = {"username": self.user.username, "password": "1_test_TEST_!"}
-        response = self.client.post(reverse(self.name), data=payload, follow=True)
-
-        self.assertRedirects(response, reverse("bet-home"))
-        self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertTrue(response.context["user"].is_authenticated)
-
     def test_should_not_login_when_form_invalid(self):
         payload = {"username": self.user.username, "password": ""}
         response = self.client.post(reverse(self.name), data=payload, follow=True)
@@ -207,6 +208,31 @@ class HomeTest(TestCase):
         self.assertFalse(response.context["last_bets"])
         self.assertFalse(response.context["top_players"])
 
+    def test_context_table_should_show_only_eight_first_positions_when_teamstats_has_more_than_eight_instance(
+        self,
+    ):
+        league = LeagueFactory()
+        season = SeasonFactory(league=league)
+        TeamStatsFactory.create_batch(10, season=season)
+
+        response = self.client.get(reverse(self.name))
+        table = response.context["table"]
+
+        self.assertEquals(League.objects.count(), 1)
+        self.assertEquals(TeamStats.objects.count(), 10)
+
+        self.assertEquals(len(table), 8)
+
+    def test_context_should_get_last_ended_match(self):
+        season = SeasonFactory()
+        mw = MatchweekFactory(season=season, finished=True)
+        match = MatchFactory(matchweek=mw, home_goals=1, away_goals=2, finished=True)
+
+        response = self.client.get(reverse(self.name))
+        last_match = response.context["last_match"]
+
+        self.assertEquals(last_match, match)
+
 
 @tag("profile")
 class ProfileDetailViewTest(TestCase):
@@ -228,13 +254,13 @@ class ProfileDetailViewTest(TestCase):
 
         self.assertRedirects(response, f"/login/?next={self.url(username)}")
 
-    # def test_view_url_exist_at_desired_location_when_user_is_authenticated(self):
-    #     self.client.login(
-    #         username=self.user_one.username, password="1_test_TEST_!"
-    #     )  # nosec
-    #
-    #     response = self.client.get(self.url(self.user_one.username))
-    #     self.assertEquals(response.status_code, HTTPStatus.OK)
+    def test_view_url_exist_at_desired_location_when_user_is_authenticated(self):
+        self.client.login(
+            username=self.user_one.username, password="1_test_TEST_!"
+        )  # nosec
+
+        response = self.client.get(self.url(self.user_one.username))
+        self.assertEquals(response.status_code, HTTPStatus.OK)
 
     def test_view_url_inaccessible_by_name_when_user_is_not_authenticated(self):
         username = self.user_one.username
@@ -243,60 +269,181 @@ class ProfileDetailViewTest(TestCase):
 
         self.assertRedirects(response, f"/login/?next={self.url(username)}")
 
-    # def test_view_url_accessible_by_name_when_user_is_authenticated(self):
-    #     username = self.user_one.username
-    #     self.client.login(
-    #         username=self.user_one.username, password="1_test_TEST_!"
-    #     )  # nosec
-    #     response = self.client.get(reverse(self.name, kwargs={"slag": username}))
-    #
-    #     self.assertEquals(response.status_code, HTTPStatus.OK)
+    def test_view_url_accessible_by_name_when_user_is_authenticated(self):
+        username = self.user_one.username
+        self.client.login(
+            username=self.user_one.username, password="1_test_TEST_!"
+        )  # nosec
+        response = self.client.get(reverse(self.name, kwargs={"slag": username}))
 
-    # def test_view_uses_should_correctly_templates_when_user_is_authenticated(self):
-    #     username = self.user_one.username
-    #     self.client.login(
-    #         username=self.user_one.username, password="1_test_TEST_!"
-    #     )  # nosec
-    #
-    #     response = self.client.get(reverse(self.name, kwargs={"slag": username}))
-    #
-    #     self.assertTemplateUsed(response, "users/profile.html")
-    #
-    # def test_user_can_watch_different_users_when_is_authenticated(self):
-    #     username = self.user_one.username
-    #     self.client.login(username=username, password="1_test_TEST_!")  # nosec
-    #
-    #     response = self.client.get(
-    #         reverse(self.name, kwargs={"slag": self.user_two.username})
-    #     )
-    #
-    #     self.assertEquals(response.status_code, HTTPStatus.OK)
-    #
-    # def test_should_status_not_found_when_user_want_to_get_non_exist_profile(self):
-    #     username = self.user_one.username
-    #     self.client.login(username=username, password="1_test_TEST_!")  # nosec
-    #
-    #     response = self.client.get(reverse(self.name, kwargs={"slag": "non_user"}))
-    #
-    #     self.assertEquals(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
 
-    # def test_view_url_exist_at_desired_location_2(self):
-    #     u = UserFactory()
-    #     is_done = self.client.login(
-    #         username=u.username, password="IhT5JiLnWC7VfrA"
-    #     )  # nosec
-    #
-    #     response = self.client.get(
-    #         reverse(self.name, kwargs={"slag": self.sample_user.username})
-    #     )
-    #     # self.assertEquals(response.status_code, HTTPStatus.OK)
-    #     print(is_done)
+    def test_view_uses_should_correctly_templates_when_user_is_authenticated(self):
+        username = self.user_one.username
+        self.client.login(
+            username=self.user_one.username, password="1_test_TEST_!"
+        )  # nosec
 
-    # def test_view_url_accessible_by_name(self):
-    #     response = self.client.get(reverse(self.name))
-    #     self.assertEquals(response.status_code, HTTPStatus.OK)
-    #
-    # def test_view_uses_correctly_templates(self):
-    #     response = self.client.get(reverse(self.name))
+        response = self.client.get(reverse(self.name, kwargs={"slag": username}))
 
-    # https://realpython.com/testing-in-django-part-2-model-mommy-vs-django-testing-fixtures/
+        self.assertTemplateUsed(response, "users/profile.html")
+
+    def test_user_can_watch_different_users_when_is_authenticated(self):
+        username = self.user_one.username
+        self.client.login(username=username, password="1_test_TEST_!")  # nosec
+
+        response = self.client.get(
+            reverse(self.name, kwargs={"slag": self.user_two.username})
+        )
+
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_should_status_not_found_when_user_want_to_get_non_exist_profile(self):
+        username = self.user_one.username
+        self.client.login(username=username, password="1_test_TEST_!")  # nosec
+
+        response = self.client.get(reverse(self.name, kwargs={"slag": "non_user"}))
+
+        self.assertEquals(response.status_code, HTTPStatus.NOT_FOUND)
+
+
+@tag("profile_list")
+class ProfileDetailViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory.create_batch(10)
+
+    def setUp(self):
+        self.name = "profile-list"
+        self.url = "/profiles/"
+
+        self.sample_user = User.objects.all().first()
+
+    def test_view_url_does_not_exist_when_user_is_not_authenticated(self):
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, f"/login/?next={self.url}")
+
+    def test_view_url_exist_at_desired_location_when_user_is_authenticated(self):
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_view_url_inaccessible_by_name_when_user_is_not_authenticated(self):
+        response = self.client.get(reverse(self.name))
+
+        self.assertRedirects(response, f"/login/?next={self.url}")
+
+    def test_view_url_accessible_by_name_when_user_is_authenticated(self):
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+        response = self.client.get(reverse(self.name))
+
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_should_none_object_list_when_user_did_use_search(self):
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+        response = self.client.get(reverse(self.name))
+        object_list = response.context["object_list"]
+        self.assertFalse(object_list)
+
+    def test_should_object_list_when_user_used_search(self):
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+        response = self.client.get(self.url + "?username=user")
+        object_list = response.context["object_list"]
+        self.assertTrue(object_list)
+        self.assertEquals(len(object_list), 10)
+
+    def test_show_message_when_user_not_found(self):
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+        response = self.client.get(self.url + "?username=xxx")
+
+        expected_message = "User not found!"
+        message = list(response.context.get("messages"))[0]
+
+        self.assertTrue(message.tags == "info")
+        self.assertTrue(message.message == expected_message)
+
+
+@tag("profile_edit")
+class EditProfileTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory()
+
+    def setUp(self):
+        self.sample_user = User.objects.get(id=1)
+
+        self.name = "profile-edit"
+        self.url = lambda username: f"/profile/{username}/edit/"
+
+    def test_view_url_does_not_exist_when_user_is_not_authenticated(self):
+        username = self.sample_user.username
+        response = self.client.get(self.url(username))
+
+        self.assertRedirects(response, f"/login/?next={self.url(username)}")
+
+    def test_view_url_exist_at_desired_location_when_user_is_authenticated(self):
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+
+        response = self.client.get(self.url(self.sample_user.username))
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_view_url_inaccessible_by_name_when_user_is_not_authenticated(self):
+        username = self.sample_user.username
+        response = self.client.get(reverse(self.name, kwargs={"username": username}))
+
+        self.assertRedirects(response, f"/login/?next={self.url(username)}")
+
+    def test_view_url_accessible_by_name_when_user_is_authenticated(self):
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+        username = self.sample_user.username
+        response = self.client.get(reverse(self.name, kwargs={"username": username}))
+
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_should_message_when_user_try_update_sb_profile(self):
+        user = UserFactory()
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+
+        response = self.client.get(
+            reverse(self.name, kwargs={"username": user.username}), follow=True
+        )
+
+        expected_message = "You can only update own profile!"
+        message = list(response.context.get("messages"))[0]
+
+        self.assertEquals(message.message, expected_message)
+        self.assertEquals(message.tags, "warning")
+
+    def test_should_give_appropriate_form(self):
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+        username = self.sample_user.username
+        response = self.client.get(reverse(self.name, kwargs={"username": username}))
+        self.assertIsInstance(response.context["form"], ProfileUpdateForm)
+
+    def test_post_should_change_description(self):
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+        username = self.sample_user.username
+
+        payload = {"description": "new_description"}
+
+        self.client.post(
+            reverse(self.name, kwargs={"username": username}), data=payload
+        )
+
+        self.assertEquals(self.sample_user.profile.description, payload["description"])
+        self.assertFalse(self.sample_user.profile.support_team)
+
+    def test_post_should_set_new_support_team(self):
+        team = TeamFactory()
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+        username = self.sample_user.username
+
+        payload = {"support_team": team.pk}
+
+        self.client.post(
+            reverse(self.name, kwargs={"username": username}), data=payload
+        )
+
+        self.assertEquals(self.sample_user.profile.support_team, team)

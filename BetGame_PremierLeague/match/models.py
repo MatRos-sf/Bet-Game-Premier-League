@@ -25,36 +25,12 @@ class Matchweek(models.Model):
 
     finished = models.BooleanField(default=False)
 
-    @property
-    def status(self):
-        """
-        3 differents status: before, now, after
-        """
-        # TODO zastanowić się czy to jest potrzebne
-        if self.canceled:
-            return "Canceled"
-
-        time_now = timezone.now().date()
-        if self.start_date <= time_now <= self.end_date:
-            return "Now"
-        elif time_now <= self.start_date:
-            return "Before"
-        else:
-            return "After"
-
-    @property
-    def matches_count(self) -> int:
-        return self.matches.all().count()
-
-    @property
-    def matches_played(self) -> int:
-        return self.matches.filter(finished=True).count()
-
-    def is_finished(self) -> True:
-        return self.matches_count == self.matches_played
-
     class Meta:
         ordering = ["start_date"]
+
+    def __str__(self):
+        start = self.season.start_date.strftime("%y")
+        return f"Matchweek {self.matchweek}/{start}"
 
     def save(self, *args, **kwargs):
         super(Matchweek, self).save(*args, **kwargs)
@@ -67,18 +43,20 @@ class Matchweek(models.Model):
                 "The finished field cannot be true unless all matches are finished"
             )
 
-    def check_bet_user(self, pk):
-        bet = self.bet_set.filter(user_id=pk)
+    @property
+    def matches_count(self) -> int:
+        """
+        Return all matches in this matchweek
+        :return:
+        """
+        return self.matches.all().count()
 
-        return bet.first().choice if bet.exists() else False
+    @property
+    def matches_played(self) -> int:
+        return self.matches.filter(finished=True).count()
 
-    def is_editable(self) -> bool:
-        now = timezone.now().date()
-        return now < self.start_date
-
-    def __str__(self):
-        start = self.season.start_date.strftime("%y")
-        return f"Matchweek {self.matchweek}/{start}"
+    def is_finished(self) -> True:
+        return self.matches_count == self.matches_played
 
 
 class Match(models.Model):
@@ -99,6 +77,15 @@ class Match(models.Model):
 
     finished = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ["start_date"]
+
+    def __str__(self):
+        return f"{self.pk}: {self.home_team} vs {self.away_team} {self.score or '' }"
+
+    def get_absolute_url(self):
+        return reverse("match:detail", kwargs={"pk": self.pk})
+
     @property
     def score(self) -> Optional[str]:
         if self.finished:
@@ -112,7 +99,7 @@ class Match(models.Model):
 
         if self.home_goals > self.away_goals:
             return "home", self.home_team
-        elif self.home_team == self.away_team:
+        elif self.home_goals == self.away_goals:
             return "draw", True
         else:
             return "away", self.away_team
@@ -126,6 +113,9 @@ class Match(models.Model):
 
     @classmethod
     def get_last_match(cls, team: Optional[Team] = None):
+        """
+        Get the details of the last finished match for the specified team or all teams.
+        """
         if team:
             last_match = cls.objects.filter(
                 Q(finished=True), Q(home_team=team) | Q(away_team=team)
@@ -133,7 +123,11 @@ class Match(models.Model):
         else:
             last_match = cls.objects.filter(finished=True)
 
-        return last_match.order_by("-start_date").first()
+        return (
+            last_match.select_related("home_team", "away_team", "matchweek")
+            .order_by("-start_date")
+            .first()
+        )
 
     @classmethod
     def get_season_finished_matches(cls, team: Team, season):
@@ -141,7 +135,7 @@ class Match(models.Model):
             Q(finished=True),
             Q(home_team=team) | Q(away_team=team),
             Q(matchweek__season=season),
-        )
+        ).prefetch_related("home_team", "away_team")
 
         return finished_matches.order_by("-start_date")
 
@@ -169,7 +163,7 @@ class Match(models.Model):
         else:
             next_match = cls.objects.filter(finished=False)
 
-        return next_match.first()
+        return next_match.select_related("home_team", "away_team", "matchweek").first()
 
     @classmethod
     def get_form_guide_team(cls, team: Team, amt: int) -> QuerySet:
@@ -178,9 +172,11 @@ class Match(models.Model):
             w: it indicates whether it is an H (home) match or an A (away) match,
             result: it provides information about the match: W (won), L (lost), D (draw).
         """
-        fg = cls.objects.filter(
-            Q(finished=True), Q(home_team=team) | Q(away_team=team)
-        ).order_by("-start_date")[:amt]
+        fg = (
+            cls.objects.filter(Q(finished=True), Q(home_team=team) | Q(away_team=team))
+            .prefetch_related("home_team", "away_team")
+            .order_by("-start_date")[:amt]
+        )
         where_played = Case(
             When(home_team=team, then=Value("H")),
             default=Value("A"),
@@ -226,17 +222,8 @@ class Match(models.Model):
             for bet in bets:
                 bet.check_bet()
 
-    def get_absolute_url(self):
-        return reverse("match:detail", kwargs={"pk": self.pk})
-
     def has_bet_for_match(self, user):
         return self.bet_set.filter(user=user).exists()
 
-    def get_season_and_league(self) -> Tuple[datetime.date, str]:
+    def get_season_and_league(self):
         return self.matchweek.season, self.league
-
-    def __str__(self):
-        return self.score
-
-    class Meta:
-        ordering = ["start_date"]

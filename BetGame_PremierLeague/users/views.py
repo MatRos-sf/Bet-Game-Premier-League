@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
 
 from .models import Profile, UserScores
-from .forms import UserRegisterForm, ProfileUpdate
+from .forms import UserRegisterForm, ProfileUpdateForm
 from league.models import TeamStats, Season
 from match.models import Match, Matchweek
 from bet.models import Bet
@@ -84,7 +84,6 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
 
     def get_object(self, queryset=None):
         username = self.kwargs.get("slag")
-
         return get_object_or_404(Profile, user__username=username)
 
     def get_context_data(self, **kwargs):
@@ -108,6 +107,7 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         last_bets = (
             Bet.objects.filter(user__username=username)
             .exclude(is_won__isnull=True)
+            .prefetch_related("match", "match__home_team", "match__away_team")
             .order_by("-match__start_date")[:4]
         )
         context["bets"] = last_bets
@@ -136,7 +136,7 @@ class ProfileListView(LoginRequiredMixin, ListView):
         # user following
         user = self.request.user
         user_profile = Profile.objects.get(user=user)
-        following = user_profile.following.all()
+        following = user_profile.following.all().prefetch_related("profile")
 
         context["following"] = sorted(
             list(following), key=lambda x: x.profile.all_points, reverse=True
@@ -159,10 +159,10 @@ def edit_profile(request, username):
         return redirect("profile-detail", slag=request.user.username)
 
     user_profile = get_object_or_404(Profile, user__username=username)
-    form = ProfileUpdate(instance=user_profile)
+    form = ProfileUpdateForm(instance=user_profile)
 
     if request.method == "POST":
-        form = ProfileUpdate(request.POST, request.FILES, instance=user_profile)
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=user_profile)
         if form.is_valid():
             old_photo = Profile.objects.get(user__username=username)
             if old_photo.image.url != "/media/default.jpg":

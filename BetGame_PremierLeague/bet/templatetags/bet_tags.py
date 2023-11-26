@@ -1,5 +1,10 @@
 from django import template
 from bet.models import Bet
+from django.db.models import QuerySet
+from typing import Tuple, Union
+from django.contrib.auth.models import User
+
+from match.models import Matchweek
 
 register = template.Library()
 
@@ -30,3 +35,32 @@ def user_risk(match, user) -> bool:
         return bet.risk
     except Bet.DoesNotExist:
         return False
+
+
+@register.simple_tag
+def get_user_matchweek_bets(user: User, matchweek: Matchweek) -> QuerySet[dict]:
+    fields = ("match_id", "risk", "choice")
+    bets = (
+        Bet.objects.filter(user=user, match__matchweek=matchweek)
+        .select_related("match")
+        .values(*fields)
+    )
+    return bets
+
+
+@register.simple_tag
+def check_user_choice(
+    match_id: int, bets: QuerySet[dict]
+) -> Union[Tuple[str, bool], Tuple[None, None]]:
+    """
+    Get the user's bet details: the choice and risk.
+
+    Returns Tuple[None, None] if user's has not a bet!
+    """
+    bet = list(filter(lambda x: x["match_id"] == match_id, bets))
+    try:
+        bet = bet[0]
+    except IndexError:
+        return None, None
+    else:
+        return bet["choice"], bet["risk"]

@@ -32,7 +32,6 @@ class Bet(models.Model):
     def __str__(self):
         return str(self.pk)
 
-    # TODO kiedy is_active ma się zmieniać na false ( wtedy  kiedy rozpoczyna się kolejka)
     def check_bet(self):
         if isinstance(self.is_won, bool):
             return self.is_won

@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.contrib import messages
 from .models import Match
 from league.models import TeamStats, Team
+from django.shortcuts import get_object_or_404
 
 
 def count_different(match, team) -> int:
@@ -29,8 +30,15 @@ def find_biggest_win_and_worst_defeat(qs_match, main_team):
 
 
 class MatchDetailView(LoginRequiredMixin, DetailView):
-    model = Match
+    # model = Match
     template_name = "match/match_detail.html"
+    queryset = Match.objects.select_related(
+        "home_team",
+        "away_team",
+        "matchweek",
+        "matchweek__season",
+        "matchweek__season__league",
+    )
 
     def get_context_data(self, **kwargs):
         context = super(MatchDetailView, self).get_context_data(**kwargs)
@@ -42,7 +50,6 @@ class MatchDetailView(LoginRequiredMixin, DetailView):
         position_away = table.filter(team=match.away_team).first().get_position
 
         context["position"] = {"home": position_home, "away": position_away}
-        # TODO takie staty jak tu: https://www.premierleague.com/match/93424
 
         # form guide
         home = Match.get_form_guide_team(match.home_team, 5)
@@ -61,29 +68,13 @@ class MatchDetailView(LoginRequiredMixin, DetailView):
         context["so_far_away"] = so_far_away
 
         # count biggest and worst match
-        matches_so_far_home = Match.get_season_finished_matches(
+        context["home"] = self.__find_biggest_win_and_worst_defeat(
             match.home_team, match.matchweek.season
         )
-        biggest_win_and_worst_defeat_home = find_biggest_win_and_worst_defeat(
-            matches_so_far_home, match.home_team
-        )
 
-        matches_so_far_away = Match.get_season_finished_matches(
+        context["away"] = self.__find_biggest_win_and_worst_defeat(
             match.away_team, match.matchweek.season
         )
-        biggest_win_and_worst_defeat_away = find_biggest_win_and_worst_defeat(
-            matches_so_far_away, match.away_team
-        )
-
-        context["home"] = {
-            "bw": biggest_win_and_worst_defeat_home[0],
-            "wd": biggest_win_and_worst_defeat_home[1],
-        }
-
-        context["away"] = {
-            "bw": biggest_win_and_worst_defeat_away[0],
-            "wd": biggest_win_and_worst_defeat_away[1],
-        }
 
         context["clean_sheets"] = {
             "home": Match.get_clean_sheets(match.home_team, match.matchweek.season),
@@ -91,6 +82,16 @@ class MatchDetailView(LoginRequiredMixin, DetailView):
         }
 
         return context
+
+    def __find_biggest_win_and_worst_defeat(self, team, season):
+        matches_so_far = Match.get_season_finished_matches(team, season)
+        biggest_win_and_worst_defeat = find_biggest_win_and_worst_defeat(
+            matches_so_far, team
+        )
+        return {
+            "bw": biggest_win_and_worst_defeat[0],
+            "wd": biggest_win_and_worst_defeat[1],
+        }
 
 
 class ResultsSeasonListView(LoginRequiredMixin, ListView):
@@ -111,7 +112,10 @@ class ResultsSeasonListView(LoginRequiredMixin, ListView):
                 queryset = self.model.objects.filter(finished=True)
         else:
             queryset = self.model.objects.filter(finished=True)
-        return queryset.order_by("-start_date")
+
+        return queryset.select_related("home_team", "away_team", "matchweek").order_by(
+            "-start_date"
+        )
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(ResultsSeasonListView, self).get_context_data(*kwargs)
@@ -139,7 +143,7 @@ class FixturesSeasonListView(ResultsSeasonListView):
                 queryset = self.model.objects.filter(finished=False)
         else:
             queryset = self.model.objects.filter(finished=False)
-        return queryset
+        return queryset.select_related("home_team", "away_team", "matchweek")
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(FixturesSeasonListView, self).get_context_data(*kwargs)

@@ -48,16 +48,6 @@ def get_temporary_image(size: Tuple[int, int], name: str) -> File:
     return File(file_obj, name=name)
 
 
-# class xyz(TestCase):
-#     def setUp(self):
-#         ...
-#
-# class xyzTest(xyz):
-#     def setUp(self):
-#         super().setUp()
-#         ...
-
-
 @tag("model_profile")
 class ProfileTest(TestCase):
     @classmethod
@@ -306,7 +296,3 @@ class UserScoresTest(TestCase):
         user_scores = UserScores.objects.get(id=pk)
 
         self.assertEquals(user_scores.description, f"{pt} pt for: {info}.")
-
-
-# https://dev.to/thedevtimeline/mock-django-models-using-faker-and-factory-boy-3ib0
-# https://pythonprogramming.org/how-to-use-factoryboy-to-create-model-instances-in-python-for-testing/

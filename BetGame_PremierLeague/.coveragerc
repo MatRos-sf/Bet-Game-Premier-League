@@ -1,0 +1,9 @@
+[run]
+omit =
+    # omit anything in a .local directory anywhere
+    */migrations/*
+    manage.py
+    */tests/*
+    BetGame_PremierLeague/*
+    */__init__.py/*
+    */__init__.py

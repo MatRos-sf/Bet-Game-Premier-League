@@ -26,4 +26,6 @@ urlpatterns = [
     path("bet/", include("bet.urls")),
     path("match/", include("match.urls")),
     path("event/", include("event.urls")),
+    path("api/", include("api.urls")),
+    path("__debug__/", include("debug_toolbar.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

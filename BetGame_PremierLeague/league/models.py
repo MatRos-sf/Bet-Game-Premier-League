@@ -14,7 +14,7 @@ class League(models.Model):
         return self.name
 
     def current_season(self):
-        pass
+        return self.season_set.filter(is_currently=True).first()
 
 
 class Season(models.Model):
@@ -27,12 +27,12 @@ class Season(models.Model):
 
     is_currently = models.BooleanField(default=True)
 
-    def __str__(self):
-        league = self.league.name
-        return f"{league} {self.start_date}"
-
     class Meta:
         ordering = ["start_date"]
+
+    def __str__(self):
+        league = self.league.name
+        return f"{league} {self.start_date.year}"
 
     @property
     def matchweek(self) -> int:
@@ -63,10 +63,6 @@ class Team(models.Model):
     name = models.CharField(max_length=100)
     short_name = models.CharField(max_length=50, blank=True, null=True)
     shortcut = models.CharField(max_length=5, blank=True, null=True)
-    # TODO: will change name currently_league -> league
-    currently_league = models.ForeignKey(
-        League, on_delete=models.CASCADE, related_name="teams", blank=True, null=True
-    )
 
     crest = models.URLField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
@@ -110,11 +106,13 @@ class TeamStats(models.Model):
 
     @classmethod
     def get_season_table(cls, league: str, season: int = None):
-        # TODO ma szukać w League aktualny sezon
-
-        return cls.objects.filter(
-            season__start_date__year=season, season__league__name=league
-        ).order_by("-points", "-goals_for", "team__name")
+        return (
+            cls.objects.filter(
+                season__start_date__year=season, season__league__name=league
+            )
+            .select_related("season", "team")
+            .order_by("-points", "-goals_for", "team__name")
+        )
 
     @classmethod
     def get_season_so_far(cls, season: Season, first_team: Team):
