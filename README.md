@@ -4,7 +4,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/MatRos-sf/Bet-Game-Premier-League">
-    <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/blob/main/BetGame_PremierLeague/media/website_img/logo.png" alt="Logo" width="80" height="80">
+    <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/blob/main/BetGame_PremierLeague/media/website_img/logo.png" alt="Logo" width="180" height="180">
   </a>
 
 <h3 align="center">Bet Game Premier League</h3>
