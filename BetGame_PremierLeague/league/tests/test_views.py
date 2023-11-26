@@ -25,3 +25,14 @@ class TeamDetailViewTest(SimpleDB):
         self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
         response = self.client.get(self.url(pk))
         self.assertEquals(response.status_code, HTTPStatus.OK)
+
+    def test_should_not_empty_context(self):
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+        response = self.client.get(self.url(1))
+
+        context = response.context
+
+        self.assertTrue(context["object"])
+        self.assertTrue(context["stats"])
+        self.assertTrue(context["next_match"])
+        self.assertTrue(context["last_match"])

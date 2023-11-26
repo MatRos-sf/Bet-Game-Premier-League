@@ -38,33 +38,6 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Bet section -->
-    {% if match.finished %}
-        <!--#TODO: win_bet, amt_home, amt_draw, amt_home, amt_risk -->
-    {% else %}
-    {% user_bet user=user match=match as chose %}
-
-    <div class="container py-4">
-        <div class="row text-center">
-          <div class="col-lg-12 ">
-            <form method="POST">
-                {% csrf_token %}
-                <div class="form-group">
-                    <button type="submit" class="btn {% if chose == 'home' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="home {{ match.id }}">{{ match.home_team.short_name}}</button>
-                    <button type="submit" class="btn {% if chose == 'draw' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="draw {{ match.id }}">Draw</button>
-                    <button type="submit" class="btn {% if chose == 'away' %}btn-primary{% else %}btn-outline-primary{% endif %} py-3 px-5" name="bet" value="away {{ match.id }}">{{ match.away_team.short_name}}</button>
-                </div>
-                {% user_risk match user as risk %}
-                    {% if not risk %}
-                        <input class='form-check-input' type="checkbox" id="id_risk" name="risk" value="True" >
-                        <label for="id_risk">Risk: </label>
-                    {% endif %}
-
-            </form>
-          </div>
-        </div>
-    </div>
-    {% endif %}
 
     <!-- Recent Meeting section -->
     <div class="latest-news">
