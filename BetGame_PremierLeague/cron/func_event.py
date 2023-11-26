@@ -17,14 +17,13 @@ def start_event() -> None:
     """
     Search for events, change their status to 'now,' and cancel all requests because the time has expired.
     """
-    events = Event.objects.filter(
-        start_date__lte=timezone.now(), status=Event.BEFORE
-    ).update(status=Event.NOW)
+    Event.objects.filter(start_date__lte=timezone.now(), status=Event.BEFORE).update(
+        status=Event.NOW
+    )
 
-    if events.exists():  # probably if events wystarczy
-        no_accept_request = EventRequest.objects.filter(
-            event__in=events, is_accept=False, canceled=False
-        ).update(canceled=True)
+    EventRequest.objects.filter(
+        event__status=Event.NOW, is_accept=False, canceled=False
+    ).update(canceled=True)
 
 
 def finish_event() -> None:

@@ -14,10 +14,9 @@
   <div class="col-lg-5 ml-auto">
     <h1 class="text-white">Are you ready for an exciting journey?</h1>
     <p>
-        Our website is the place where you can test your match prediction skills, track scores, get thrilled by matches,
-        and compete with {{ amt_users }} of other users, all without the risk of losing money. Whether you're a die-hard
-        Premier League fan or just enjoy an extra dose of adrenaline, we're here to provide you with the best
-        experience in sports event prediction.
+Welcome to Bet Game Premier League! Follow and bet on Premier League matches, compete with other players,
+        earn points for successful bets, and even create and invite friends to unique football events.
+        Experience the thrill of football betting now!
     </p>
     <p>
       <a href="{% url 'login' %}" class="btn btn-primary py-3 px-4 mr-3">Log In</a>
@@ -192,6 +191,7 @@
                     </a>
               </div>
               <div class="caption p-5">
+                <h2 class="mb-3">{{ player.user.username }}</h2>
                 <h3 class="mb-3">{{ player.sum_points }}</h3>
               </div>
             </div>
