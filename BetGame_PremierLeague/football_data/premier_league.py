@@ -326,7 +326,7 @@ class PremierLeague:
     def convert_league_to_dict(self):
         if not self.league:
             raise AttributeError("The league attribute is None!")
-        return self.season.__dict__
+        return self.league.__dict__
 
     def check_new_season(self, season: int) -> Optional[bool]:
         url = self.__get_full_url(self.url_current_season)
@@ -339,5 +339,4 @@ class PremierLeague:
         start_new_season = datetime.strptime(
             dataset["currentSeason"]["startDate"], "%Y-%m-%d"
         )
-
         return start_new_season.year != season
