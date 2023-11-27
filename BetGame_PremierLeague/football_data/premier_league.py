@@ -11,8 +11,8 @@ from http import HTTPStatus
 
 load_dotenv()
 
-# HEADER = {"X-Auth-Token": settings.API_TOKEN}
-HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
+HEADER = {"X-Auth-Token": settings.API_TOKEN}
+# HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
 
 
 @dataclass
