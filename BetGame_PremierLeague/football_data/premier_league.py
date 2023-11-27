@@ -38,7 +38,6 @@ class Team:
     name: str
     short_name: str
     shortcut: str
-    currently_league: League | None
     crest: str
     website: str
     club_colours: str
@@ -161,24 +160,27 @@ class PremierLeague:
 
         return matches
 
-    def get_league(self, dataset: dict):
-        name = dataset["name"]
-        country = dataset["area"]["name"]
-        emblem = dataset["emblem"]
+    @staticmethod
+    def get_league(dataset: dict) -> League:
+        name: str = dataset["name"]
+        country: str = dataset["area"]["name"]
+        emblem: str = dataset["emblem"]
 
         return League(name, country, emblem)
 
-    def get_season(self, dataset: dict):
+    def get_season(self, dataset: dict) -> Season:
         if not self.league:
             raise ValueError("You don't set League!")
 
-        fb_id = dataset["currentSeason"]["id"]
-        start_date = datetime.strptime(
+        fb_id: int = dataset["currentSeason"]["id"]
+        start_date: datetime = datetime.strptime(
             dataset["currentSeason"]["startDate"], "%Y-%m-%d"
         )
-        end_date = datetime.strptime(dataset["currentSeason"]["endDate"], "%Y-%m-%d")
-        matchweek = dataset["currentSeason"]["currentMatchday"]
-        is_currently = dataset["currentSeason"]["winner"] == None
+        end_date: datetime = datetime.strptime(
+            dataset["currentSeason"]["endDate"], "%Y-%m-%d"
+        )
+        matchweek: int = dataset["currentSeason"]["currentMatchday"]
+        is_currently: bool = dataset["currentSeason"]["winner"] == None
 
         return Season(
             fb_id=fb_id,
@@ -189,7 +191,7 @@ class PremierLeague:
             league=self.league,
         )
 
-    def get_teams(self, league: League = None):
+    def get_teams(self) -> Optional[List[Team]]:
         """
         The method retrieves information about teams. It returns a list of Team objects.
         """
@@ -198,7 +200,11 @@ class PremierLeague:
 
         if not succeed:
             return
+
         dataset = response.json()["teams"]
+
+        if not dataset:
+            raise KeyError("Empty list of Teams!")
 
         teams: List[Team] = []
 
@@ -211,14 +217,13 @@ class PremierLeague:
                 crest=team["crest"],
                 website=team["website"],
                 club_colours=team["clubColors"],
-                currently_league=league,
             )
 
             teams.append(team_obj)
 
         return teams
 
-    def get_matches(self, year: int, finished: bool = True) -> List[Match] | None:
+    def get_matches(self, year: int) -> Optional[List[Match]]:
         """
         The method retrieves information about all season matches.
         It returns a list of Match objects.
@@ -252,8 +257,9 @@ class PremierLeague:
 
         for mw in range(1, all_matchweek):
             mw_matches = [match for match in matches if match.matchweek == mw]
-            start_date = mw_matches[0].start_date
-            end_date = mw_matches[-1].start_date
+            start_date = mw_matches[0].start_date.replace(tzinfo=timezone.utc)
+            end_date = mw_matches[-1].start_date.replace(tzinfo=timezone.utc)
+
             matchweek_obj = Matchweek(
                 matchweek=mw,
                 start_date=start_date,

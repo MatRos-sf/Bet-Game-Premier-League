@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "rest_framework",
     "rest_framework_simplejwt",
+    "silk",
 ]
 
 MIDDLEWARE = [
@@ -64,6 +65,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    "silk.middleware.SilkyMiddleware",
 ]
 
 ROOT_URLCONF = "BetGame_PremierLeague.urls"
@@ -179,3 +181,5 @@ SIMPLE_JWT = {
     # 'ROTATE_REFRESH_TOKEN': True,
     # 'BLACKLIST_AFTER_ROTATION': True,
 }
+
+SILKY_PYTHON_PROFILER = True
