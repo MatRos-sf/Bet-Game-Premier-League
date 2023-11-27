@@ -201,11 +201,15 @@ class Match(models.Model):
         """
         Retrieves the recent meetings between two teams.
         """
-        return cls.objects.filter(
-            Q(finished=True),
-            Q(home_team=first_team) | Q(away_team=first_team),
-            Q(home_team=second_team) | Q(away_team=second_team),
-        ).order_by("-start_date")[:amt]
+        return (
+            cls.objects.filter(
+                Q(finished=True),
+                Q(home_team=first_team) | Q(away_team=first_team),
+                Q(home_team=second_team) | Q(away_team=second_team),
+            )
+            .select_related("matchweek__season__league")
+            .order_by("-start_date")[:amt]
+        )
 
     def set_score(self, home_goals: int, away_goals: int) -> None:
         """
