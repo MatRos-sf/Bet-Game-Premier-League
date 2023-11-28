@@ -8,19 +8,50 @@
 {% endif %}
 {% endblock %}
 
-{% block bg_section %}
-    <div class="col-lg-9 mx-auto text-center">
-        <h1 class="text-white">
-            {% if title %}
-                {{ title }}
-            {% else %}
-                Log In
-            {% endif %}
-        </h1>
+{% block background_photo %}
+    <div class="site-section bg-light" data-aos="fade-up">
+      <div class="container">
+        <div class="row align-items-first">
+          <div class="col-md-7">
+
+            <form action="#" method="post" class="bg-white">
+
+              <div class="p-3 p-lg-5 border">
+                <h1>{% if title %}
+                    {{ title }}
+                  {% else %}
+                    Log In
+                  {% endif %}
+                  </h1>
+                  {% csrf_token %}
+                  {{ form|crispy }}
+
+                  <div class="col-lg-12">
+                      <button type="submit" class="btn btn-primary btn-lg btn-block">
+                          {% if button_name %} {{ button_name }} {% else %} Log In {% endif %}
+                      </button>
+                    {% if not button_name %}
+                      <p class="p-1 text-center">Don't have an account? <a href="{% url 'register' %}" >Sign up</a></p>
+                    {% endif %}
+                  </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="col-md-5">
+            <div class="p-4 border mb-3 bg-white">
+                <img src="/media/website_img/logo.png" alt="Image" class="img-fluid">
+            </div>
+
+          </div>
+
+        </div>
+      </div>
     </div>
+
 {% endblock %}
 
-{% block content %}
+{% block essa %}
     <div class="site-section">
       <div class="container">
         <div class="row justify-content-center">

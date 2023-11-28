@@ -38,7 +38,7 @@ def home(request: HttpRequest) -> HttpResponse:
         last_matchweek_bet_stat = {}
 
     # top 3 players
-    top_players = Profile.top_players(3)
+    top_players = Profile.top_players(5)
 
     return render(
         request,

@@ -4,89 +4,78 @@
 
 {% block title %}Bets{% endblock %}
 
-{% block bg_section %}
-<div class="col-lg-9 mx-auto text-center" xmlns="http://www.w3.org/1999/html">
-        <h1 class="text-white">Your Finished Bets</h1>
-    </div>
-
-{% endblock %}
-
 {% block content %}
-    <!-- Upcoming section -->
-    <div class="site-section bg-dark">
+    <div class="site-section site-blocks-vs">
       <div class="container">
-          <div class="row">
-          <div class="col-12 title-section">
-            <h2 class="heading">Finished Bets</h2>
+            <div class="col-md-12 text-center">
+            <h2 class="text-black">Finished Bets</h2>
           </div>
-            {% for bet in object_list %}
-                <div class="col-lg-6 mb-4">
-                    <a href="{{ bet.match.get_absolute_url }}">
-                    <div class="bg-light p-4 rounded">
-                      <div class="widget-body">
-                          <div class="widget-vs">
-                            <div class="d-flex align-items-center justify-content-around justify-content-between w-100">
-                              <div class="team-1 text-center">
-                                <img src="{{ bet.match.home_team.crest}}" alt="Team">
-                                <h3>{{ bet.match.home_team.short_name}}</h3>
-                              </div>
-
-                              <div class="team-1 text-center score">
-                                <h1 >{{ bet.match.home_goals }}</h1>
-                              </div>
-                              <div class="team-1 text-center score">
-                                <h1 >:</h1>
-                              </div>
-                              <div class="team-1 text-center score">
-                                <h1>{{ bet.match.away_goals }}</h1>
-                              </div>
-
-                              <div class="team-2 text-center">
-                                <img src="{{ bet.match.away_team.crest}}" alt="Team">
-                                <h3>{{ bet.match.away_team.short_name}}</h3>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="text-center widget-vs-contents mb-4">
-                            {% if bet.is_won %}
-                                <h4>WIN</h4>
-                                <p class="text-white">{% if bet.risk %}+4 {% else %}+1 {% endif %}pt</p>
-                            {% else %}
-                                <h4>LOSE</h4>
-                                <p class="text-white">{% if bet.risk %}-1 {% else %}0 {% endif %}pt</p>
-                            {% endif %}
-                        </div>
+            <div class="row align-items-center mb-5">
+          <div class="col-md-12">
+              {% for bet in object_list %}
+            <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
+              <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
+                <div class="text-center text-lg-left">
+                  <div class="d-block d-lg-flex align-items-center">
+                    <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
+                      <img src="{{ bet.match.home_team.crest}}" alt="Image" class="img-fluid">
                     </div>
-                </a>
+                    <div class="text">
+                      <h3 class="h5 mb-0 text-black">{{ bet.match.home_team.short_name}}</h3>
+                    </div>
+                  </div>
                 </div>
+              </div>
+              <div class="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
+                <div class="d-inline-block">
+                  <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded"><span class="h5">{{ bet.match.home_goals }}:{{ bet.match.away_goals }}</span></div>
+                    <div class="col">
+                        {% if bet.is_won %}
+                            <span class="text-uppercase small country text-success">{% if bet.risk %} <b>+4</b> {% else %}+1 {% endif %}pt</span>
+                        {% else %}
+                        <span class="text-uppercase small country text-danger">{% if bet.risk %} -1 {% else %}0 {% endif %}pt</span>
+                        {% endif %}
+                    </div>
+                 </div>
 
+              </div>
+
+              <div class="col-md-4 col-lg-4 text-center text-lg-right">
+                <div class="">
+                  <div class="d-block d-lg-flex align-items-center">
+                    <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
+                      <img src="{{ bet.match.away_team.crest}}" alt="Image" class="img-fluid">
+                    </div>
+                    <div class="text order-1 w-100">
+                      <h3 class="h5 mb-0 text-black">{{ bet.match.away_team.short_name}}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             {% endfor %}
-
-        </div>
-
-        <section id="pagination">
-            <div class="row justify-content-center">
-        <div class="col-lg-7 text-center">
-          <div class="custom-pagination">
-            {% if page_obj.has_previous %}
-              <a href="?page=1">&laquo;</a>
-              <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
-            {% endif %}
-            <span>{{ page_obj.number }}</span>
-
-            {% if page_obj.has_next %}
-              <a href="?page={{ page_obj.next_page_number }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">{{ page_obj.next_page_number}}</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">&raquo;</a>
-            {% endif %}
-
           </div>
         </div>
-      </div>
-        </section>
+            <div class="row">
+              <div class="col-md-12 text-center">
+                    <div class="site-block-27">
+                      <ul>
+                        {% if page_obj.has_previous %}
+                          <li><a href="?page=1">&lt;</a> </li>
+                          <li><a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
+                        {% endif %}
+                          <li class="active"><span>{{ page_obj.number }}</span></li>
+
+                        {% if page_obj.has_next %}
+                          <li> <a href="?page={{ page_obj.next_page_number }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">{{ page_obj.next_page_number}}</a> </li>
+                            <li><a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">&gt;</a></li>
+                        {% endif %}
+
+                      </ul>
+                    </div>
+                  </div>
+        </div>
 
       </div>
     </div>
-
 {% endblock %}
