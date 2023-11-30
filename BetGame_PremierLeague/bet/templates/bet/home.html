@@ -7,7 +7,8 @@
 {% block content %}
       <div class="site-blocks-vs site-section bg-light">
         <div class="container">
-            <div class="row mb-5">
+        <h1 class="text-center text-black mb-6">Bet</h1>
+        <div class="row mb-5">
           <div class="col-md-12">
             <div class="border mb-3 rounded d-block d-lg-flex align-items-center p-3 next-match">
               <div class="mr-auto order-md-1 w-60 text-center text-lg-left mb-3 mb-lg-0">
@@ -29,7 +30,7 @@
         <!-- last match sector -->
         {% for match in matches %}
             {% check_user_choice match.pk user_bets as chose %}
-            <div class="bg-image overlay-success rounded mb-5" style="background-image: url(/media/website_img/EPL_Cover.webp);" data-stellar-background-ratio="0.5">
+            <div class="bg-image overlay-success rounded mb-5" style="background-image: url(/media/website_img/stadium/stadium.jpg);" data-stellar-background-ratio="0.5">
 
             <div class="row align-items-center">
                 <div class="col-md-12 col-lg-4 mb-4 mb-lg-0">

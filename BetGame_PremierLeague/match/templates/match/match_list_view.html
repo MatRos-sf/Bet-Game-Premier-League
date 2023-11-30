@@ -4,107 +4,96 @@
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block bg_section %}
-<div class="col-lg-9 mx-auto text-center" xmlns="http://www.w3.org/1999/html">
-        <h1 class="text-white">{{ title }}</h1>
-        <p>Season {{ season_name }}</p>
-    </div>
-
-{% endblock %}
-
 {% block content %}
-    <div class="site-section bg-dark">
+    <div class="site-section site-blocks-vs">
       <div class="container">
-
-        <!-- Finished Matches -->
-        <div class="row">
-          <div class="col-12 title-section">
-            <h2 class="heading">Matches</h2>
+            <div class="col-md-12 text-center">
+            <h2 class="text-black">{{ title }}</h2>
+                <span class="meta">Season: {{ season_name }}</span>
           </div>
-            <div class="sidebar-box">
-              <form method="GET" class="search-form">
-                <div class="form-group">
-                  <span class="icon fa fa-search"></span>
-                  <input type="text" name='name_team' class="form-control" placeholder="Type a name team and hit enter">
-                </div>
-              </form>
+
+              <div class="row justify-content-center m-3">
+            <div class="col-12 title-section">
+                <h2 class="heading text-center">Search!</h2>
             </div>
-            {% for match in object_list %}
-                <div class="col-lg-6 mb-4">
-                    <a href="{{ match.get_absolute_url }}">
-                    <div class="bg-light p-4 rounded">
-                      <div class="widget-body">
-                          <div class="widget-vs">
-                            <div class="d-flex align-items-center justify-content-around justify-content-between w-100">
-                              <div class="team-1 text-center">
-                                <img src="{{ match.home_team.crest}}" alt="Team">
-                                <h3>{{ match.home_team.short_name}}</h3>
-                              </div>
-                              {% if match.finished %}
-                                 <div class="team-1 text-center score">
-                                <h1 >{{ match.home_goals }}</h1>
-                              </div>
-                                 <div class="team-1 text-center score">
-                                <h1 >:</h1>
-                              </div>
-                                 <div class="team-1 text-center score">
-                                <h1>{{ match.away_goals }}</h1>
-                              </div>
-                              {% else %}
-                                <div>
-                                   <span class="vs"><span>VS</span></span>
-                                </div>
-                              {% endif %}
-
-
-                              <div class="team-2 text-center">
-                                <img src="{{ match.away_team.crest}}" alt="Team">
-                                <h3>{{ match.away_team.short_name}}</h3>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                          {% if not match.finished %}
-
-                    <div class="text-center widget-vs-contents mb-4">
-                      <p class="mb-5">
-                        <span class="d-block">{{ match.start_date|date:"M dS, Y"}}</span>
-                        <span class="d-block">{{ match.start_date|date:"fA e"}}</span>
-                      </p>
-
+            <div class="col-5">
+                <form  method="GET">
+                    <div class="input-group mb-3">
+                      <input type="text" name='name_team' class="form-control border-secondary text-black bg-transparent" placeholder="Type a team name and hit enter">
+                      <div class="input-group-append">
+                        <button class="btn btn-primary" type="button" id="button-addon2">Search!</button>
+                      </div>
                     </div>
-                          {% endif %}
-
-                        </div>
-                    </a>
-                    </div>
-
-            {% endfor %}
-
+                  </form>
+            </div>
         </div>
-      </div>
-        <section id="pagination">
-            <div class="row justify-content-center">
-        <div class="col-lg-7 text-center">
-          <div class="custom-pagination">
-            {% if page_obj.has_previous %}
-              <a href="?page=1{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">&laquo;</a>
-              <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">{{ page_obj.previous_page_number }}</a>
-            {% endif %}
-            <span>{{ page_obj.number }}</span>
 
-            {% if page_obj.has_next %}
-              <a href="?page={{ page_obj.next_page_number }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">{{ page_obj.next_page_number}}</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">&raquo;</a>
-            {% endif %}
+            <div class="row align-items-center mb-5">
+          <div class="col-md-12">
+              {% for match in object_list %}
+                <a href="{{ match.get_absolute_url }}">
+                  <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
+                  <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
+                    <div class="text-center text-lg-left">
+                      <div class="d-block d-lg-flex align-items-center">
+                        <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
+                          <img src="{{ match.home_team.crest}}" alt="Image" class="img-fluid">
+                        </div>
+                        <div class="text">
+                          <h3 class="h5 mb-0 text-black">{{ match.home_team.short_name}}</h3>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
+                    <div class="d-inline-block">
+                      <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded"><span class="h5">
+                          {% if match.finished %}
+                          {{ match.home_goals }}:{{ match.away_goals }}
+                          {% else %}
+                          vs
+                          {% endif %}
+                      </span></div>
+                     </div>
 
+                  </div>
+
+                  <div class="col-md-4 col-lg-4 text-center text-lg-right">
+                    <div class="">
+                      <div class="d-block d-lg-flex align-items-center">
+                        <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
+                          <img src="{{ match.away_team.crest}}" alt="Image" class="img-fluid">
+                        </div>
+                        <div class="text order-1 w-100">
+                          <h3 class="h5 mb-0 text-black">{{ match.away_team.short_name}}</h3>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                </a>
+              {% endfor %}
           </div>
         </div>
+            <div class="row">
+              <div class="col-md-12 text-center">
+                    <div class="site-block-27">
+                      <ul>
+                        {% if page_obj.has_previous %}
+                          <li><a href="?page=1">&lt;</a> </li>
+                          <li><a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
+                        {% endif %}
+                          <li class="active"><span>{{ page_obj.number }}</span></li>
+
+                        {% if page_obj.has_next %}
+                          <li> <a href="?page={{ page_obj.next_page_number }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">{{ page_obj.next_page_number}}</a> </li>
+                            <li><a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">&gt;</a></li>
+                        {% endif %}
+
+                      </ul>
+                    </div>
+                  </div>
+        </div>
       </div>
-        </section>
     </div>
-    </div>
-
-
 {% endblock %}

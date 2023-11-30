@@ -2,87 +2,82 @@
 {% load crispy_forms_tags %}
 {% block title %}Profile{% endblock %}
 
-{% block bg_section %}
-    <div class="col-lg-9 mx-auto text-center">
-        <h1 class="text-white">{{ object.name }}</h1>
-        <h2><span>Event</span></h2>
+
+{% block background_photo %}
+    {% if object.status == 'finished' %}
+    <div class="site-blocks-cover overlay" style="background-image: url('/media/website_img/winners.webp');" data-aos="fade" data-stellar-background-ratio="0.5">
+      <div class="container">
+        <div class="row align-items-center justify-content-center">
+          <div class="col-md-6 text-center" data-aos="fade-up" data-aos-delay="400">
+                <h1 class="bg-text-line">The winner of the event is {{ object.leader }}!</h1>
+          </div>
+        </div>
+      </div>
     </div>
+    {% endif %}
 {% endblock %}
 
+
 {% block content %}
-
-<div class="container site-section">
-  <div class="row">
-      <div class="col-6 title-section">
-      <h2 class="heading">Detail</h2>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-sm-6 col-md-8">
-      <div class="custom-media d-flex">
-        <div class="text">
-            <h2 class="mb-1">{% if object.name %}{{ object.name }}{% else %}Event{% endif %}</h2>
-            <h3 class="mb-2">Amount of Members:  {{ object.amt_members  }}</h3>
-            <h3 class="mb-1">Start: {{ object.start_date|date:"M d, Y" }} </h3>
-            <h3 class="mb-1">End:  {{ object.end_date|date:"M d, Y" }}</h3>
-            <h3 class="mb-1">Fee:  {{ object.fee }}</h3>
-
+    <div class="site-section aos-init aos-animate" data-aos="fade-up">
+      <div class="container">
+        <h1 class="text-center text-black mb-5">{{ object.name }}</h1>
+        <div class="row">
+          <div class="col-md-6">
+            <h2 class="text-black">Detail</h2>
+            <p class="lead">Fee:  {{ object.fee }}</p>
+            <p>Amount of Members:  {{ object.amt_members  }}</p>
+            {% if object.status == 'before' %}
+              <div class="mr-auto order-md-1 w-60 text-center text-lg-left mb-3 mb-lg-0">
+                Matchweek start:
+                <div id="date-countdown" data-start-time="{{ object.start_date|date:'Y-m-d' }}"></div>
+            </div>
+            {% endif %}
+          </div>
+          <div class="col-md-6">
+            <h2 class="text-black">Awards</h2>
+            <p class="lead"></p>
+            <p>First Place: {{ object.calculate_first_place_points }}pt</p>
+            <p>Second Place: {{ object.calculate_second_place_points }}pt</p>
+            <p>Third Place: {{ object.calculate_third_place_points }}pt</p>
         </div>
       </div>
     </div>
-
-      <div class="col-6 col-md-4">
-
-            <div class="custom-media d-flex">
-            <div class="text">
-                <h2 class="mb-1">Price:</h2>
-                <h3 class="mb-2">First Place: {{ object.calculate_first_place_points }} </h3>
-                <h3 class="mb-2">Second Place: {{ object.calculate_second_place_points }} </h3>
-                <h3 class="mb-2">Third Place: {{ object.calculate_third_place_points }} </h3>
-
+    {% if form and user == object.owner %}
+    <div class="site-blocks-vs site-section bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 title-section text-center">
+                <h2 class="heading">Add members!</h2>
             </div>
-
-          </div>
-        </div>
-      {% if form and user == object.owner %}
-            <div class="sidebar-box">
-              <form method="POST" class="search-form">
-                <div class="form-group">
-                  <span class="icon fa fa-search"></span>
+            <div class="col-6">
+                <form  method="POST">
                     {% csrf_token %}
                     {{ form|crispy }}
-                </div>
-              </form>
+                  </form>
             </div>
-
-        {% endif %}
-  </div>
-</div>
-
-<!-- Description section -->
-{% if object.description %}
-    <div class="site-section bg-dark">
-        <div class="container">
-          <div class="row">
-            <div class="col-6 title-section">
-              <h2 class="heading">Description</h2>
-            </div>
+        </div>
+    </div>
+    </div>
+    {% endif %}
+    {% if object.description %}
+    <div class="site-section block-13 bg-primary fixed overlay-primary bg-image" style="background-image: url('/media/website_img/photo_1.jpg');"  data-stellar-background-ratio="0.5">
+      <div class="container">
+        <div class="row mb-5">
+          <div class="col-md-12 text-center">
+            <h2 class="text-white">{{ object.description }}</h2>
           </div>
-            <div class="text">
-                <p> {{ object.description }} </p>
         </div>
       </div>
-    </div>
-
-{% endif %}
-
-<div class="site-section bg-dark">
-        <div class="container justify-content-around">
-          <div class="row">
-          <div class="col-12 title-section">
-            <h2 class="heading">Table:</h2>
-          </div>
-              <table class="table custom-table ">
+      </div>
+    {% endif %}
+    <div class="site-blocks-vs site-section bg-light">
+      <div class="container">
+        <h2 class="h3 text-uppercase text-black font-weight-bold mb-3 text-center">Table</h2>
+        <div class="row mb-5 justify-content-center">
+          <div class="col-lg-6">
+            <div class="widget-next-match">
+              <table class="table" >
                 <thead>
                   <tr>
                     <th>P</th>
@@ -94,16 +89,22 @@
                   {% for u in object.rank %}
                       <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td><a href="{{ u.profile.get_absolute_url }}"><strong class="{% if user == u %}text-danger{% else %}text-white{% endif %}">
+                        <td><a href="{{ u.profile.get_absolute_url }}"><strong class="{% if user == u %}text-danger{% else %}text-black{% endif %}">
                             {{ u.username }}
                         </strong></a></td>
                         <td>{{ u.total_points }}</td>
+
                       </tr>
                   {% endfor %}
 
                 </tbody>
               </table>
+            </div>
+
           </div>
         </div>
-</div>
+
+      </div>
+    </div>
+
 {% endblock %}
