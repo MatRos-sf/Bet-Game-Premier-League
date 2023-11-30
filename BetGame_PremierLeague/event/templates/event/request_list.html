@@ -4,14 +4,59 @@
 
 {% block title %}Requests{% endblock %}
 
-{% block bg_section %}
-<div class="col-lg-9 mx-auto text-center" xmlns="http://www.w3.org/1999/html">
-        <h1 class="text-white">Requests</h1>
+{% block content %}
+ <div class="site-blocks-vs site-section bg-light">
+      <div class="container">
+        <!-- next match sector -->
+        <div class="site-section">
+            <div class="container">
+                <div class="row mb-5">
+                  <div class="col-md-12 text-center">
+                    <h2 class="text-black">Requests</h2>
+                  </div>
+                </div>
+            </div>
+            <div class="row align-items-center justify-content-center">
+                <div class="col-md-9">
+                {% for req in object_list  %}
+                    <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
+                    <div class="col text-center">
+                      <div class="text">
+                        <h3 class="h5 mb-0 text-black">{{ req.event.name }}</h3>
+                        {% if req.event.fee %}Fee: <span class="text-uppercase small country">{{ req.event.fee }}</span>{% endif %}
+                      </div>
+                    </div>
+                    <div class="col text-center">
+
+                    <form method="POST" action="{% url 'event:answer_to_request' pk=req.pk %}">
+                      {% csrf_token %}
+                          <button type="submit" name="answer" class="btn btn-primary" value="true">Accept</button>
+                          <button type="submit" name="answer" class="btn btn-primary" value="false" >Cancel</button>
+                    </form>
+
+                    </div>
+
+                  </div>
+                  <!-- END row -->
+                {% empty %}
+                    <h1> You don't have any invitation.</h1>
+                {% endfor %}
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
+
+  </div>
 
 {% endblock %}
 
-{% block content %}
+
+
+
+{% block xD %}
     <!-- Upcoming section -->
     <div class="site-section bg-dark">
       <div class="container">

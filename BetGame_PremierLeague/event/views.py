@@ -30,7 +30,11 @@ def create(request):
                 event = Event.objects.create(**cd)
                 return redirect(event)
 
-    return render(request, "event/event_form.html", {"form": form})
+    return render(
+        request,
+        "users/form.html",
+        {"form": form, "title": "Create Event", "button_name": "Create"},
+    )
 
 
 class EventDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):

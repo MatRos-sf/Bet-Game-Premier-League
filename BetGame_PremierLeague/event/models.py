@@ -84,6 +84,9 @@ class Event(models.Model):
         )
         return rank
 
+    def leader(self):
+        return self.rank[0]
+
     def _calculate_points(self, place) -> int:
         points = self.members.count() * self.fee
         return points * place // 100
