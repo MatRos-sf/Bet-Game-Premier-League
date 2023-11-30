@@ -18,7 +18,7 @@
             </p>
             <p>
               <a href="{% url 'login' %}" class="btn btn-primary py-3 px-4 mr-3">Log In</a>
-              <a href="{% url 'register' %}" class="more light">Create new account</a>
+              <a href="{% url 'register' %}" class="more light text-white">Create new account</a>
             </p>
             {% else %}
                 <h1 class="bg-text-line">Home</h1>
@@ -44,11 +44,11 @@
           <div class="ml-auto pr-4 order-md-2">
             <div class="h5 text-black text-uppercase text-center text-lg-left">
               <div class="d-block d-md-inline-block mb-3 mb-lg-0">
-                <img src="{{ next_match.home_team.crest }}" alt="Image" class="mr-3 image"><span class="d-block d-md-inline-block ml-0 ml-md-3 ml-lg-0">{{ next_match.home_team.short_name }}</span>
+                    <img src="{{ next_match.home_team.crest }}" alt="Image" class="mr-3 image"><span class="d-block d-md-inline-block ml-0 ml-md-3 ml-lg-0">{{ next_match.home_team.short_name }}</span>
               </div>
               <span class="text-muted mx-3 text-normal mb-3 mb-lg-0 d-block d-md-inline ">vs</span>
               <div class="d-block d-md-inline-block">
-                <img src="{{ next_match.away_team.crest }}" alt="Image" class="mr-3 image"><span class="d-block d-md-inline-block ml-0 ml-md-3 ml-lg-0">{{ next_match.away_team.short_name }}</span>
+                  <img src="{{ next_match.away_team.crest }}" alt="Image" class="mr-3 image"><span class="d-block d-md-inline-block ml-0 ml-md-3 ml-lg-0">{{ next_match.away_team.short_name }}</span>
               </div>
             </div>
           </div>
@@ -56,7 +56,8 @@
 
         </div>
 
-        <div class="bg-image overlay-success rounded mb-5" style="background-image: url(/media/website_img/EPL_Cover.webp);" data-stellar-background-ratio="0.5">
+      <a href="{{ next_match.get_absolute_url }}">
+              <div class="bg-image overlay-success rounded mb-5" style="background-image: url('/media/website_img/stadium/stadium.jpg')" data-stellar-background-ratio="0.5">
 
             <!-- last match sector -->
           <div class="row align-items-center">
@@ -95,7 +96,9 @@
             </div>
           </div>
         </div>
-       <!-- table -->
+        </a>
+
+          <!-- table -->
        <h2 class="h6 text-uppercase text-black font-weight-bold mb-3">Table</h2>
 
       <div class="row mb-5 justify-content-center">
@@ -135,7 +138,7 @@
       </div>
 
     <!-- stats lastmatchweek -->
-        <div class="site-section">
+    <div class="site-section">
           <div class="container">
             <div class="row mb-5">
               <div class="col-md-12 text-center">
@@ -146,7 +149,7 @@
                 <div class="col-md-6 col-lg-4 mb-4">
                 <div class="post-entry">
                   <div class="image">
-                    <img src="/media/website_img/photo_2.jpg" alt="Image" class="img-fluid">
+                    <img src="/media/website_img/stats/stats_2.jpg" alt="Image" class="img-fluid">
                   </div>
                   <div class="text p-4">
                     <h1 class="p-2 h4 text-red text-center">The amount of bets</h1>
@@ -168,7 +171,7 @@
                 <div class="col-md-6 col-lg-4 mb-4">
                 <div class="post-entry">
                   <div class="image">
-                    <img src="/media/website_img/photo_2.jpg" alt="Image" class="img-fluid">
+                    <img src="/media/website_img/stats/stats_1.webp" alt="Image" class="img-fluid">
                   </div>
                   <div class="text p-4">
                     <h1 class="p-2 h4 text-red text-center">The amount of risk bet</h1>
@@ -180,7 +183,7 @@
           </div>
         </div>
 
-      <div class="site-section block-13 bg-primary fixed overlay-primary bg-image" style="background-image: url('/media/website_img/photo_1.jpg');"  data-stellar-background-ratio="0.5">
+      <div class="site-section block-13 bg-primary fixed overlay-primary bg-image" style="background-image: url('/media/website_img/top_players.webp');"  data-stellar-background-ratio="0.5">
 
 
       <div class="container">
