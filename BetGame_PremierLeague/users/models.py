@@ -75,9 +75,12 @@ class Profile(models.Model):
             .order_by("-sum_points")[:end]
         )
 
-    def unfollow(self, username) -> None:
-        user = User.objects.get(username=username)
-        self.following.remove(user)
+    def unfollow(self, pk: int) -> None:
+        self.following.remove(pk)
+        self.save()
+
+    def follow(self, user_id: int):
+        self.following.add(user_id)
         self.save()
 
 

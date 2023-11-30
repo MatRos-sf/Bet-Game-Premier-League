@@ -25,7 +25,7 @@
                     <div class="input-group mb-3">
                       <input type="text" name='username' class="form-control border-secondary text-black bg-transparent" placeholder="Type a username and hit enter">
                       <div class="input-group-append">
-                        <button class="btn btn-primary" type="button" id="button-addon2">Search!</button>
+                        <button class="btn btn-primary" type="submit" id="button-addon2">Search!</button>
                       </div>
                     </div>
                   </form>
@@ -34,8 +34,9 @@
         <!-- result search section -->
         <div class="row align-items-center mb-5">
           <div class="col-md-12">
-              {% for u in object_list %}
-            <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
+                {% for u in object_list %}
+                    <a href="{{ u.get_absolute_url }}">
+                        <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
               <div class="col justify-content-center">
                 <div class="text-center text-lg-left">
                   <div class="d-block d-lg-flex align-items-center">
@@ -49,7 +50,8 @@
                 </div>
               </div>
             </div>
-            {% endfor %}
+                    </a>
+                {% endfor %}
           </div>
         </div>
         <!-- table section -->

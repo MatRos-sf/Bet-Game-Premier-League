@@ -28,6 +28,7 @@
         </div>
 
         <!-- last match sector -->
+        {% get_user_matchweek_bets user matchweek as user_bets %}
         {% for match in matches %}
             {% check_user_choice match.pk user_bets as chose %}
             <div class="bg-image overlay-success rounded mb-5" style="background-image: url(/media/website_img/stadium/stadium.jpg);" data-stellar-background-ratio="0.5">
@@ -96,7 +97,8 @@
         <!-- Finished Matches -->
         <div class="row align-items-center mb-5">
           <div class="col-md-12">
-            {% for match in finished_matches %}
+
+              {% for match in finished_matches %}
                 {% user_check_bet user=user match=match as won %}
                 <a href="{{ match.get_absolute_url }}">
                     <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
