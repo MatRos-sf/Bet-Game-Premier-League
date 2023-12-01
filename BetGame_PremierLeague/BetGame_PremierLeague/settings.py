@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "debug_toolbar",
     "rest_framework",
+    "rest_framework.authtoken",
     "rest_framework_simplejwt",
     "silk",
 ]
@@ -167,19 +168,9 @@ INTERNAL_IPS = [
 ]
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
-}
-
-from datetime import timedelta
-
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=2),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
-    # 'ROTATE_REFRESH_TOKEN': True,
-    # 'BLACKLIST_AFTER_ROTATION': True,
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
 }
 
 SILKY_PYTHON_PROFILER = True

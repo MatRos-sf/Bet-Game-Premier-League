@@ -36,7 +36,6 @@ class Bet(models.Model):
         if isinstance(self.is_won, bool):
             return self.is_won
         won, _ = self.match.winner
-        # TODO musi być is_active = False
         if isinstance(won, str):
             self.is_won = won == self.choice
             self.is_active = False
