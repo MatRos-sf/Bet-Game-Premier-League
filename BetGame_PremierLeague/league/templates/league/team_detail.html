@@ -21,7 +21,7 @@
 
               <div class="row p-3 justify-content-md-center">
                   <div class="col-6 pl-md-2">
-                      <p class="mb-6 h4">League:  {% if object.currently_league %}{{ object.currently_league }}{% else %}Degraded{% endif %}</p>
+                      <p class="mb-6 h4">{% if object.currently_league %}Premier League{% else %}Degraded{% endif %}</p>
                   </div>
                   <div class="col-6 pl-md-2">
                       <p class="mb-1 h4"><a href="{{ object.website }}">{{ object.website }}</a></p>

@@ -222,12 +222,21 @@ class ProfileTest(TestCase):
         profile_test = ProfileFactory(following=(profile_user.user,))
         ProfileFactory(following=(profile_user.user,))
 
-        profile_test.unfollow(profile_user.user.username)
+        profile_test.unfollow(profile_user.user.pk)
 
         qs_of_users_who_follow = Profile.followers(profile_user.user)
 
         self.assertTrue(qs_of_users_who_follow)
         self.assertEquals(qs_of_users_who_follow.count(), 1)
+
+    def test_should_follow_new_user(self):
+        profile_user = ProfileFactory()
+
+        profile_test = ProfileFactory()
+
+        profile_test.follow(profile_user.user.pk)
+
+        self.assertTrue(profile_user.user in profile_test.following.all())
 
     def test_position_should_first_position_user_pk_two(self):
         profile_user_two = User.objects.get(id=2)

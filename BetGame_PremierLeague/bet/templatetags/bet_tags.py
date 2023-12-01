@@ -3,6 +3,7 @@ from bet.models import Bet
 from django.db.models import QuerySet
 from typing import Tuple, Union
 from django.contrib.auth.models import User
+from datetime import timedelta
 
 from match.models import Matchweek
 

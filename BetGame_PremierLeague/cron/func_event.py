@@ -30,7 +30,7 @@ def finish_event() -> None:
     """
     Search for the event to finish and give away prizes.
     """
-    events = Event.objects.filter(end_date__gt=timezone.now(), status="now")
+    events = Event.objects.filter(end_date__gt=timezone.now(), status=Event.NOW)
 
     events.update(status="finished")
 

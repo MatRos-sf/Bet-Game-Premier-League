@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from django.contrib import messages
 
 from .models import Event, EventRequest
@@ -87,8 +87,23 @@ class EventListView(LoginRequiredMixin, ListView):
     template_name = "event/event_list.html"
 
     def get_queryset(self) -> QuerySet[Event]:
-        qs = self.model.objects.filter(members=self.request.user, is_finished=False)
+        qs = self.model.objects.filter(
+            Q(members=self.request.user), ~Q(status=Event.FINISHED)
+        )
         return qs
+
+
+class FinishedEventListView(EventListView):
+    model = Event
+    template_name = "event/event_list.html"
+
+    def get_queryset(self) -> QuerySet[Event]:
+        fields = ("name",)
+        return (
+            self.model.objects.filter(members=self.request.user, status=Event.FINISHED)
+            .only(*fields)
+            .order_by("end_date")
+        )
 
 
 class RequestListViews(LoginRequiredMixin, ListView):

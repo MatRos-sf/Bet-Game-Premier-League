@@ -31,12 +31,12 @@ def home(request: HttpRequest) -> HttpResponse:
     next_match = Match.get_next_match()
 
     mw = Matchweek.objects.filter(finished=True).last()
+    print(mw)
     if mw:
         last_matchweek_bet_stat = Bet.get_stats_matchweek(mw)
         last_matchweek_bet_stat["matchweek"] = mw.matchweek
     else:
         last_matchweek_bet_stat = {}
-
     # top 3 players
     top_players = Profile.top_players(5)
 
@@ -113,6 +113,12 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         context["bets"] = last_bets
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        func_name = request.POST.get("button_friend")
+        call_func = getattr(self.request.user.profile, func_name)
+        call_func(self.get_object().pk)
+        return self.get(request)
 
 
 class ProfileListView(LoginRequiredMixin, ListView):

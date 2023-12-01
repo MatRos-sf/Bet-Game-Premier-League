@@ -6,12 +6,14 @@ from .views import (
     RequestListViews,
     answer_to_request,
     EventListView,
+    FinishedEventListView,
 )
 
 app_name = "event"
 
 urlpatterns = [
     path("", EventListView.as_view(), name="list"),
+    path("finished/", FinishedEventListView.as_view(), name="finished"),
     path("create/", create, name="create"),
     path("detail/<int:pk>/", EventDetailView.as_view(), name="detail"),
     path("requests/", RequestListViews.as_view(), name="requests"),

@@ -74,6 +74,12 @@ class Team(models.Model):
     def get_absolute_url(self):
         return reverse("league:team-detail", args=[self.pk])
 
+    def currently_league(self) -> bool:
+        """
+        Method checks if team is currently league then returns True
+        """
+        return self.stats.filter(season__is_currently=True).exists()
+
 
 class TeamStats(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="stats")
