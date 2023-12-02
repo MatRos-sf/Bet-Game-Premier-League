@@ -1,0 +1,139 @@
+{% extends 'bet/index.html'%}
+{% load crispy_forms_tags %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+    <div class="site-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12 text-center mb-5">
+            <h2 class="text-black">Teams</h2>
+          </div>
+        </div>
+        <div class="row justify-content-center">
+            {% for team in currently_team|slice:"5" %}
+                    <div class="mb-4 mb-lg-0 col-6 col-md-4 col-lg-2 text-center">
+                        <div class="player mb-5">
+                          <a href="{{ team.team.get_absolute_url }}">
+                              <img src="{{ team.team.crest }}" alt="Image" class="img-fluid image rounded-circle">
+                          </a>
+                          <h2 class="text-black text-center">{{ team.team.short_name }}</h2>
+                        </div>
+                    </div>
+
+
+            {% endfor %}
+        </div>
+        <div class="row justify-content-center">
+            {% for team in currently_team|slice:"5:10" %}
+                <div class="mb-4 mb-lg-0 col-6 col-md-4 col-lg-2 text-center">
+                    <div class="player mb-5">
+                        <a href="{{ team.team.get_absolute_url }}">
+                            <img src="{{ team.team.crest }}" alt="Image" class="img-fluid image rounded-circle">
+                        </a>
+                        <h2>{{ team.team.short_name }}</h2>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="row justify-content-center">
+            {% for team in currently_team|slice:"10:15" %}
+                <div class="mb-4 mb-lg-0 col-6 col-md-4 col-lg-2 text-center">
+                    <div class="player mb-5">
+                      <a href="{{ team.team.get_absolute_url }}">
+                        <img src="{{ team.team.crest }}" alt="Image" class="img-fluid image rounded-circle">
+                      </a>
+                      <h2>{{ team.team.short_name }}</h2>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="row justify-content-center">
+            {% for team in currently_team|slice:"15:20" %}
+                <div class="mb-4 mb-lg-0 col-6 col-md-4 col-lg-2 text-center">
+                    <div class="player mb-5">
+                      <a href="{{ team.team.get_absolute_url }}">
+                        <img src="{{ team.team.crest }}" alt="Image" class="img-fluid image rounded-circle">
+                      </a>
+                      <h2>{{ team.team.short_name }}</h2>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col-md-12 text-center">
+        <h2 class="text-black">Table</h2>
+      </div>
+    </div>
+    <div class="row mb-5 justify-content-center">
+
+        <div class="col-lg-6">
+            <div class="widget-next-match">
+              <table class="table" >
+                <thead>
+                  <tr>
+                    <th>P</th>
+                    <th>Team</th>
+                    <th>W</th>
+                    <th>D</th>
+                    <th>L</th>
+                    <th>PTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for team in table %}
+                      <a>
+                        <td>{{ forloop.counter }}</td>
+                          <td><a href="{{ team.team.get_absolute_url }}"><strong class="text-black">{{ team.team.name }}</strong></td></a>
+                        <td>{{ team.won }}</td>
+                        <td>{{ team.drawn }}</td>
+                        <td>{{ team.lost }}</td>
+                        <td>{{ team.points }}</td>
+                      </tr>
+                  {% endfor %}
+
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+
+{% endblock %}
+
+{% block xDDD %}
+    <div class="col-lg-9 mx-auto text-center">
+        <div class="vcard bio">
+            <img class="rounded-circle" src="{{ object.emblem }}" alt="League Image">
+        </div>
+        <h1 class="text-white">{{ object.name }}</h1>
+        <p><span>{{ object.country }}</span></p>
+    </div>
+{% endblock %}
+
+{% block xD %}
+
+<div class="container site-section">
+  <div class="row">
+    <div class="col-6 title-section">
+      <h2 class="heading">Detail</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6 col-md-8">
+      <div class="custom-media d-flex">
+
+        <div class="text">
+            <h2 class="mb-1">{{ object_list}}</h2>
+            <h3 class="mb-1">Country:  {{ league.country  }}</h3>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
