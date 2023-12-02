@@ -31,7 +31,6 @@ def home(request: HttpRequest) -> HttpResponse:
     next_match = Match.get_next_match()
 
     mw = Matchweek.objects.filter(finished=True).last()
-    print(mw)
     if mw:
         last_matchweek_bet_stat = Bet.get_stats_matchweek(mw)
         last_matchweek_bet_stat["matchweek"] = mw.matchweek

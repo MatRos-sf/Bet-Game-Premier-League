@@ -5,7 +5,7 @@ from . import views
 app_name = "league"
 
 urlpatterns = [
-    # path("<int:pk>/", views.LeagueDetailView.as_view(), name="detail"),
+    path("", views.LeagueDetailView.as_view(), name="detail"),
     # path("season/", views.SeasonDetailView.as_view(), name="league-season-list"),
     # path(
     #     "season/<int:pkt>/",

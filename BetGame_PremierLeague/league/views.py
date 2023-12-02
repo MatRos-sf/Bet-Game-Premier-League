@@ -1,11 +1,28 @@
 from django.shortcuts import render
-from django.views.generic import ListView, DetailView, UpdateView, View
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import DetailView, ListView, View
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
-from typing import List
-
-from .models import Team, TeamStats
+from django.http import HttpResponse
+from .models import Team, TeamStats, League
 from match.models import Match
+
+
+class LeagueDetailView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs) -> HttpResponse:
+        league = League.objects.prefetch_related(
+            "season_set", "season_set__teamstats_set", "season_set__teamstats_set__team"
+        ).get(name="Premier League")
+        currently_team = (
+            league.season_set.first().teamstats_set.all().order_by("team__name")
+        )
+        table = TeamStats.get_season_table(
+            "Premier League", currently_team.first().season.start_date.year
+        )
+        return render(
+            request,
+            "league/league_detail.html",
+            {"league": league, "currently_team": currently_team, "table": table},
+        )
 
 
 class TeamDetailView(LoginRequiredMixin, DetailView):
