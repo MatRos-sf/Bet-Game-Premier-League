@@ -111,7 +111,11 @@ class PremierLeague:
         except Timeout:
             raise Timeout("Can't connect with server!")
 
-        if response.status_code != HTTPStatus.OK:
+        if response.status_code == HTTPStatus.FORBIDDEN:
+            raise HTTPError(
+                "The resource you are looking for is restricted and apparently not within your permissions. Please check your subscription."
+            )
+        elif response.status_code != HTTPStatus.OK:
             raise HTTPError("The status code cannot be different than 200.")
 
         return True, response
@@ -191,11 +195,11 @@ class PremierLeague:
             league=self.league,
         )
 
-    def get_teams(self) -> Optional[List[Team]]:
+    def get_teams(self, filters: Optional[list] = None) -> Optional[List[Team]]:
         """
         The method retrieves information about teams. It returns a list of Team objects.
         """
-        url = self.__get_full_url(self.url_competitions)
+        url = self.__get_full_url(self.url_competitions, filters)
         succeed, response = self.__get_response(url)
 
         if not succeed:
@@ -340,3 +344,76 @@ class PremierLeague:
             dataset["currentSeason"]["startDate"], "%Y-%m-%d"
         )
         return start_new_season.year != season
+
+    def capture_season(self, dataset: dict):
+        fb_id: int = dataset["id"]
+        start_date: datetime = datetime.strptime(dataset["startDate"], "%Y-%m-%d")
+        end_date: datetime = datetime.strptime(dataset["endDate"], "%Y-%m-%d")
+        matchweek: int = dataset["currentMatchday"]
+        is_currently: bool = False if dataset["winner"] else True
+
+        return Season(
+            fb_id=fb_id,
+            start_date=start_date,
+            end_date=end_date,
+            matchweek=matchweek,
+            is_currently=is_currently,
+            league=self.league,
+        )
+
+    def capture_standings(self, dataset: dict) -> List[TeamStats]:
+        teams_standings = []
+
+        for position in dataset:
+            team = TeamStats(
+                team_fb_id=position["team"]["id"],
+                played=position["playedGames"],
+                won=position["won"],
+                drawn=position["draw"],
+                lost=position["lost"],
+                goals_for=position["goalsFor"],
+                goals_against=position["goalsAgainst"],
+                points=position["points"],
+            )
+
+            teams_standings.append(team)
+
+        return teams_standings
+
+    def capture_previous_season(self, league, currently_season):
+        self.league = League(*league)
+        season = currently_season - 1
+
+        while season:
+            url = self.__get_full_url(self.url_standings, [f"season={season}"])
+
+            try:
+                succeed, response = self.__get_response(url)
+
+            except HTTPError:
+                break
+
+            dataset = response.json()
+
+            # get season
+            self.season = self.capture_season(dataset["season"])
+
+            # get teams
+            self.teams = self.get_teams([f"season={self.season.start_date.year}"])
+
+            # set matches and matchweeks
+            matches = self.get_matches(self.season.start_date.year)
+            # sort and create Matchweek
+            self.matchweek = self.get_matchweeks(matches)
+
+            # set current standing
+            self.standings = self.capture_standings(dataset["standings"][0]["table"])
+
+            yield {
+                "season": self.season,
+                "teams": self.teams,
+                "matchweek": self.matchweek,
+                "standings": self.standings,
+            }
+
+            season -= 1
