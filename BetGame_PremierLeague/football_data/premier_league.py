@@ -309,7 +309,7 @@ class PremierLeague:
     @staticmethod
     def capture_match(data: dict) -> Match:
         date = datetime.strptime(data["utcDate"], "%Y-%m-%dT%H:%M:%SZ")
-        # date = timezone.make_aware(date, timezone=timezone.utc)
+        date = timezone.make_aware(date, timezone=timezone.utc)
 
         match_obj = Match(
             home_team_id=data["homeTeam"]["id"],

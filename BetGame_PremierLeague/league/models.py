@@ -21,8 +21,8 @@ class Season(models.Model):
     fb_id = models.CharField(
         max_length=20, unique=True, help_text="Season id from football database."
     )
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
     league = models.ForeignKey(League, on_delete=models.CASCADE)
 
     is_currently = models.BooleanField(default=True)

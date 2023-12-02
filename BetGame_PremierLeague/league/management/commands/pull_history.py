@@ -1,3 +1,5 @@
+import time
+
 from django.core.management.base import BaseCommand, CommandError
 from typing import List
 
@@ -10,9 +12,6 @@ class Command(BaseCommand):
     help = (
         "Execute the command to fetch the dataset and set or update the current season."
     )
-
-    def __message(self, message) -> None:
-        self.stdout.write(message)
 
     def handle(self, *args, **options):
         try:
@@ -28,26 +27,20 @@ class Command(BaseCommand):
         for data in dataset_pl.capture_previous_season(
             (league.name, league.country, league.emblem), season_start
         ):
-            print(data["season"])
-            print(data["teams"])
-            print(data["matchweek"][0])
-            print(data["standings"][0])
-            input()
-
-        # dataset_pl = pl.PremierLeague()
-        # dataset_pl.pull()
-        #
-        # league = self.capture_or_create_league(dataset_pl.league)
-        # season = self.capture_or_create_season(league, dataset_pl.season)
-        # self.capture_or_create_teams(league, dataset_pl.teams)
-        # self.capture_or_create_matchweeks_and_matches(season, dataset_pl.matchweek)
-        # self.capture_or_create_standings(season, dataset_pl.standings)
+            season = self.capture_or_create_season(league, data["season"])
+            self.capture_or_create_teams(data["teams"])
+            self.capture_or_create_matchweeks_and_matches(season, data["matchweek"])
+            self.capture_or_create_standings(season, data["standings"])
+            time.sleep(5)
 
     def __communication_about_created(self, created: bool, communication: str) -> None:
         if created:
             self.stdout.write(f"{communication} has been created.", ending="+ \n")
         else:
             self.stdout.write(f"{communication} exists.", ending="\u2713 \n")
+
+    def __message(self, message) -> None:
+        self.stdout.write(message)
 
     def __set_attr(self, instance, dataset: dict):
         for field, value in dataset.items():
@@ -68,6 +61,7 @@ class Command(BaseCommand):
         season_obj, created = Season.objects.get_or_create(
             fb_id=season.fb_id, league=league
         )
+
         self.__communication_about_created(created, f"The season: {season.fb_id}")
 
         season = season.__dict__
@@ -76,23 +70,16 @@ class Command(BaseCommand):
 
         return season_obj
 
-    def capture_or_create_teams(
-        self, league: League, teams: List[pl.Team]
-    ) -> List[Team]:
+    def capture_or_create_teams(self, teams: List[pl.Team]) -> List[Team]:
         list_of_teams = list()
-
         for team in teams:
-            team_obj, created = Team.objects.get_or_create(
-                fb_id=team.fb_id, currently_league=league
-            )
-            self.__communication_about_created(created, f"\nThe team: {team.name}")
-
+            team_obj, created = Team.objects.get_or_create(fb_id=team.fb_id)
             team = team.__dict__
-            team["currently_league"] = league
 
-            self.__set_attr(team_obj, team)
+            if created:
+                self.__set_attr(team_obj, team)
+
             list_of_teams.append(team_obj)
-
         return list_of_teams
 
     def capture_or_create_matchweeks_and_matches(
@@ -146,8 +133,9 @@ class Command(BaseCommand):
 
     def capture_or_create_standings(self, season: Season, standings):
         for s in standings:
+            team = Team.objects.get(fb_id=s.team_fb_id)
             team_stats_obj, created = TeamStats.objects.get_or_create(
-                team__fb_id=s.team_fb_id, season=season
+                team=team, season=season
             )
             self.__communication_about_created(
                 created, f"Stats: {team_stats_obj.team.name}"

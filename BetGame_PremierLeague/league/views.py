@@ -13,7 +13,10 @@ class LeagueDetailView(LoginRequiredMixin, View):
             "season_set", "season_set__teamstats_set", "season_set__teamstats_set__team"
         ).get(name="Premier League")
         currently_team = (
-            league.season_set.first().teamstats_set.all().order_by("team__name")
+            league.season_set.filter(is_currently=True)
+            .first()
+            .teamstats_set.all()
+            .order_by("team__name")
         )
         table = TeamStats.get_season_table(
             "Premier League", currently_team.first().season.start_date.year
