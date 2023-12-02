@@ -60,6 +60,7 @@ class MatchDetailView(LoginRequiredMixin, DetailView):
         recent_meetings = Match.get_recent_meetings(match.home_team, match.away_team)
         context["recent_meetings"] = recent_meetings
 
+        print(context["recent_meetings"])
         # season so far
         so_far_home = TeamStats.get_season_so_far(season, match.home_team)
         so_far_away = TeamStats.get_season_so_far(season, match.away_team)
