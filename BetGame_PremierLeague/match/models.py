@@ -130,20 +130,26 @@ class Match(models.Model):
         )
 
     @classmethod
-    def get_season_finished_matches(cls, team: Team, season):
+    def get_season_finished_matches(cls, team: Team, season: Optional[Season] = None):
+        """
+        Provides information on all matches involving a specific team or matches in a specific season.
+        """
         finished_matches = cls.objects.filter(
-            Q(finished=True),
-            Q(home_team=team) | Q(away_team=team),
-            Q(matchweek__season=season),
-        ).prefetch_related("home_team", "away_team")
+            Q(finished=True), Q(home_team=team) | Q(away_team=team)
+        )
+
+        if season:
+            finished_matches = finished_matches.filter(Q(matchweek__season=season))
+
+        finished_matches = finished_matches.prefetch_related("home_team", "away_team")
 
         return finished_matches.order_by("-start_date")
 
     @classmethod
     def get_clean_sheets(cls, team, season: Optional[Season] = None):
-        if not season:
-            season = Season.objects.filter(is_currently=True).first()
-
+        """
+        Counts the number of clean sheets in all seasons or a specific season.
+        """
         finished_matches = cls.get_season_finished_matches(team, season)
         is_clean_sheet = Case(
             When(Q(home_team=team) & Q(away_goals=0), then=True),

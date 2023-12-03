@@ -38,7 +38,7 @@ class BetsListView(LoginRequiredMixin, ListView):
         matchweek = context["matches"].first().matchweek
         context["matchweek"] = matchweek
 
-        matchweek_is_started = timezone.now().date() < matchweek.start_date
+        matchweek_is_started = timezone.now().date() <= matchweek.start_date
 
         context["is_started"] = matchweek_is_started
         finished_matches = Match.objects.filter(
@@ -63,14 +63,25 @@ class BetsListView(LoginRequiredMixin, ListView):
         choice, match_pk = cd.get("bet").split()
         risk = cd.get("risk", False)
 
-        bet, _ = Bet.objects.get_or_create(
-            match=Match.objects.get(pk=match_pk), user=request.user
+        match = (
+            Match.objects.select_related("matchweek")
+            .only("matchweek__season__start_date")
+            .get(pk=match_pk)
         )
 
-        bet.choice = choice
-        if risk:
-            self._try_place_bet(request, risk, bet)
-        bet.save()
+        if match.matchweek.start_date < timezone.now().date():
+            bet, _ = Bet.objects.get_or_create(
+                match=Match.objects.get(pk=match_pk), user=request.user
+            )
+
+            bet.choice = choice
+            if risk:
+                self._try_place_bet(request, risk, bet)
+            bet.save()
+        else:
+            messages.info(
+                request, "You cannot create bet because the matchweek has been started!"
+            )
         return self.get(request)
 
     def _try_place_bet(self, request, risk, bet):
