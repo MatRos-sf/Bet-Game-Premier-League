@@ -1,9 +1,7 @@
-from django.test import tag, TestCase
+from django.test import TestCase
 from django.contrib.auth.models import User
-from django.db.models import QuerySet
 from parameterized import parameterized
 
-from bet.models import Bet
 from match.models import Matchweek
 from league.tests.test_models import SimpleDB
 from bet.templatetags.bet_tags import get_user_matchweek_bets, check_user_choice
@@ -27,7 +25,6 @@ class GetUserMatchweekBetTest(SimpleDB):
         self.assertFalse(result.exists())
 
 
-@tag("get_user_matchweek_bets")
 class CheckUserChoiceTest(TestCase):
     @parameterized.expand(
         [
