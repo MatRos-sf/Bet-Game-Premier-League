@@ -34,6 +34,11 @@ class Command(BaseCommand):
             time.sleep(5)
 
     def __communication_about_created(self, created: bool, communication: str) -> None:
+        """
+        :param created:
+        :param communication:
+        :return:
+        """
         if created:
             self.stdout.write(f"{communication} has been created.", ending="+ \n")
         else:

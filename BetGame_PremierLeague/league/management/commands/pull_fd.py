@@ -60,9 +60,7 @@ class Command(BaseCommand):
         list_of_teams = list()
 
         for team in teams:
-            team_obj, created = Team.objects.get_or_create(
-                fb_id=team.fb_id, currently_league=league
-            )
+            team_obj, created = Team.objects.get_or_create(fb_id=team.fb_id)
             self.__communication_about_created(created, f"\nThe team: {team.name}")
 
             team = team.__dict__
@@ -124,8 +122,9 @@ class Command(BaseCommand):
 
     def capture_or_create_standings(self, season: Season, standings):
         for s in standings:
+            team = Team.objects.get(fb_id=s.team_fb_id)
             team_stats_obj, created = TeamStats.objects.get_or_create(
-                team__fb_id=s.team_fb_id, season=season
+                team=team, season=season
             )
             self.__communication_about_created(
                 created, f"Stats: {team_stats_obj.team.name}"
