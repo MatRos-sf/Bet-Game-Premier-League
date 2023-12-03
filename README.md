@@ -67,11 +67,9 @@ Bet Game Premier League is a straightforward platform for betting on Premier Lea
 
 * [![Django][Django]][Django-url]
 * [![Python][Python]][Python-url]
-* [![Requests][Requests]][Requests-url]
 * [![Django_Rest_Framework][Django_Rest_Framework]][Django_Rest_Framework-url]
-* [![Factory_Boy][Factory_Boy]][Factory_Boy-url]
-* [![Parameterized][Parameterized]][Parameterized-url]
-* [![JWT][JWT]][JWT-url]
+
+
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -85,30 +83,35 @@ Before you begin, kindly create an account to obtain a free API Key from [footba
 This key is essential for connecting with the project.
 
 ### Installation
-1. Clone the repo
+1. Clone the repository:
    ```sh
    git clone https://github.com/MatRos-sf/Bet-Game-Premier-League.git
    ```
-2. Create environment
+2. Create a virtual environment:
    ```sh
    python3 -m venv venv
    ```
-3. Install the package:
+3. Install the required packages:
    ```sh
    pip install -r requirements.txt
    ```
-4. Create `.env` file, and add:
+4. Create a `.env` file, and add following information:
     ```text
     SECRET_KEY= PROJECT_SECRET_KEY
     API_TOKEN=MORE_Prerequisites
     ```
-5. Next, you have to pull information about currently season:
+5. Execute the `migration` command:
+    ```sh
+    python3 manage.py migrate
+    ```
+6. Additionally, retrieve information about the current season and set up workers:
     ```sh
     python3 manage.py pull_fd
+   python3 manage.py set_workers
     ```
-6. Finally, you have to set workers
+   If you want, you have to download information about previous seasons:
     ```sh
-    python3 manage.py set_workers
+    python3 manage.py pull_history
    ```
 
 
@@ -141,17 +144,15 @@ Project Link: [https://github.com/MatRos-sf/Bet-Game-Premier-League](https://git
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[Django]: https://img.shields.io/badge/Django-3.2-092E20?style=for-the-badge&logo=django
+[Django]: https://img.shields.io/badge/Django-4.2.7-092E20?style=for-the-badge&logo=django
 [Django-url]: https://www.djangoproject.com/
 [Python]: https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python
 [Python-url]: https://www.python.org/
 [Requests]: https://img.shields.io/badge/Requests-2.26.0-008080?style=for-the-badge&logo=requests
 [Requests-url]: https://docs.python-requests.org/en/latest/
-[Django_Rest_Framework]: https://img.shields.io/badge/Django%20Rest%20Framework-3.12-03282C?style=for-the-badge&logo=django
+[Django_Rest_Framework]: https://img.shields.io/badge/Django%20Rest%20Framework-3.14.0-03282C?style=for-the-badge&logo=django
 [Django_Rest_Framework-url]: https://www.django-rest-framework.org/
 [Factory_Boy]: https://img.shields.io/badge/Factory%20Boy-3.2.0-FF69B4?style=for-the-badge&logo=python
 [Factory_Boy-url]: https://factoryboy.readthedocs.io/en/stable/
 [Parameterized]: https://img.shields.io/badge/Parameterized-0.8.1-00CED1?style=for-the-badge&logo=python
 [Parameterized-url]: https://parameterizedtestcase.readthedocs.io/en/latest/
-[JWT]: https://img.shields.io/badge/DRF%20Simple%20JWT-4.9.0-1E90FF?style=for-the-badge&logo=django
-[JWT-url]: https://django-rest-framework-simplejwt.readthedocs.io/en/latest/
