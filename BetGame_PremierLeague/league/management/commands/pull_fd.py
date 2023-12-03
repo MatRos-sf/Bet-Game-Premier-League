@@ -12,6 +12,12 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
+        """
+        Main process for capturing information about the previous season,
+        creating/updating league, season, teams, matchweeks, matches, and standings.
+
+        This command should be executed before running the server to ensure that all necessary data is set up.
+        """
         dataset_pl = pl.PremierLeague()
         dataset_pl.pull()
 
@@ -22,18 +28,27 @@ class Command(BaseCommand):
         self.capture_or_create_standings(season, dataset_pl.standings)
 
     def __communication_about_created(self, created: bool, communication: str) -> None:
+        """
+        Shows information about creating or checking the existence of a model.
+        """
         if created:
             self.stdout.write(f"{communication} has been created.", ending="+ \n")
         else:
             self.stdout.write(f"{communication} exists.", ending="\u2713 \n")
 
     def __set_attr(self, instance, dataset: dict):
+        """
+        Updates or assigns new values to fields.
+        """
         for field, value in dataset.items():
             if hasattr(instance, field):
                 setattr(instance, field, value)
         instance.save()
 
     def capture_or_create_league(self, league: pl.League) -> League:
+        """
+        Creates or updates a league based on the provided information
+        """
         league_obj, created = League.objects.get_or_create(name=league.name)
         self.__communication_about_created(created, f"The League: {league.name}")
 
@@ -43,6 +58,9 @@ class Command(BaseCommand):
         return league_obj
 
     def capture_or_create_season(self, league, season: pl.Season) -> Season:
+        """
+        Creates or updates a season based on the provided information
+        """
         season_obj, created = Season.objects.get_or_create(
             fb_id=season.fb_id, league=league
         )
@@ -57,6 +75,9 @@ class Command(BaseCommand):
     def capture_or_create_teams(
         self, league: League, teams: List[pl.Team]
     ) -> List[Team]:
+        """
+        Creates or updates a teams based on the provided information
+        """
         list_of_teams = list()
 
         for team in teams:
@@ -74,6 +95,10 @@ class Command(BaseCommand):
     def capture_or_create_matchweeks_and_matches(
         self, season: Season, matchweeks: List[pl.Matchweek]
     ) -> None:
+        """
+        Creates or updates a matchweeks based on the provided information, including of all matches.
+        """
+
         for matchweek in matchweeks:
             matchweek_obj, created = Matchweek.objects.get_or_create(
                 season=season,
@@ -121,6 +146,9 @@ class Command(BaseCommand):
                 self.__set_attr(match_obj, match)
 
     def capture_or_create_standings(self, season: Season, standings):
+        """
+        Creates or updates a standings based on the provided information.
+        """
         for s in standings:
             team = Team.objects.get(fb_id=s.team_fb_id)
             team_stats_obj, created = TeamStats.objects.get_or_create(
