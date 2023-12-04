@@ -8,7 +8,7 @@ from match.models import Match, Matchweek
 from football_data import premier_league as pl
 
 
-class Command(BaseCommand):
+class CCDQWDQWommand(BaseCommand):
     help = "Execute the command to fetch the dataset and set or update the previous seasons."
 
     def handle(self, *args, **options):

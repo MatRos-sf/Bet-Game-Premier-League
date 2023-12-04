@@ -34,7 +34,7 @@ def check_and_update_currently_matchweek() -> str:
         if create_new_season():
             return f"The new season has been created"
         return f"The {matchweek.season.start_date.year } season has ended!"
-    elif matchweek.start_date < timezone.now().date():
+    elif timezone.now().date() < matchweek.start_date:
         return "No changes!"
     elif matchweek.matchweek == matchweek.season.amt_matchweeks and matchweek.finished:
         if create_new_season():
