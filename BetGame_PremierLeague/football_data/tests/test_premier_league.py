@@ -13,6 +13,7 @@ from football_data.premier_league import (
 )
 import mock
 from datetime import datetime
+from http import HTTPStatus
 
 
 @tag("PremierLeague")
@@ -327,7 +328,7 @@ class PremierLeagueTest(TestCase):
     ):
         response = mock.MagicMock()
         response.json.return_value = payload
-        response.status_code.return_value = 200
+        response.status_code.return_value = HTTPStatus.OK
         api_response.return_value = (True, response)
 
         pl = PremierLeague()

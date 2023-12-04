@@ -395,15 +395,11 @@ class PremierLeague:
 
             dataset = response.json()
 
-            # get season
             self.season = self.capture_season(dataset["season"])
 
-            # get teams
             self.teams = self.get_teams([f"season={self.season.start_date.year}"])
 
-            # set matches and matchweeks
             matches = self.get_matches(self.season.start_date.year)
-            # sort and create Matchweek
             self.matchweek = self.get_matchweeks(matches)
 
             # set current standing

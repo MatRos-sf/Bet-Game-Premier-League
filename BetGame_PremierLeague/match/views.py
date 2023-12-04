@@ -130,6 +130,8 @@ class ResultsSeasonListView(LoginRequiredMixin, ListView):
 
 
 class FixturesSeasonListView(ResultsSeasonListView):
+    extra_context = {"title": "Fixtures"}
+
     def get_queryset(self):
         name_team = self.request.GET.get("name_team", "")
         if name_team:
@@ -144,9 +146,3 @@ class FixturesSeasonListView(ResultsSeasonListView):
         else:
             queryset = self.model.objects.filter(finished=False)
         return queryset.select_related("home_team", "away_team", "matchweek")
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(FixturesSeasonListView, self).get_context_data(*kwargs)
-        context["title"] = "Fixtures"
-
-        return context
