@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.db.models import Avg, Sum, Max, F
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
+from notifications.signals import notify
 
 from .models import Profile, UserScores
 from .forms import UserRegisterForm, ProfileUpdateForm
@@ -116,6 +117,10 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
     def post(self, request, *args, **kwargs):
         func_name = request.POST.get("button_friend")
         call_func = getattr(self.request.user.profile, func_name)
+        if func_name == "follow":
+            notify.send(
+                self.request.user, recipient=self.get_object().user, verb="followed you"
+            )
         call_func(self.get_object().pk)
         return self.get(request)
 
