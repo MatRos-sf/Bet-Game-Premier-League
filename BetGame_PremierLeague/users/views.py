@@ -1,15 +1,18 @@
-import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.generic import DetailView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
-from django.db.models import Avg, Sum, Max, F
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
 
-from .models import Profile, UserScores
+import os
+
+from notifications.signals import notify
+from notifications.views import AllNotificationsList
+
+from .models import Profile
 from .forms import UserRegisterForm, ProfileUpdateForm
 from league.models import TeamStats, Season
 from match.models import Match, Matchweek
@@ -116,6 +119,10 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
     def post(self, request, *args, **kwargs):
         func_name = request.POST.get("button_friend")
         call_func = getattr(self.request.user.profile, func_name)
+        if func_name == "follow":
+            notify.send(
+                self.request.user, recipient=self.get_object().user, verb="followed you"
+            )
         call_func(self.get_object().pk)
         return self.get(request)
 
@@ -183,3 +190,14 @@ def edit_profile(request, username):
         "users/form.html",
         {"title": "Edit Profile", "button_name": "Update", "form": form},
     )
+
+
+class AllUserNotificationsList(AllNotificationsList):
+    template_name = "users/notifications.html"
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST
+        if action.get("mark_as_read"):
+            request.user.notifications.mark_all_as_read()
+
+        return self.get(request, *args, **kwargs)

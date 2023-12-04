@@ -1,6 +1,13 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import register, ProfileDetailView, ProfileListView, home, edit_profile
+from .views import (
+    register,
+    ProfileDetailView,
+    ProfileListView,
+    home,
+    edit_profile,
+    AllUserNotificationsList,
+)
 
 
 urlpatterns = [
@@ -11,6 +18,11 @@ urlpatterns = [
         "logout/",
         LogoutView.as_view(template_name="users/logout.html"),
         name="logout",
+    ),
+    path(
+        "profile/notifications/",
+        AllUserNotificationsList.as_view(),
+        name="profile-notifications",
     ),
     path("profiles/", ProfileListView.as_view(), name="profile-list"),
     path("profile/<str:slag>/", ProfileDetailView.as_view(), name="profile-detail"),
