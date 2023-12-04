@@ -1,6 +1,6 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
-from typing import Type
+from notifications.signals import notify
 
 from .models import Bet
 from users.models import UserScores
@@ -12,12 +12,21 @@ def allocation_point_for_won_bet(sender, instance: Bet, **kwargs) -> None:
     Give points if user win Bet
     """
 
-    if instance.is_won:
+    if isinstance(instance.is_won, bool) and instance.is_won:
         points = 4 if instance.risk else 1
         UserScores.objects.create(
             profile=instance.user.profile,
             points=points,
             description=UserScores.render_description(points, f"WON bet {instance.pk}"),
+        )
+        notify.send(
+            instance.match,
+            recipient=instance.user,
+            verb=f"finished; you won {points} pts.",
+        )
+    elif isinstance(instance.is_won, bool) and not instance.is_won:
+        notify.send(
+            instance.match, recipient=instance.user, verb=f"finished; you lost."
         )
 
 

@@ -5,7 +5,7 @@ from typing import Tuple, Union
 from django.contrib.auth.models import User
 from datetime import timedelta
 
-from match.models import Matchweek
+from match.models import Matchweek, Match
 
 register = template.Library()
 
@@ -65,3 +65,8 @@ def check_user_choice(
         return None, None
     else:
         return bet["choice"], bet["risk"]
+
+
+@register.simple_tag
+def is_match_instance(instance) -> bool:
+    return isinstance(instance, Match)

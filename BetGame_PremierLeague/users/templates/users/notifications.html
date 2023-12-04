@@ -34,13 +34,17 @@
                 {% endif %}
             </div>
             <div class="row align-items-center justify-content-center">
-                <div class="col-md-5">
+                <div class="col-md-7">
                 {% for notification in notifications  %}
-
+                    {% is_match_instance  notification.actor as is_match %}
                     <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
                         {% if notification.unread %}
                         <div class="col text-center font-weight-bold">
-                            <a href="{{ notification.actor.profile.get_absolute_url }}">{{ notification.actor }}</a> followed you
+                            {% if is_match %}
+                                    <a href="{{ notification.actor.get_absolute_url }}">{{ notification.actor }}</a> {{ notification.verb }}
+                                {% else %}
+                                    <a href="{{ notification.actor.profile.get_absolute_url }}">{{ notification.actor }}</a> followed you
+                                {% endif %}
                             <p class="h6">
                                 {% if notification.naturalday == 'today' %} {{ notification.naturaltime }} {% else %}
                                 {{ notification.naturalday }} ago{% endif %}
@@ -48,10 +52,14 @@
                         </div>
                         {% else %}
                         <div class="col text-center ">
-                            <a href="{{ notification.actor.profile.get_absolute_url }}">{{ notification.actor }}</a> followed you
+                            {% if is_match %}
+                                    <a href="{{ notification.actor.get_absolute_url }}">{{ notification.actor }}</a> {{ notification.verb }}
+                            {% else %}
+                                <a href="{{ notification.actor.profile.get_absolute_url }}">{{ notification.actor }}</a> followed you
+                            {% endif %}
                             <p class="h6">
-                                {% if notification.naturalday == 'today' %} {{ notification.naturaltime }} {% else %}
-                                {{ notification.naturalday }} ago{% endif %}
+                            {% if notification.naturalday == 'today' %} {{ notification.naturaltime }} {% else %}
+                            {{ notification.naturalday }} ago{% endif %}
                             </p>
                         </div>
                         {% endif %}

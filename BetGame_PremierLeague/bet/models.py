@@ -40,6 +40,8 @@ class Bet(models.Model):
             self.is_won = won == self.choice
             self.is_active = False
             self.save()
+
+            # notifications
         return self.is_won
 
     def save(self, *args, **kwargs):

@@ -28,9 +28,9 @@
                   {{ form|crispy }}
 
                   <div class="col-lg-12">
-                      < type="submit" class="btn btn-primary btn-lg btn-block">
+                      <button type="submit" class="btn btn-primary btn-lg btn-block">
                           {% if button_name %} {{ button_name }} {% else %} Log In {% endif %}
-                      </>
+                      </button>
                     {% if not button_name %}
                       <p class="p-1 text-center">Don't have an account? <a href="{% url 'register' %}" >Sign up</a></p>
                     {% endif %}
@@ -68,7 +68,7 @@
 
                   <div class="col-lg-12">
                       <button type="submit" class="btn btn-primary btn-lg btn-block">
-                          {% if button_name %} {{ button_name }} {% else %} Log In {% endif %}
+                          {% if button_name %} {{ button_name }} {% else %} Log In{% endif %}
                       </button>
                     {% if not button_name %}
                       <p class="p-1 text-center">Don't have an account? <a href="{% url 'register' %}" >Sign up</a></p>
