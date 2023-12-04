@@ -8,7 +8,7 @@
 {% endif %}
 {% endblock %}
 
-{% block background_photo %}
+{% block content %}
     {% if not title %}
     <div class="site-section bg-light" data-aos="fade-up">
       <div class="container">
@@ -28,9 +28,9 @@
                   {{ form|crispy }}
 
                   <div class="col-lg-12">
-                      <button type="submit" class="btn btn-primary btn-lg btn-block">
+                      < type="submit" class="btn btn-primary btn-lg btn-block">
                           {% if button_name %} {{ button_name }} {% else %} Log In {% endif %}
-                      </button>
+                      </>
                     {% if not button_name %}
                       <p class="p-1 text-center">Don't have an account? <a href="{% url 'register' %}" >Sign up</a></p>
                     {% endif %}
@@ -83,27 +83,4 @@
     </div>
 
     {% endif %}
-{% endblock %}
-
-{% block essa %}
-    <div class="site-section">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-7">
-            <form method="POST">
-                {% csrf_token %}
-                {{ form|crispy }}
-
-              <div class="form-group text-lg-center">
-                  <button type="submit" class="btn btn-primary py-3 px-5">
-                      {% if button_name %} {{ button_name }} {% else %} Log In {% endif %}
-                  </button>
-              </div>
-            </form>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
 {% endblock %}

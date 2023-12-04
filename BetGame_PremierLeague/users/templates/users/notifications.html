@@ -1,0 +1,75 @@
+{% extends 'bet/index.html'%}
+{% load crispy_forms_tags %}
+{% load bet_tags %}
+{% load notifications_tags %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+  <div class="site-blocks-vs site-section bg-light">
+      <div class="container">
+        <div class="site-section">
+            <div class="container">
+                <div class="row mb-5">
+                  <div class="col-md-12 text-center">
+                    <h2 class="text-black">Notifications</h2>
+                      {% notifications_unread as unread_count %}
+                        {% if unread_count %}
+                            You have <strong>{{ unread_count }}</strong> unread notifications.
+                        {% endif %}
+                  </div>
+                </div>
+                {% if unread_count %}
+                <div class="row mb-5 justify-content-center">
+                    <div class="col text-center">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <button type="submit" name="mark_as_read" value="True" class="btn btn-primary" >
+                                Mark all as read
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="row align-items-center justify-content-center">
+                <div class="col-md-5">
+                {% for notification in notifications  %}
+
+                    <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
+                        {% if notification.unread %}
+                        <div class="col text-center font-weight-bold">
+                            <a href="{{ notification.actor.profile.get_absolute_url }}">{{ notification.actor }}</a> followed you
+                            <p class="h6">
+                                {% if notification.naturalday == 'today' %} {{ notification.naturaltime }} {% else %}
+                                {{ notification.naturalday }} ago{% endif %}
+                            </p>
+                        </div>
+                        {% else %}
+                        <div class="col text-center ">
+                            <a href="{{ notification.actor.profile.get_absolute_url }}">{{ notification.actor }}</a> followed you
+                            <p class="h6">
+                                {% if notification.naturalday == 'today' %} {{ notification.naturaltime }} {% else %}
+                                {{ notification.naturalday }} ago{% endif %}
+                            </p>
+                        </div>
+                        {% endif %}
+
+                  </div>
+                  <!-- END row -->
+                {% empty %}
+                    <h1> Join to any event and achieve more points! </h1>
+                {% endfor %}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+  </div>
+
+
+{% endblock %}
