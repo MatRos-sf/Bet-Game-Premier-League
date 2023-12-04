@@ -1,4 +1,5 @@
 {% load static %}
+{% load notifications_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,14 +61,22 @@
                 <li><a href="{% url 'match:fixtures' %}">Fixtures</a></li>
               </ul>
             </li>
-            <li><a href="{% url 'profile-detail' user.username %}">Profile</a></li>
+            {% notifications_unread as unread_count %}
+            <li class="has-children">
+              <a href="{% url 'profile-detail' user.username %}">Profile {% if unread_count > 0 %}
+                  <span class="badge text-bg-secondary align-text-top bg">{% if unread_count > 10 %}10+{% else %}{{ unread_count }}{% endif %}</span>
+                {% endif %}</a>
+              <ul class="dropdown arrow-top">
+                <li><a href="{% url 'profile-notifications' %}">Notifications</a></li>
+              </ul>
+            </li>
             <li class="{% if request.path == '/profiles/' %}active{% endif %}"><a href="{% url 'profile-list' %}">Players</a></li>
             <li class="has-children {% if request.path == '/event/' %}active{% endif %}">
                 <a href="{% url 'event:list' %}">Event</a>
                 <ul class="dropdown arrow-top">
                     <li><a href="{% url 'event:create' %}">Create</a></li>
                     <li><a href="{% url 'event:requests' %}">Requests</a></li>
-{#                    <li><a href="{% url 'event' %}">Finished</a></li>#}
+                    <li><a href="{% url 'event:finished' %}">Finished</a></li>
 
                 </ul>
             </li>
