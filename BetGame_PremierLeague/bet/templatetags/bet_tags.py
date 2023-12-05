@@ -68,5 +68,8 @@ def check_user_choice(
 
 
 @register.simple_tag
-def is_match_instance(instance) -> bool:
-    return isinstance(instance, Match)
+def get_name_instance(instance) -> str:
+    """
+    Gets lower instance name
+    """
+    return instance.__class__.__name__.lower()

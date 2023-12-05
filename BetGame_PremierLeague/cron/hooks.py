@@ -3,4 +3,4 @@ def check_and_update_currently_matchweek_info(task):
 
 
 def check_event_info(task):
-    print(task)
+    print(task.result)
