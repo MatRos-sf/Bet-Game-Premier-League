@@ -36,14 +36,16 @@
             <div class="row align-items-center justify-content-center">
                 <div class="col-md-7">
                 {% for notification in notifications  %}
-                    {% is_match_instance  notification.actor as is_match %}
+                    {% get_name_instance notification.actor as name_instance %}
                     <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
                         {% if notification.unread %}
                         <div class="col text-center font-weight-bold">
-                            {% if is_match %}
+                            {% if name_instance == 'match'%}
                                     <a href="{{ notification.actor.get_absolute_url }}">{{ notification.actor }}</a> {{ notification.verb }}
-                                {% else %}
+                                {% elif name_instance == 'user' %}
                                     <a href="{{ notification.actor.profile.get_absolute_url }}">{{ notification.actor }}</a> followed you
+                                {% elif name_instance == 'event' %}
+                                    <a href="{{ notification.actor.get_absolute_url }}">The event: {{ notification.actor.name }}</a> {{ notification.verb }}
                                 {% endif %}
                             <p class="h6">
                                 {% if notification.naturalday == 'today' %} {{ notification.naturaltime }} {% else %}
@@ -52,11 +54,13 @@
                         </div>
                         {% else %}
                         <div class="col text-center ">
-                            {% if is_match %}
+                                {% if name_instance == 'match'%}
                                     <a href="{{ notification.actor.get_absolute_url }}">{{ notification.actor }}</a> {{ notification.verb }}
-                            {% else %}
-                                <a href="{{ notification.actor.profile.get_absolute_url }}">{{ notification.actor }}</a> followed you
-                            {% endif %}
+                                {% elif name_instance == 'user' %}
+                                    <a href="{{ notification.actor.profile.get_absolute_url }}">{{ notification.actor }}</a> followed you
+                                {% elif name_instance == 'event' %}
+                                    <a href="{{ notification.actor.get_absolute_url }}">The event: {{ notification.actor.name }}</a> {{ notification.verb }}
+                                {% endif %}
                             <p class="h6">
                             {% if notification.naturalday == 'today' %} {{ notification.naturaltime }} {% else %}
                             {{ notification.naturalday }} ago{% endif %}
