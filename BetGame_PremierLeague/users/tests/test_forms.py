@@ -70,6 +70,3 @@ class UserRegisterFormTest(TestCase):
         self.assertTrue(form.is_valid())
         form.save()
         self.assertEquals(User.objects.count(), 1)
-
-
-# class ProfileUpdateTest(TestCase):
