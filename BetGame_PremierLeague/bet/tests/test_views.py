@@ -1,11 +1,13 @@
-from django.test import tag
+from datetime import timedelta
+from unittest import mock
+
+from django.test import tag, TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
-from http import HTTPStatus
-
+from django.utils import timezone
 from league.tests.test_models import SimpleDB
 from bet.models import Bet
-from match.models import Match
+from match.models import Match, Matchweek
 
 
 class UserFinishedBetsListViewTest(SimpleDB):
@@ -61,3 +63,11 @@ class BetsListViewWhenMatchweekStartTest(SimpleDB):
         )
         self.assertEquals(message.tags, "info")
         self.assertEquals(message.message, expected_message)
+
+    @mock.patch("match.models.Matchweek.objects")
+    def test_should_have_end_season_in_the_context(self, mock_matchweek):
+        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
+        mock_matchweek.filter.return_value.first.return_value = None
+        response = self.client.get(reverse(self.url))
+
+        self.assertTrue(response.context["end_season"])

@@ -69,6 +69,8 @@ class BetsListView(LoginRequiredMixin, ListView):
             .get(pk=match_pk)
         )
 
+        s = match.matchweek.start_date
+        t = timezone.now().date()
         if timezone.now().date() < match.matchweek.start_date:
             bet, _ = Bet.objects.get_or_create(
                 match=Match.objects.get(pk=match_pk), user=request.user

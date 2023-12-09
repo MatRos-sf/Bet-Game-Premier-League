@@ -1,7 +1,7 @@
 from django import template
 from bet.models import Bet
 from django.db.models import QuerySet
-from typing import Tuple, Union
+from typing import Tuple, Union, Any
 from django.contrib.auth.models import User
 from datetime import timedelta
 
@@ -11,31 +11,11 @@ register = template.Library()
 
 
 @register.simple_tag
-def user_bet(**kwargs):
-    user = kwargs["user"]
-    match = kwargs["match"]
-    choice_bet = Bet.objects.filter(user=user, match=match).first()
-    return choice_bet.choice if choice_bet else "None"
-
-
-@register.simple_tag
 def user_check_bet(**kwargs):
     user = kwargs["user"]
     match = kwargs["match"]
     choice_bet = Bet.objects.filter(user=user, match=match).first()
     return choice_bet.check_bet() if choice_bet else None
-
-
-@register.simple_tag
-def user_risk(match, user) -> bool:
-    """
-    The tag which check if user has bet with risk.
-    """
-    try:
-        bet = Bet.objects.get(user=user, match=match)
-        return bet.risk
-    except Bet.DoesNotExist:
-        return False
 
 
 @register.simple_tag
@@ -68,7 +48,7 @@ def check_user_choice(
 
 
 @register.simple_tag
-def get_name_instance(instance) -> str:
+def get_name_instance(instance: Any) -> str:
     """
     Gets lower instance name
     """
