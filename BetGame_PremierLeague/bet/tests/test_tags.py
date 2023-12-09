@@ -1,10 +1,15 @@
-from django.test import TestCase
+from django.test import TestCase, tag
 from django.contrib.auth.models import User
 from parameterized import parameterized
 
-from match.models import Matchweek
+from match.models import Matchweek, Match
 from league.tests.test_models import SimpleDB
-from bet.templatetags.bet_tags import get_user_matchweek_bets, check_user_choice
+from bet.templatetags.bet_tags import (
+    get_user_matchweek_bets,
+    check_user_choice,
+    get_name_instance,
+    user_check_bet,
+)
 
 
 class GetUserMatchweekBetTest(SimpleDB):
@@ -62,3 +67,35 @@ class CheckUserChoiceTest(TestCase):
 
         self.assertFalse(response[0])
         self.assertFalse(response[1])
+
+
+class GetNameInstanceTest(TestCase):
+    @parameterized.expand([(int(3), "int"), (float(2), "float"), (str("test"), "str")])
+    def test_should_return_name_instance(self, instance, name_instance):
+        result = get_name_instance(instance)
+        self.assertEquals(result, name_instance)
+
+    def test_should_raise_exception_if_no_name_instance(self):
+        with self.assertRaises(TypeError):
+            get_name_instance()
+
+
+@tag("tag-test")
+class UserCheckBetTest(SimpleDB):
+    def setUp(self):
+        self.sample_user = User.objects.first()
+
+    def test_should_return_false_if_it_is_checked_first_match(self):
+        match = Match.objects.first()
+        result = user_check_bet(user=self.sample_user, match=match)
+        self.assertFalse(result)
+
+    def test_should_return_true_if_it_is_checked_second_match(self):
+        match = Match.objects.all()[1]
+        result = user_check_bet(user=self.sample_user, match=match)
+        self.assertTrue(result)
+
+    def test_should_return_none_if_user_does_not_have_a_bet(self):
+        match = Match.objects.last()
+        result = user_check_bet(user=self.sample_user, match=match)
+        self.assertIsNone(result)
