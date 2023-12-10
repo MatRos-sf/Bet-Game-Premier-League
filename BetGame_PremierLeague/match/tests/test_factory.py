@@ -1,14 +1,13 @@
-from django.test import TestCase, tag
+from django.test import TestCase
 from django.utils import timezone
 from datetime import timedelta
 
-from .factories.models_factory import MatchweekFactory, MatchFactory
-from league.tests.factories.models_factory import LeagueFactory, SeasonFactory
+from ..factories.models_factory import MatchweekFactory, MatchFactory
+from league.factories.models_factory import SeasonFactory
 from league.models import League, Season, Team
 from match.models import Match, Matchweek
 
 
-@tag("matchweek-factory")
 class MatchweekFactoryTest(TestCase):
     def test_create_factory(self):
         MatchweekFactory()

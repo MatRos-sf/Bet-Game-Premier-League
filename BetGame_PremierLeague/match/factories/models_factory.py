@@ -3,7 +3,7 @@ from factory.django import DjangoModelFactory
 from factory import Sequence, Faker, SubFactory
 
 from match.models import Matchweek, Match
-from league.tests.factories.models_factory import SeasonFactory, TeamFactory
+from league.factories.models_factory import SeasonFactory, TeamFactory
 
 
 class MatchweekFactory(DjangoModelFactory):

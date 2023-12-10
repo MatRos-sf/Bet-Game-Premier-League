@@ -3,12 +3,11 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
 
-from .factories.models_factory import EventFactory, EventRequestFactory
+from ..factories.models_factory import EventFactory, EventRequestFactory
 from users.factories import UserFactory
 from event.models import Event, EventRequest
 
 
-@tag("event_factory")
 class EventFactoryTest(TestCase):
     def setUp(self):
         some_day = timezone.now() + timedelta(days=2)
@@ -31,7 +30,6 @@ class EventFactoryTest(TestCase):
         self.assertEquals(event.members.count(), 3)
 
 
-@tag("event_request_factory")
 class EventRequestFactoryTest(TestCase):
     def setUp(self):
         some_day = timezone.now() + timedelta(days=2)

@@ -2,7 +2,7 @@ from league.models import League, Season, Team, TeamStats
 from django.test import TestCase, tag
 from datetime import date
 
-from .factories.models_factory import (
+from league.factories.models_factory import (
     LeagueFactory,
     SeasonFactory,
     TeamFactory,

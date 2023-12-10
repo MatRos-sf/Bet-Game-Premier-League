@@ -5,17 +5,17 @@ from parameterized import parameterized
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from .factories.models_factory import (
+from league.factories.models_factory import (
     LeagueFactory,
     SeasonFactory,
     TeamFactory,
     TeamStatsFactory,
 )
-from match.tests.factories.models_factory import MatchweekFactory, MatchFactory
+from match.factories.models_factory import MatchweekFactory, MatchFactory
 from users.factories import UserFactory, UserScoresFactory
 from league.models import League, Season, Team, TeamStats
-from bet.tests.factories.model_factory import BetFactory
-from event.tests.factories.models_factory import EventFactory
+from bet.factories.model_factory import BetFactory
+from event.factories.models_factory import EventFactory
 
 
 class SimpleDB(TestCase):

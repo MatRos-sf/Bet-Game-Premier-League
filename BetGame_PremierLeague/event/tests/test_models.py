@@ -2,7 +2,7 @@ from django.test import tag
 from parameterized import parameterized
 
 from league.tests.test_models import SimpleDB
-from .factories.models_factory import EventFactory
+from ..factories.models_factory import EventFactory
 from users.factories import UserFactory
 from event.models import Event
 

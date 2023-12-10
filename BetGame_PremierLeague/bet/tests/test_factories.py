@@ -1,14 +1,13 @@
-from django.test import TestCase, tag
+from django.test import TestCase
 from django.contrib.auth.models import User
 
-from .factories.model_factory import BetFactory
+from ..factories.model_factory import BetFactory
 from bet.models import Bet
-from league.models import League, Season, Team
+from league.models import Team
 from match.models import Match, Matchweek
 from users.models import Profile
 
 
-@tag("bet_factory")
 class BetFactoryTest(TestCase):
     def test_should_created_bet(self):
         BetFactory()

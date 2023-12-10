@@ -2,8 +2,8 @@ from django.test import tag
 
 from league.tests.test_models import SimpleDB
 from bet.models import Bet
-from .factories.model_factory import BetFactory
-from match.tests.factories.models_factory import MatchFactory
+from bet.factories.model_factory import BetFactory
+from match.factories.models_factory import MatchFactory
 
 
 @tag("bet_model")

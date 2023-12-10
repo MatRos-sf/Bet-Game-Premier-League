@@ -1,13 +1,11 @@
 from django.test import TestCase
 from faker import Faker
-from django.test import tag
 from django.contrib.auth.models import User
 
 from users.forms import UserRegisterForm
 from users.factories.user import UserFactory
 
 
-@tag("form_registration")
 class UserRegisterFormTest(TestCase):
     def setUp(self):
         self.fake = Faker()

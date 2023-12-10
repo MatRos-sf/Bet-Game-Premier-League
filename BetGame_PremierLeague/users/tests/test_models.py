@@ -13,13 +13,13 @@ from random import randint, choices
 
 from users.models import Profile, UserScores
 from league.models import Team
-from users.factories.user import UserFactory
 from ..factories import (
     SimpleProfileFactory,
     ProfileFactory,
     ExtendProfileFactory,
+    UserFactory,
+    UserScoresFactory,
 )
-from ..factories import users_scores
 
 
 def get_random_name(suffix: str) -> str:
@@ -48,7 +48,7 @@ def get_temporary_image(size: Tuple[int, int], name: str) -> File:
     return File(file_obj, name=name)
 
 
-@tag("model_profile")
+@tag("12a")
 class ProfileTest(TestCase):
     @classmethod
     def setUpTestData(cls):
