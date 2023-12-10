@@ -122,6 +122,8 @@ class ResultsSeasonListView(LoginRequiredMixin, ListView):
 
         # season
         match = context["object_list"].first()
+        if not match:
+            return context
         season_name = f"{match.matchweek.season.start_date.strftime('%Y')}/{match.matchweek.season.end_date.strftime('%y')}"
         context["season_name"] = season_name
 

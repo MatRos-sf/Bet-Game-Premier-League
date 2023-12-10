@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.db.models import Avg, Count, Q
+from django.db.models import Avg, Count, Q, Sum
 from typing import Dict
 
 from match.models import Matchweek
@@ -76,7 +76,7 @@ class Bet(models.Model):
 
         stats = cls.objects.filter(user=user).aggregate(
             amt_bets=Count("id"),
-            win_rate=Avg("is_won", default=0),
+            # win_rate=Avg("is_won", default=0),
             won_bets=won_bets,
             risk_bets=risk_bets,
             won_bets_risk=win_bets_risk,
@@ -88,6 +88,15 @@ class Bet(models.Model):
             )
         except ZeroDivisionError:
             stats["win_rate_risk_bet"] = 0
-        stats["win_rate"] = int(stats["win_rate"] * 100)
+
+        amt_bets = stats["amt_bets"]
+        won_bets = stats["won_bets"]
+
+        if amt_bets and won_bets:
+            stats["win_rate"] = int(won_bets * 100 / amt_bets)
+        else:
+            stats["win_rate"] = 0
+
+        # stats["win_rate"] = int(stats["win_rate"] * 100)
 
         return stats

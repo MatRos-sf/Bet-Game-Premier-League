@@ -6,7 +6,7 @@ from http import HTTPStatus
 
 from users.models import Profile
 from users.forms import ProfileUpdateForm
-from .factories.user import UserFactory
+from ..factories.user import UserFactory
 from league.tests.factories.models_factory import (
     TeamStatsFactory,
     LeagueFactory,

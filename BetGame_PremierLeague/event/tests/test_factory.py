@@ -4,7 +4,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 from .factories.models_factory import EventFactory, EventRequestFactory
-from users.tests.factories.user import UserFactory
+from users.factories import UserFactory
 from event.models import Event, EventRequest
 
 

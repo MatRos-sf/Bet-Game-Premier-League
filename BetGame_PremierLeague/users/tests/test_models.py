@@ -13,13 +13,13 @@ from random import randint, choices
 
 from users.models import Profile, UserScores
 from league.models import Team
-from .factories.user import UserFactory
-from .factories.profile import (
+from users.factories.user import UserFactory
+from ..factories import (
     SimpleProfileFactory,
     ProfileFactory,
     ExtendProfileFactory,
 )
-from .factories.users_scores import UserScoresFactory
+from ..factories import users_scores
 
 
 def get_random_name(suffix: str) -> str:
@@ -52,12 +52,12 @@ def get_temporary_image(size: Tuple[int, int], name: str) -> File:
 class ProfileTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        user_one = UserFactory(username="JanTest")
-        user_two = UserFactory(username="OlaTest")
+        user_one = UserFactory.create(username="JanTest")
+        user_two = UserFactory.create(username="OlaTest")
 
-        UserScoresFactory(profile=user_one.profile, points=100)
-        UserScoresFactory(profile=user_one.profile)
-        UserScoresFactory(profile=user_two.profile, points=1000)
+        UserScoresFactory.create(profile=user_one.profile, points=100)
+        UserScoresFactory.create(profile=user_one.profile)
+        UserScoresFactory.create(profile=user_two.profile, points=1000)
 
     def setUp(self) -> None:
         self.profile = Profile.objects.get(id=1)
@@ -138,7 +138,7 @@ class ProfileTest(TestCase):
     def test_image_field_with_factory_boy_should_set_new_default_image_height_when_image_is_too_height(
         self, height
     ):
-        p = ExtendProfileFactory(image__height=height)
+        p = ExtendProfileFactory.create(image__height=height)
 
         self.assertLessEqual(p.image.height, height)
         os.remove(os.path.join(p.image.path))
@@ -147,7 +147,7 @@ class ProfileTest(TestCase):
     def test_image_field_with_factory_boy_should_set_new_default_width_image_when_image_is_too_width(
         self, width
     ):
-        p = ExtendProfileFactory(image__height=width)
+        p = ExtendProfileFactory.create(image__height=width)
 
         self.assertLessEqual(p.image.height, width)
         os.remove(os.path.join(p.image.path))
@@ -156,7 +156,7 @@ class ProfileTest(TestCase):
         user_one = User.objects.get(id=1)
         user_two = User.objects.get(id=2)
 
-        p = ExtendProfileFactory(following=(user_one, user_two))
+        p = ExtendProfileFactory.create(following=(user_one, user_two))
 
         self.assertTrue(p.following)
         self.assertIn(user_one, p.following.all())
@@ -164,18 +164,18 @@ class ProfileTest(TestCase):
         os.remove(p.image.path)
 
     def test_following_field_should_following_be_empty_when_created(self):
-        profile_obj = ExtendProfileFactory()
+        profile_obj = ExtendProfileFactory.create()
 
         self.assertEquals(profile_obj.following.count(), 0)
 
         os.remove(profile_obj.image.path)
 
     def test_support_team_field_should_none_when_create_profile(self):
-        profile_obj = SimpleProfileFactory()
+        profile_obj = SimpleProfileFactory.create()
         self.assertIsNone(profile_obj.support_team)
 
     def test_support_team_field_should_set_team_when_user_set_it(self):
-        profile_obj = ExtendProfileFactory()
+        profile_obj = ExtendProfileFactory.create()
         self.assertTrue(profile_obj.support_team)
 
         team = Team.objects.get(id=1)
@@ -205,10 +205,10 @@ class ProfileTest(TestCase):
         self.assertEquals(qs_of_users_who_follow.count(), 1)
 
     def test_should_return_two_followers_when_some_users_following_them(self):
-        profile_user = ProfileFactory()
+        profile_user = ProfileFactory.create()
 
-        profile_test = ProfileFactory(following=(profile_user.user,))
-        ProfileFactory(following=(profile_user.user,))
+        profile_test = ProfileFactory.create(following=(profile_user.user,))
+        ProfileFactory.create(following=(profile_user.user,))
 
         qs_of_users_who_follow = Profile.followers(profile_user.user)
 
@@ -217,10 +217,10 @@ class ProfileTest(TestCase):
         self.assertTrue(qs_of_users_who_follow.filter(user=profile_test.user))
 
     def test_should_unfollow_user(self):
-        profile_user = ProfileFactory()
+        profile_user = ProfileFactory.create()
 
-        profile_test = ProfileFactory(following=(profile_user.user,))
-        ProfileFactory(following=(profile_user.user,))
+        profile_test = ProfileFactory.create(following=(profile_user.user,))
+        ProfileFactory.create(following=(profile_user.user,))
 
         profile_test.unfollow(profile_user.user.pk)
 
@@ -230,9 +230,9 @@ class ProfileTest(TestCase):
         self.assertEquals(qs_of_users_who_follow.count(), 1)
 
     def test_should_follow_new_user(self):
-        profile_user = ProfileFactory()
+        profile_user = ProfileFactory.create()
 
-        profile_test = ProfileFactory()
+        profile_test = ProfileFactory.create()
 
         profile_test.follow(profile_user.user.pk)
 
@@ -262,29 +262,29 @@ class UserScoresTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         # set 3 users
-        user_one = UserFactory(username="JanTest")
-        user_two = UserFactory(username="OlaTest")
-        UserFactory()
+        user_one = UserFactory.create(username="JanTest")
+        user_two = UserFactory.create(username="OlaTest")
+        UserFactory.create()
 
         # give points
         ## user one -> 320
-        UserScoresFactory(
+        UserScoresFactory.create(
             profile=user_one.profile,
             points=320,
             description=UserScores.render_description(320, "WIN BET"),
         )
-        UserScoresFactory(
+        UserScoresFactory.create(
             profile=user_one.profile,
             description=UserScores.render_description(10, "WIN BET"),
         )
-        UserScoresFactory(
+        UserScoresFactory.create(
             profile=user_one.profile,
             points=-10,
             description=UserScores.render_description(-10, "LOSE BET"),
         )
 
         ## user two -> 400
-        UserScoresFactory(
+        UserScoresFactory.create(
             profile=user_two.profile,
             points=400,
             description=UserScores.render_description(400, "WIN BET"),

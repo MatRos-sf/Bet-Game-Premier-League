@@ -4,7 +4,7 @@ from django.test import tag
 from django.contrib.auth.models import User
 
 from users.forms import UserRegisterForm
-from .factories.user import UserFactory
+from users.factories.user import UserFactory
 
 
 @tag("form_registration")
@@ -70,6 +70,3 @@ class UserRegisterFormTest(TestCase):
         self.assertTrue(form.is_valid())
         form.save()
         self.assertEquals(User.objects.count(), 1)
-
-
-# class ProfileUpdateTest(TestCase):

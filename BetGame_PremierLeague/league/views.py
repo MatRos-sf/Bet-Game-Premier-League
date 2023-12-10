@@ -9,9 +9,18 @@ from match.models import Match
 
 class LeagueDetailView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs) -> HttpResponse:
-        league = League.objects.prefetch_related(
-            "season_set", "season_set__teamstats_set", "season_set__teamstats_set__team"
-        ).get(name="Premier League")
+        league = (
+            League.objects.prefetch_related(
+                "season_set",
+                "season_set__teamstats_set",
+                "season_set__teamstats_set__team",
+            )
+            .filter(name="Premier League")
+            .first()
+        )
+
+        if not league:
+            return render(request, "league/league_detail.html", {})
         currently_team = (
             league.season_set.filter(is_currently=True)
             .first()

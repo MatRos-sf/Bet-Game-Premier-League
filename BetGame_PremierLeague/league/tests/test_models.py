@@ -12,8 +12,7 @@ from .factories.models_factory import (
     TeamStatsFactory,
 )
 from match.tests.factories.models_factory import MatchweekFactory, MatchFactory
-from users.tests.factories.user import UserFactory
-from users.tests.factories.users_scores import UserScoresFactory
+from users.factories import UserFactory, UserScoresFactory
 from league.models import League, Season, Team, TeamStats
 from bet.tests.factories.model_factory import BetFactory
 from event.tests.factories.models_factory import EventFactory

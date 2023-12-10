@@ -1,10 +1,11 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-
+from django.test import tag
 from users.models import Profile
-from .factories.user import UserFactory
+from users.factories.user import UserFactory
 
 
+@tag("users_tag")
 class UserSignalTest(TestCase):
     @classmethod
     def setUpTestData(cls):
