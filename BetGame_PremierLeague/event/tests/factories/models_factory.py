@@ -4,7 +4,7 @@ import factory
 from django.utils import timezone
 
 from event.models import Event, EventRequest
-from users.tests.factories.user import UserFactory
+from users.factories import UserFactory
 
 
 class EventFactory(DjangoModelFactory):

@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 
 
 from event.forms import EventForm
-from users.tests.factories.user import UserFactory
+from users.factories import UserFactory
 
 
 @tag("event_form")

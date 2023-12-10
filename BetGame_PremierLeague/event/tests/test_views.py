@@ -10,7 +10,7 @@ from typing import Optional
 from league.tests.test_models import SimpleDB
 from event.models import Event, EventRequest
 from .factories.models_factory import EventFactory, EventRequestFactory
-from users.tests.factories.user import UserFactory
+from users.factories import UserFactory
 
 
 @tag("event_create_view")

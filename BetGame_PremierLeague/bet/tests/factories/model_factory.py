@@ -3,7 +3,7 @@ from factory import Sequence, Faker, SubFactory
 
 
 from bet.models import Bet
-from users.tests.factories.user import UserFactory
+from users.factories.user import UserFactory
 from match.tests.factories.models_factory import MatchFactory
 
 

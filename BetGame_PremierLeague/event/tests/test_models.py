@@ -3,7 +3,7 @@ from parameterized import parameterized
 
 from league.tests.test_models import SimpleDB
 from .factories.models_factory import EventFactory
-from users.tests.factories.user import UserFactory
+from users.factories import UserFactory
 from event.models import Event
 
 

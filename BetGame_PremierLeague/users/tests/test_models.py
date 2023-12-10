@@ -13,13 +13,13 @@ from random import randint, choices
 
 from users.models import Profile, UserScores
 from league.models import Team
-from .factories.user import UserFactory
-from .factories.profile import (
+from users.factories.user import UserFactory
+from ..factories import (
     SimpleProfileFactory,
     ProfileFactory,
     ExtendProfileFactory,
 )
-from .factories.users_scores import UserScoresFactory
+from ..factories import users_scores
 
 
 def get_random_name(suffix: str) -> str:
