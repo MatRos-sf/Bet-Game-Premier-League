@@ -17,7 +17,6 @@ from match.factories.models_factory import MatchweekFactory, MatchFactory
 from league.models import League, TeamStats
 
 
-@tag("xax")
 class RegisterTest(TestCase):
     def setUp(self):
         self.url = "/register/"
@@ -107,7 +106,6 @@ class RegisterTest(TestCase):
         self.assertEquals(expected_message, message.message)
 
 
-@tag("xax")
 class LoginViewTest(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -142,7 +140,6 @@ class LoginViewTest(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
 
 
-@tag("xax")
 class LogoutView(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -179,7 +176,6 @@ class LogoutView(TestCase):
         self.assertFalse(response.context["user"].is_authenticated)
 
 
-@tag("xax")
 class HomeTest(TestCase):
     def setUp(self):
         self.url = ""
@@ -236,7 +232,6 @@ class HomeTest(TestCase):
         self.assertEquals(last_match, match)
 
 
-@tag("xax")
 class ProfileDetailViewTest(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -310,7 +305,6 @@ class ProfileDetailViewTest(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.NOT_FOUND)
 
 
-@tag("xax")
 class ProfileListViewTest(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -369,7 +363,6 @@ class ProfileListViewTest(TestCase):
         self.assertTrue(message.message == expected_message)
 
 
-@tag("xax")
 class EditProfileTest(TestCase):
     @classmethod
     def setUpClass(cls):

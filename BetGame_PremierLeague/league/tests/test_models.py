@@ -20,7 +20,7 @@ from event.factories.models_factory import EventFactory
 
 class SimpleDB(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
         """
         * Creat 3 different Users
         * Create 2 Events:
@@ -64,6 +64,7 @@ class SimpleDB(TestCase):
                 user_three = 'away' + risk      +4
 
         """
+        super(SimpleDB, cls).setUpClass()
         # Create Users
         UserFactory.create_batch(3)
         user_one, user_two, user_three = User.objects.all()[:3]

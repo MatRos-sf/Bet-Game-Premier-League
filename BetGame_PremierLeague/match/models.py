@@ -6,7 +6,7 @@ from django.core.validators import MinValueValidator
 from django.utils import timezone
 from django.urls import reverse
 from django.core.exceptions import ValidationError
-from django.db.models import QuerySet, Q, Case, Value, When, CharField, F, Sum
+from django.db.models import QuerySet, Q, Case, Value, When, CharField, F, Sum, Count
 
 from league.models import Team, Season
 
@@ -156,8 +156,9 @@ class Match(models.Model):
             When(Q(away_team=team) & Q(home_goals=0), then=True),
             default=False,
         )
+
         return finished_matches.annotate(is_clean_sheet=is_clean_sheet).aggregate(
-            clean_sheets=Sum("is_clean_sheet", default=0)
+            clean_sheets=Count("is_clean_sheet", filter=Q(is_clean_sheet=True))
         )["clean_sheets"]
 
     @classmethod
