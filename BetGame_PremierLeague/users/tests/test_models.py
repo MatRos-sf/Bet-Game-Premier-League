@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.files.base import File
 from django.conf import settings
-from django.test import tag
 from parameterized import parameterized
 from PIL import Image
 from io import BytesIO
@@ -48,10 +47,10 @@ def get_temporary_image(size: Tuple[int, int], name: str) -> File:
     return File(file_obj, name=name)
 
 
-@tag("12a")
 class ProfileTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
+        super(ProfileTest, cls).setUpClass()
         user_one = UserFactory.create(username="JanTest")
         user_two = UserFactory.create(username="OlaTest")
 
@@ -60,14 +59,14 @@ class ProfileTest(TestCase):
         UserScoresFactory.create(profile=user_two.profile, points=1000)
 
     def setUp(self) -> None:
-        self.profile = Profile.objects.get(id=1)
+        self.profile = Profile.objects.first()
 
     def test_amt_profiles_should_return_two(self):
         amt_profile = Profile.objects.count()
         self.assertEquals(amt_profile, 2)
 
     def test_user_field_should_one_to_one_with_user(self):
-        user = User.objects.get(id=1)
+        user = User.objects.first()
         self.assertEquals(user, self.profile.user)
 
     def test_image_label(self):
@@ -153,8 +152,8 @@ class ProfileTest(TestCase):
         os.remove(os.path.join(p.image.path))
 
     def test_following_field_should_add_new_user(self):
-        user_one = User.objects.get(id=1)
-        user_two = User.objects.get(id=2)
+        user_one = User.objects.first()
+        user_two = User.objects.last()
 
         p = ExtendProfileFactory.create(following=(user_one, user_two))
 
@@ -178,7 +177,7 @@ class ProfileTest(TestCase):
         profile_obj = ExtendProfileFactory.create()
         self.assertTrue(profile_obj.support_team)
 
-        team = Team.objects.get(id=1)
+        team = Team.objects.first()
         self.assertEqual(team.fb_id, profile_obj.support_team.fb_id)
 
         os.remove(profile_obj.image.path)
@@ -196,7 +195,7 @@ class ProfileTest(TestCase):
 
     def test_user_pk_one_should_have_less_points_than_user_pk_two(self):
         points_user_one = self.profile.all_points
-        points_user_two = User.objects.get(id=2).profile.all_points
+        points_user_two = User.objects.last().profile.all_points
 
         self.assertLess(points_user_one, points_user_two)
 
@@ -239,14 +238,14 @@ class ProfileTest(TestCase):
         self.assertTrue(profile_user.user in profile_test.following.all())
 
     def test_position_should_first_position_user_pk_two(self):
-        profile_user_two = User.objects.get(id=2)
+        profile_user_two = User.objects.last()
         position = Profile.position(profile_user_two.username)
         self.assertEquals(position, 1)
         self.assertIsInstance(position, int)
 
     def test_top_players_should_retrieve_the_best_player(self):
         top_player = Profile.top_players(5)
-        profile = Profile.objects.get(id=2)
+        profile = Profile.objects.last()
 
         self.assertEquals(top_player[0], profile)
         self.assertEquals(top_player[0].sum_points, 1000)
@@ -257,34 +256,35 @@ class ProfileTest(TestCase):
             Profile.top_players(end)
 
 
-@tag("model_user_scores")
 class UserScoresTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
         # set 3 users
+        super(UserScoresTest, cls).setUpClass()
+
         user_one = UserFactory.create(username="JanTest")
         user_two = UserFactory.create(username="OlaTest")
-        UserFactory.create()
 
         # give points
         ## user one -> 320
-        UserScoresFactory.create(
+        UserScoresFactory(
             profile=user_one.profile,
             points=320,
             description=UserScores.render_description(320, "WIN BET"),
         )
-        UserScoresFactory.create(
+        UserScoresFactory(
             profile=user_one.profile,
+            points=10,
             description=UserScores.render_description(10, "WIN BET"),
         )
-        UserScoresFactory.create(
+        UserScoresFactory(
             profile=user_one.profile,
             points=-10,
-            description=UserScores.render_description(-10, "LOSE BET"),
+            description=UserScores.render_description(pt=-10, action="LOSE BET"),
         )
 
         ## user two -> 400
-        UserScoresFactory.create(
+        UserScoresFactory(
             profile=user_two.profile,
             points=400,
             description=UserScores.render_description(400, "WIN BET"),
@@ -295,13 +295,12 @@ class UserScoresTest(TestCase):
 
     @parameterized.expand(
         [
-            (1, 320, "WIN BET"),
-            (2, 10, "WIN BET"),
-            (3, -10, "LOSE BET"),
-            (4, 400, "WIN BET"),
+            (0, 320, "WIN BET"),
+            (1, 10, "WIN BET"),
+            (2, -10, "LOSE BET"),
+            (3, 400, "WIN BET"),
         ]
     )
-    def test_should_create_appropriate_description(self, pk, pt, info):
-        user_scores = UserScores.objects.get(id=pk)
-
+    def test_should_create_appropriate_description(self, index, pt, info):
+        user_scores = UserScores.objects.all()[index]
         self.assertEquals(user_scores.description, f"{pt} pt for: {info}.")

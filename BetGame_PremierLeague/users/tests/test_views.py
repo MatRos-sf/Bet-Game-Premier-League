@@ -17,7 +17,7 @@ from match.factories.models_factory import MatchweekFactory, MatchFactory
 from league.models import League, TeamStats
 
 
-@tag("register")
+@tag("xax")
 class RegisterTest(TestCase):
     def setUp(self):
         self.url = "/register/"
@@ -107,17 +107,18 @@ class RegisterTest(TestCase):
         self.assertEquals(expected_message, message.message)
 
 
-@tag("login")
+@tag("xax")
 class LoginViewTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
+        super(LoginViewTest, cls).setUpClass()
         UserFactory()
 
     def setUp(self):
         self.url = "/login/"
         self.name = "login"
 
-        self.user = User.objects.get(id=1)
+        self.user = User.objects.first()
 
     def test_view_url_exist_at_desired_location(self):
         response = self.client.get(self.url)
@@ -141,17 +142,18 @@ class LoginViewTest(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
 
 
-@tag("logout")
+@tag("xax")
 class LogoutView(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
+        super(LogoutView, cls).setUpClass()
         UserFactory()
 
     def setUp(self):
         self.url = "/logout/"
         self.name = "logout"
 
-        self.user = User.objects.get(id=1)
+        self.user = User.objects.first()
 
     def test_view_url_exist_at_desired_location(self):
         response = self.client.get(self.url)
@@ -177,7 +179,7 @@ class LogoutView(TestCase):
         self.assertFalse(response.context["user"].is_authenticated)
 
 
-@tag("user_home")
+@tag("xax")
 class HomeTest(TestCase):
     def setUp(self):
         self.url = ""
@@ -234,10 +236,11 @@ class HomeTest(TestCase):
         self.assertEquals(last_match, match)
 
 
-@tag("profile")
+@tag("xax")
 class ProfileDetailViewTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
+        super(ProfileDetailViewTest, cls).setUpClass()
         UserFactory()
         UserFactory()
 
@@ -245,8 +248,8 @@ class ProfileDetailViewTest(TestCase):
         self.name = "profile-detail"
         self.url = lambda x: f"/profile/{x}/"
 
-        self.user_one = User.objects.get(pk=1)
-        self.user_two = User.objects.get(pk=2)
+        self.user_one = User.objects.first()
+        self.user_two = User.objects.last()
 
     def test_view_url_does_not_exist_when_user_is_not_authenticated(self):
         username = self.user_one.username
@@ -307,10 +310,11 @@ class ProfileDetailViewTest(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.NOT_FOUND)
 
 
-@tag("profile_list")
-class ProfileDetailViewTest(TestCase):
+@tag("xax")
+class ProfileListViewTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
+        super(ProfileListViewTest, cls).setUpClass()
         UserFactory.create_batch(10)
 
     def setUp(self):
@@ -365,10 +369,11 @@ class ProfileDetailViewTest(TestCase):
         self.assertTrue(message.message == expected_message)
 
 
-@tag("profile_edit")
+@tag("xax")
 class EditProfileTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
+        super(EditProfileTest, cls).setUpClass()
         UserFactory()
 
     def setUp(self):
