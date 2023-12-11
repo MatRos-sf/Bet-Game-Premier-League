@@ -4,6 +4,7 @@ from http import HTTPStatus
 from parameterized import parameterized
 
 from .test_models import SimpleDB
+from league.models import Team
 
 
 @tag("team_detal_view")
@@ -20,15 +21,16 @@ class TeamDetailViewTest(SimpleDB):
 
         self.assertRedirects(response, f"/login/?next={self.url(pk)}")
 
-    @parameterized.expand([1, 2, 3, 4])
-    def test_view_url_exist_at_desired_location_when_user_is_authenticated(self, pk):
+    @parameterized.expand([0, 1, 2, 3])
+    def test_view_url_exist_at_desired_location_when_user_is_authenticated(self, index):
         self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
-        response = self.client.get(self.url(pk))
+        team = Team.objects.all()[index]
+        response = self.client.get(self.url(team.pk))
         self.assertEquals(response.status_code, HTTPStatus.OK)
 
     def test_should_not_empty_context(self):
         self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
-        response = self.client.get(self.url(1))
+        response = self.client.get(self.url(Team.objects.first().pk))
 
         context = response.context
 
