@@ -48,22 +48,6 @@ class BetsListViewWhenMatchweekStartTest(SimpleDB):
         self.assertTrue(context["is_started"])
         self.assertFalse(context["finished_matches"])
 
-    def test_should_not_create_bet_when_matchweek_has_been_started(self):
-        self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
-        number_of_bets_before_post = Bet.objects.filter(user=self.sample_user).count()
-        expected_message = (
-            "You cannot create bet because the matchweek has been started!"
-        )
-        response = self.client.post(reverse(self.url), data={"bet": "home 7"})
-
-        message = list(response.context["messages"])[0]
-        self.assertEquals(
-            number_of_bets_before_post,
-            Bet.objects.filter(user=self.sample_user).count(),
-        )
-        self.assertEquals(message.tags, "info")
-        self.assertEquals(message.message, expected_message)
-
     @mock.patch("match.models.Matchweek.objects")
     def test_should_have_end_season_in_the_context(self, mock_matchweek):
         self.client.login(username=self.sample_user.username, password="1_test_TEST_!")

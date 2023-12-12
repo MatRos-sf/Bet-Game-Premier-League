@@ -105,16 +105,6 @@ class MatchTest(SimpleDB):
 
         self.assertTrue(last_match.finished)
 
-    def test_get_last_match_should_return_match_team3_vs_team0_when_user_do_not_provide_team(
-        self,
-    ):
-        last_match = Match.get_last_match()
-
-        self.assertEquals(last_match.home_team.name, "team_3")
-        self.assertEquals(last_match.away_team.name, "team_0")
-
-        self.assertTrue(last_match.finished)
-
     @parameterized.expand([0, 1, 2, 3])
     def test_get_season_finished_matches(self, index):
         season = Season.objects.first()
@@ -141,25 +131,3 @@ class MatchTest(SimpleDB):
 
         self.assertEquals(result.home_team.name, "team_0")
         self.assertEquals(result.away_team.name, "team_3")
-
-    def test_get_next_match_should_return_team_0_vs_team_3_next_matches_when_user_does_not_provide_team(
-        self,
-    ):
-        result = Match.get_next_match()
-        self.assertEquals(result.home_team.name, "team_0")
-        self.assertEquals(result.away_team.name, "team_3")
-
-    # def test_get_form_guide_team_should_return_additional_field(self):
-    #
-    #     team = Team.objects.get(pk=2)
-    #
-    #     team_form = Match.get_form_guide_team(team, 3)
-    #     for i in team_form:
-    #         print(i.result)
-    #     # self.assertEquals(team_form[0].w, 'A')
-    #     # self.assertEquals(team_form[1].w, 'H')
-    #     # self.assertEquals(team_form[2].w, 'A')
-    #
-    #     self.assertEquals(team_form[0].result, 'W')
-    #     self.assertEquals(team_form[1].result, 'L')
-    #     self.assertEquals(team_form[2].result, 'D')

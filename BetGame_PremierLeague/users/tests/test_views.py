@@ -370,7 +370,7 @@ class EditProfileTest(TestCase):
         UserFactory()
 
     def setUp(self):
-        self.sample_user = User.objects.get(id=1)
+        self.sample_user = User.objects.first()
 
         self.name = "profile-edit"
         self.url = lambda username: f"/profile/{username}/edit/"

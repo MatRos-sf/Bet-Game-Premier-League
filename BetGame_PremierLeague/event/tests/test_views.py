@@ -106,14 +106,14 @@ class EventDetailViewTest(SimpleDB):
     def test_view_user_should_access_when_is_owner_or_members(self):
         self.client.login(username=self.sample_user.username, password="1_test_TEST_!")
 
-        response = self.client.get(self.url(1))
+        response = self.client.get(self.url(Event.objects.first().pk))
         self.assertEquals(response.status_code, HTTPStatus.OK)
 
     def test_user_should_not_access_when_is_not_owner_or_members(self):
         guest = UserFactory()
         self.client.login(username=guest.username, password="1_test_TEST_!")
 
-        response = self.client.get(self.url(1))
+        response = self.client.get(self.url(Event.objects.first().pk))
         self.assertEquals(response.status_code, HTTPStatus.FORBIDDEN)
 
     def test_should_not_add_form_when_event_has_been_started(self):

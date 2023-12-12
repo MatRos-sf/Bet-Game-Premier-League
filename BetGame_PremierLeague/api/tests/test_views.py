@@ -21,18 +21,18 @@ class UserListViewTest(SimpleDB):
         self.assertEquals(User.objects.count(), 3)
         self.assertEquals(Token.objects.count(), 3)
 
-    @parameterized.expand([1, 2, 3])
-    def test_should_show_user_list_when_user_is_authenticated(self, pk):
-        token = Token.objects.get(user_id=pk)
+    @parameterized.expand([0, 1, 2])
+    def test_should_show_user_list_when_user_is_authenticated(self, index):
+        token = Token.objects.all()[index]
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
         response = self.client.get(reverse("api:users"))
         self.assertEquals(response.status_code, HTTPStatus.OK)
 
-    @parameterized.expand([1, 2, 3])
+    @parameterized.expand([0, 1, 2])
     def test_should_show_show_401_when_user_did_not_write_token_in_authorization(
-        self, pk
+        self, index
     ):
-        token = Token.objects.get(user_id=pk)
+        token = Token.objects.all()[index]
         self.client.credentials(HTTP_AUTHORIZATION=token.key)
         response = self.client.get(reverse("api:users"))
         self.assertEquals(response.status_code, HTTPStatus.UNAUTHORIZED)
@@ -83,10 +83,10 @@ class ProfileViewTest(SimpleDB):
         self.assertEquals(User.objects.count(), 3)
         self.assertEquals(Token.objects.count(), 3)
 
-    @parameterized.expand([1, 2, 3])
-    def test_should_show_profile_info_when_user_is_authenticated(self, pk):
-        token = Token.objects.get(user_id=pk)
-        user = User.objects.get(id=pk)
+    @parameterized.expand([0, 1, 2])
+    def test_should_show_profile_info_when_user_is_authenticated(self, index):
+        token = Token.objects.all()[index]
+        user = User.objects.all()[index]
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
         response = self.client.get(self.url(user.username))
         self.assertEquals(response.status_code, HTTPStatus.OK)
@@ -123,10 +123,10 @@ class BetViewTest(SimpleDB):
             "api:bet", kwargs={"user__username": username}
         )
 
-    @parameterized.expand([1, 2, 3])
-    def test_should_show_bet_info_when_user_is_authenticated(self, pk):
-        token = Token.objects.get(user_id=pk)
-        user = User.objects.get(id=pk)
+    @parameterized.expand([0, 1, 2])
+    def test_should_show_bet_info_when_user_is_authenticated(self, index):
+        token = Token.objects.all()[index]
+        user = User.objects.all()[index]
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
         response = self.client.get(self.url(user.username))
         self.assertEquals(response.status_code, HTTPStatus.OK)

@@ -15,6 +15,6 @@ class BetTest(SimpleDB):
         self.assertEquals(Bet.objects.filter(risk=True).count(), 3)
 
     def test_should_show_pk_when_call_model(self):
-        bet = Bet.objects.get(id=1)
+        bet = Bet.objects.first()
 
         self.assertEquals(str(bet), str(bet.pk))
