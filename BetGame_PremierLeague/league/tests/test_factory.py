@@ -2,7 +2,7 @@ from league.models import League, Season, Team, TeamStats
 from django.test import TestCase, tag
 from datetime import date
 
-from .factories.models_factory import (
+from league.factories.models_factory import (
     LeagueFactory,
     SeasonFactory,
     TeamFactory,
@@ -10,10 +10,10 @@ from .factories.models_factory import (
 )
 
 
-@tag("league-factory")
 class LeagueFactoryTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
+        super(LeagueFactoryTest, cls).setUpClass()
         LeagueFactory()
 
     def test_should_create_league(self):
@@ -31,7 +31,8 @@ class LeagueFactoryTest(TestCase):
 
 class SeasonFactoryTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
+        super(SeasonFactoryTest, cls).setUpClass()
         SeasonFactory()
 
     def test_should_create_league(self):
@@ -54,7 +55,8 @@ class SeasonFactoryTest(TestCase):
 
 class TeamFactoryTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
+        super(TeamFactoryTest, cls).setUpClass()
         TeamFactory()
 
     def test_should_create_model_team(self):
@@ -65,7 +67,8 @@ class TeamFactoryTest(TestCase):
 
 class TeamStatsFactoryTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
+        super(TeamStatsFactoryTest, cls).setUpClass()
         TeamStatsFactory()
 
     def test_should_create_model_team(self):

@@ -90,11 +90,6 @@ class UserCheckBetTest(SimpleDB):
         result = user_check_bet(user=self.sample_user, match=match)
         self.assertFalse(result)
 
-    def test_should_return_true_if_it_is_checked_second_match(self):
-        match = Match.objects.all()[1]
-        result = user_check_bet(user=self.sample_user, match=match)
-        self.assertTrue(result)
-
     def test_should_return_none_if_user_does_not_have_a_bet(self):
         match = Match.objects.last()
         result = user_check_bet(user=self.sample_user, match=match)

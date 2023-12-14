@@ -5,22 +5,22 @@ from parameterized import parameterized
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from .factories.models_factory import (
+from league.factories.models_factory import (
     LeagueFactory,
     SeasonFactory,
     TeamFactory,
     TeamStatsFactory,
 )
-from match.tests.factories.models_factory import MatchweekFactory, MatchFactory
+from match.factories.models_factory import MatchweekFactory, MatchFactory
 from users.factories import UserFactory, UserScoresFactory
 from league.models import League, Season, Team, TeamStats
-from bet.tests.factories.model_factory import BetFactory
-from event.tests.factories.models_factory import EventFactory
+from bet.factories.model_factory import BetFactory
+from event.factories.models_factory import EventFactory
 
 
 class SimpleDB(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
         """
         * Creat 3 different Users
         * Create 2 Events:
@@ -64,6 +64,7 @@ class SimpleDB(TestCase):
                 user_three = 'away' + risk      +4
 
         """
+        super(SimpleDB, cls).setUpClass()
         # Create Users
         UserFactory.create_batch(3)
         user_one, user_two, user_three = User.objects.all()[:3]
@@ -292,7 +293,6 @@ class SimpleDB(TestCase):
         )
 
 
-@tag("league")
 class LeagueTest(SimpleDB):
     def test_object_name(self):
         league = League.objects.first()
@@ -344,45 +344,51 @@ class SeasonTests(SimpleDB):
         self.assertEquals(season.amt_matchweeks, 6)
 
 
-@tag("team")
 class TeamTest(SimpleDB):
-    @parameterized.expand([1, 2, 3, 4])
-    def test_get_absolute_url(self, pk):
-        expected = reverse("league:team-detail", kwargs={"pk": pk})
-        team = Team.objects.get(pk=pk)
+    def __get_team_by_index(self, index):
+        return Team.objects.all()[index]
+
+    @parameterized.expand([0, 1, 2, 3])
+    def test_get_absolute_url(self, index):
+        team = self.__get_team_by_index(index)
+        expected = reverse("league:team-detail", kwargs={"pk": team.pk})
+
         self.assertEquals(team.get_absolute_url(), expected)
 
-    @parameterized.expand([(1, "team_0"), (2, "team_1"), (3, "team_2"), (4, "team_3")])
-    def test_team_name(self, pk, expected):
-        team = Team.objects.get(pk=pk)
+    @parameterized.expand([(0, "team_0"), (1, "team_1"), (2, "team_2"), (3, "team_3")])
+    def test_team_name(self, index, expected):
+        team = self.__get_team_by_index(index)
         self.assertEquals(str(team), expected)
 
     def test_should_create_four_teams(self):
         self.assertEquals(Team.objects.count(), 4)
 
-    @parameterized.expand([(1, "team_0"), (2, "team_1"), (3, "team_2"), (4, "team_3")])
-    def test_should_create_appropriate_name_team(self, pk, name):
-        self.assertEquals(Team.objects.get(pk=pk).name, name)
+    @parameterized.expand([(0, "team_0"), (1, "team_1"), (2, "team_2"), (3, "team_3")])
+    def test_should_create_appropriate_name_team(self, index, name):
+        team = self.__get_team_by_index(index)
+        self.assertEquals(team.name, name)
 
 
-@tag("teamstats")
 class TeamStatsTest(SimpleDB):
-    @parameterized.expand([(1, "team_0"), (2, "team_1"), (3, "team_2"), (4, "team_3")])
-    def test_teamstate_name(self, pk, team_name):
-        ts = TeamStats.objects.get(pk=pk)
+    def __get_team_stats_by_index(self, index):
+        return TeamStats.objects.all()[index]
+
+    @parameterized.expand([(0, "team_0"), (1, "team_1"), (2, "team_2"), (3, "team_3")])
+    def test_teamstate_name(self, index, team_name):
+        ts = self.__get_team_stats_by_index(index)
         season_date = str(ts.season.start_date.year)
         expected = f"{team_name} {season_date[2:]} {ts.points}"
         self.assertEquals(str(ts), expected)
 
-    @parameterized.expand([1, 2, 3, 4])
-    def test_goal_different(self, pk):
-        ts = TeamStats.objects.get(pk=pk)
+    @parameterized.expand([0, 1, 2, 3])
+    def test_goal_different(self, index):
+        ts = self.__get_team_stats_by_index(index)
         diff = ts.goals_for - ts.goals_against
         self.assertEquals(diff, ts.goal_difference)
 
-    @parameterized.expand([(1, 4), (2, 3), (3, 1), (4, 2)])
-    def test_get_position(self, pk, expected):
-        ts = TeamStats.objects.get(pk=pk)
+    @parameterized.expand([(0, 4), (1, 3), (2, 1), (3, 2)])
+    def test_get_position(self, index, expected):
+        ts = self.__get_team_stats_by_index(index)
         self.assertEquals(ts.get_position, expected)
 
     def test_get_season_table_should_first_place_team_2_and_last_place_team_0(self):
@@ -392,9 +398,9 @@ class TeamStatsTest(SimpleDB):
         self.assertEquals(table.first().team.name, "team_2")
         self.assertEquals(table.last().team.name, "team_0")
 
-    @parameterized.expand([1, 2, 3, 4])
-    def test_get_season_so_far_should_return_appropriated_stats(self, pk):
-        ts = TeamStats.objects.get(pk=pk)
+    @parameterized.expand([0, 1, 2, 3])
+    def test_get_season_so_far_should_return_appropriated_stats(self, index):
+        ts = self.__get_team_stats_by_index(index)
         season = Season.objects.first()
         avg_goals_scored_expected = ts.goals_for / ts.played
         avg_goals_conceded_expected = ts.goals_against / ts.played

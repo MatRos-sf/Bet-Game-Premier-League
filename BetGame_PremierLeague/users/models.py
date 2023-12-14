@@ -92,6 +92,9 @@ class UserScores(models.Model):
     description = models.TextField(max_length=500)
     got = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.profile.user.username} [{self.pk}]: {self.description}"
+
     @staticmethod
     def render_description(pt, action) -> str:
         """

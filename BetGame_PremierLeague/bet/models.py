@@ -62,10 +62,13 @@ class Bet(models.Model):
         amt_won_risk_bet = Count("risk", filter=Q(is_won=True) & Q(risk=True))
         stats = cls.objects.filter(match__matchweek=matchweek).aggregate(
             amt_bets=Count("id"),
-            won=Avg("is_won", default=0),
+            win_rate=Count("is_won", filter=Q(is_won=True)),
             risk_win=amt_won_risk_bet,
         )
-        stats["won"] = int(stats["won"] * 100)
+        if stats["amt_bets"] > 0:
+            stats["win_rate"] = int((stats["win_rate"] / stats["amt_bets"]) * 100)
+        else:
+            stats["win_rate"] = 0
         return stats
 
     @classmethod

@@ -4,7 +4,7 @@ from factory import Faker, SubFactory, Sequence
 import factory
 
 from .user import UserFactory
-from league.tests.factories.models_factory import TeamFactory
+from league.factories.models_factory import TeamFactory
 from users.models import Profile, UserScores
 
 
