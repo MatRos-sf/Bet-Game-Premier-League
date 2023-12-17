@@ -53,11 +53,13 @@
                       <p class="mb-1">Followers:  {{ amt_followers }}</p>
                   </div>
                 </div>
-                <div class="row justify-content-md-center">
+              {% if object.support_team %}
+              <div class="row justify-content-md-center">
                     <div class="player mb-5 justify-content-center">
                       <img src="{{ object.support_team.crest }}" alt="Image" class="img-fluid image rounded-circle">
                     </div>
                   </div>
+              {% endif %}
           </div>
         </div>
       </div>
