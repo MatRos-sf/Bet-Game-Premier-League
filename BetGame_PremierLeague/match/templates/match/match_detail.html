@@ -1,328 +1,317 @@
-{% extends 'bet/index.html'%}
+{% extends 'bet/index.html' %}
 {% load crispy_forms_tags %}
 {% load bet_tags %}
-
 {% block title %}Mach Detail{% endblock %}
-
 {% block content %}
     <div class="site-blocks-vs site-section bg-light">
-      <div class="container">
-        <div class="bg-image overlay-success rounded mb-5" style="background-image: url('/media/website_img/stadium/stadium.jpg');" data-stellar-background-ratio="0.5">
-
-            <!-- match sector -->
-          <div class="row align-items-center">
-            <div class="col-md-12 col-lg-4 mb-4 mb-lg-0">
-
-              <div class="text-center text-lg-left">
-                <div class="d-block d-lg-flex align-items-center">
-
-                  <div class="image mx-auto mb-3 mb-lg-0 mr-lg-3">
-                    <a href="{{ match.home_team.get_absolute_url }}">
-                        <img src="{{ match.home_team.crest }}" alt="HomeCrest" class="img-fluid">
-                    </a>
-                  </div>
-
-                  <div class="text">
-                    <h3 class="h5 mb-0 text-black">{{ match.home_team.short_name }}</h3>
-                  </div>
+        <div class="container">
+            <div class="bg-image overlay-success rounded mb-5"
+                 style="background-image: url('/media/website_img/stadium/stadium.jpg')"
+                 data-stellar-background-ratio="0.5">
+                <!-- match sector -->
+                <div class="row align-items-center">
+                    <div class="col-md-12 col-lg-4 mb-4 mb-lg-0">
+                        <div class="text-center text-lg-left">
+                            <div class="d-block d-lg-flex align-items-center">
+                                <div class="image mx-auto mb-3 mb-lg-0 mr-lg-3">
+                                    <a href="{{ match.home_team.get_absolute_url }}">
+                                        <img src="{{ match.home_team.crest }}" alt="HomeCrest" class="img-fluid">
+                                    </a>
+                                </div>
+                                <div class="text">
+                                    <h3 class="h5 mb-0 text-black">{{ match.home_team.short_name }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-4 text-center mb-4 mb-lg-0">
+                        <div class="d-inline-block">
+                            <p class="mb-2">
+                                <small class="text-uppercase text-black font-weight-bold">Premier League &mdash; Matchweek {{ match.matchweek.matchweek }}</small>
+                            </p>
+                            <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded">
+                                <span class="h3">
+                                    {% if match.finished %}
+                                        {{ match.home_goals }}:{{ match.away_goals }}
+                                    {% else %}
+                                        vs
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <p class="mb-0">
+                                <small class="text-uppercase text-black font-weight-bold">{{ match.start_date|date:"d F / P" }}</small>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-4 text-center text-lg-right">
+                        <div class="">
+                            <div class="d-block d-lg-flex align-items-center">
+                                <div class="image mx-auto ml-lg-3 mb-3 mb-lg-0 order-2">
+                                    <img src="{{ match.away_team.crest }}" alt="Image" class="img-fluid">
+                                </div>
+                                <div class="text order-1">
+                                    <h3 class="h5 mb-0 text-black">{{ match.away_team.short_name }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-
             </div>
-            <div class="col-md-12 col-lg-4 text-center mb-4 mb-lg-0">
-              <div class="d-inline-block">
-                <p class="mb-2"><small class="text-uppercase text-black font-weight-bold">Premier League &mdash; Matchweek {{ match.matchweek.matchweek }}</small></p>
-                <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded"><span class="h3">
-                    {% if match.finished %}
-                    {{ match.home_goals}}:{{ match.away_goals}}
-                    {% else %}
-                    vs
-                    {% endif %}
-                </span></div>
-                <p class="mb-0"><small class="text-uppercase text-black font-weight-bold">{{ match.start_date|date:"d F / P" }}</small></p>
-              </div>
-            </div>
-            <div class="col-md-12 col-lg-4 text-center text-lg-right">
-              <div class="">
-                <div class="d-block d-lg-flex align-items-center">
-                  <div class="image mx-auto ml-lg-3 mb-3 mb-lg-0 order-2">
-                    <img src="{{ match.away_team.crest }}" alt="Image" class="img-fluid">
-                  </div>
-                  <div class="text order-1">
-                    <h3 class="h5 mb-0 text-black">{{ match.away_team.short_name }}</h3>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+            {% if chart %}{{ chart|safe }}{% endif %}
         </div>
-        {% if chart %}
-            {{ chart|safe }}
-        {% endif %}
-
-      </div>
-
-      </div>
+    </div>
     <!-- Recent Meeting section -->
     <div class="site-section site-blocks-vs">
-      <div class="container">
+        <div class="container">
             <div class="col-md-12 text-center">
-            <h2 class="text-black">Recent Meeting</h2>
-
-          </div>
+                <h2 class="text-black">Recent Meeting</h2>
+            </div>
             <div class="row align-items-center mb-5">
-          <div class="col-md-12">
-              {% for last_match in recent_meetings %}
-                <a href="{{ last_match.get_absolute_url }}">
-                  <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
-                  <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
-                    <div class="text-center text-lg-left">
-                      <div class="d-block d-lg-flex align-items-center">
-                        <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                          <img src="{{ last_match.home_team.crest}}" alt="Image" class="img-fluid">
-                        </div>
-                        <div class="text">
-                          <h3 class="h5 mb-0 text-black">{{ last_match.home_team.short_name}}</h3>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
-                    <div class="d-inline-block">
-                      <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded"><span class="h5">
-                          {{ last_match.home_goals }}:{{ last_match.away_goals }}
-                      </span></div>
-                     </div>
-
-                  </div>
-
-                  <div class="col-md-4 col-lg-4 text-center text-lg-right">
-                    <div class="">
-                      <div class="d-block d-lg-flex align-items-center">
-                        <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
-                          <img src="{{ last_match.away_team.crest}}" alt="Image" class="img-fluid">
-                        </div>
-                        <div class="text order-1 w-100">
-                          <h3 class="h5 mb-0 text-black">{{ last_match.away_team.short_name}}</h3>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                </a>
-              {% endfor %}
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Form Guide -->
-    <div class="site-section block-13 bg-primary fixed overlay-primary bg-image" style="background-image: url(/media/website_img/EPL_Cover.webp);"  data-stellar-background-ratio="0.5">
-
-      <div class="container">
-        <div class="row mb-5">
-          <div class="col-md-12 text-center">
-            <h2 class="text-white">Form Guide</h2>
-          </div>
-        </div>
-       <div class="row justify-content-center">
-                <div class="col-4 text-center">
-                    {% with form_guide.home as form_home %}
-                    {% for m in form_home %}
-                        <a href="{{ m.get_absolute_url }}">
-                        <div class="row align-items-center ml-0 mr-0 py-4 match-entry">
-                            <p class="text-white text-right h3">({{m.w}})
-                            {% if m.home_team == object.home_team %}
-                            {{ m.away_team.short_name }}
-                            {% else %}
-                            {{ m.home_team.short_name }}
-                            {% endif %}
-                            {{ m.score }} {{ m.result }}
-                            </p>
-
-                        </div>
+                <div class="col-md-12">
+                    {% for last_match in recent_meetings %}
+                        <a href="{{ last_match.get_absolute_url }}">
+                            <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
+                                <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
+                                    <div class="text-center text-lg-left">
+                                        <div class="d-block d-lg-flex align-items-center">
+                                            <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
+                                                <img src="{{ last_match.home_team.crest }}" alt="Image" class="img-fluid">
+                                            </div>
+                                            <div class="text">
+                                                <h3 class="h5 mb-0 text-black">{{ last_match.home_team.short_name }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
+                                    <div class="d-inline-block">
+                                        <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded">
+                                            <span class="h5">{{ last_match.home_goals }}:{{ last_match.away_goals }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-lg-4 text-center text-lg-right">
+                                    <div class="">
+                                        <div class="d-block d-lg-flex align-items-center">
+                                            <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
+                                                <img src="{{ last_match.away_team.crest }}" alt="Image" class="img-fluid">
+                                            </div>
+                                            <div class="text order-1 w-100">
+                                                <h3 class="h5 mb-0 text-black">{{ last_match.away_team.short_name }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </a>
                     {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Form Guide -->
+    <div class="site-section block-13 bg-primary fixed overlay-primary bg-image"
+         style="background-image: url(/media/website_img/EPL_Cover.webp)"
+         data-stellar-background-ratio="0.5">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-md-12 text-center">
+                    <h2 class="text-white">Form Guide</h2>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-4 text-center">
+                    {% with form_guide.home as form_home %}
+                        {% for m in form_home %}
+                            <a href="{{ m.get_absolute_url }}">
+                                <div class="row align-items-center ml-0 mr-0 py-4 match-entry">
+                                    <p class="text-white text-right h3">
+                                        ({{ m.w }})
+                                        {% if m.home_team == object.home_team %}
+                                            {{ m.away_team.short_name }}
+                                        {% else %}
+                                            {{ m.home_team.short_name }}
+                                        {% endif %}
+                                        {{ m.score }} {{ m.result }}
+                                    </p>
+                                </div>
+                            </a>
+                        {% endfor %}
                     {% endwith %}
                 </div>
                 <div class="col-4 text-center">
                     {% with form_guide.away as form_away %}
-                    {% for m in form_away %}
-                        <a href="{{ m.get_absolute_url }}">
-                        <div class="row align-items-center ml-0 mr-0 py-4 match-entry">
-                            <p class="text-white text-right h3">({{m.w}})
-                            {% if m.home_team == object.away_team %}
-                            {{ m.away_team.short_name }}
-                            {% else %}
-                            {{ m.home_team.short_name }}
-                            {% endif %}
-                            {{ m.score }} {{ m.result }}
-                            </p>
-
-                        </div>
-                        </a>
-                    {% endfor %}
+                        {% for m in form_away %}
+                            <a href="{{ m.get_absolute_url }}">
+                                <div class="row align-items-center ml-0 mr-0 py-4 match-entry">
+                                    <p class="text-white text-right h3">
+                                        ({{ m.w }})
+                                        {% if m.home_team == object.away_team %}
+                                            {{ m.away_team.short_name }}
+                                        {% else %}
+                                            {{ m.home_team.short_name }}
+                                        {% endif %}
+                                        {{ m.score }} {{ m.result }}
+                                    </p>
+                                </div>
+                            </a>
+                        {% endfor %}
                     {% endwith %}
                 </div>
-              </div>
-
-          </div>
-
+            </div>
+        </div>
     </div>
     <!-- Season so Far -->
     <div class="site-blocks-vs site-section bg-light">
-      <div class="container">
-        {% with home_team=match.home_team away_team=match.away_team %}
-        <table class="table table-striped text-center">
-          <thead>
-            <tr>
-              <th scope="col">
-                  <h3 class="h2 text-black">{{ match.home_team.short_name }}</h3>
-              </th>
-              <th scope="col"></th>
-              <th scope="col">
-                  <h3 class="h2 text-black">{{ match.away_team.short_name }}</h3>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <p class="h3 text-black">{{ position.home }}</p>
-
-              </td>
-                <td><p class="h3">Position</p></td>
-              <td>
-                  <p class="h3 text-black">{{ position.away }}</p>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                  <p class="h3 text-black">{{ so_far_home.won }}</p>
-              </td>
-              <td>
-                  <p class="h3">Won</p>
-              </td>
-              <td>
-                  <p class="h3 text-black">{{ so_far_away.won }}</p>
-              </td>
-            </tr>
-          <tr>
-              <td>
-                  <p class="h3 text-black">{{ so_far_home.drawn }}</p>
-              </td>
-              <td>
-                  <p class="h3">Draw</p>
-              </td>
-              <td>
-                  <p class="h3 text-black">{{ so_far_away.drawn }}</p>
-              </td>
-            </tr>
-          <tr>
-              <td>
-                  <p class="h3 text-black">{{ so_far_home.lost }}</p>
-              </td>
-              <td>
-                  <p class="h3">Lost</p>
-              </td>
-              <td>
-                  <p class="h3 text-black">{{ so_far_away.lost }}</p>
-              </td>
-            </tr>
-          <tr>
-              <td>
-                  <p class="h3 text-black">{{ so_far_home.avg_goals_scored|floatformat:2 }}</p>
-              </td>
-              <td>
-                  <p class="h3">Avg Goals Scored Per Match</p>
-              </td>
-              <td>
-                  <p class="h3 text-black">{{ so_far_away.avg_goals_scored|floatformat:2 }}</p>
-              </td>
-            </tr>
-          <tr>
-              <td>
-                  <p class="h3 text-black">{{ so_far_home.avg_goals_conceded|floatformat:2 }}</p>
-              </td>
-              <td>
-                  <p class="h3">Avg Goals Conceded Per Match</p>
-              </td>
-              <td>
-                  <p class="h3 text-black">{{ so_far_away.avg_goals_conceded|floatformat:2 }}</p>
-              </td>
-            </tr>
-           <tr>
-              <td>
-                  <p class="h3 text-black">{{ clean_sheets.home }}</p>
-              </td>
-              <td>
-                  <p class="h3">Clean sheets</p>
-              </td>
-              <td>
-                  <p class="h3 text-black">{{ clean_sheets.away }}</p>
-              </td>
-            </tr>
-           <tr>
-              <td>
-                  <a href="{{ home.bw.get_absolute_url }}">
-                      <p class="h3 text-black">
-                            {% if home.bw.home_team == home_team %}
-                          {{ home.bw.home_goals }} - {{ home.bw.away_goals }} v {{ home.bw.away_team.short_name }} (H)
-                          {% else %}
-                          {{ home.bw.home_goals }} - {{ home.bw.away_goals }} v {{ home.bw.home_team.short_name }} (A)
-                          {% endif %}
-                      </p>
-                  </a>
-              </td>
-              <td>
-                  <p class="h3">Biggest Win</p>
-              </td>
-              <td>
-                  <a href="{{ away.bw.get_absolute_url }}">
-                      <p class="h3 text-black">
-                      {% if away.bw.home_team == away_team %}
-                      (H) {{ away.bw.away_team.short_name }} v {{ away.bw.home_goals }} - {{ away.bw.away_goals }}
-                      {% else %}
-                      (A) {{ away.bw.home_team.short_name }} v {{ away.bw.home_goals }} - {{ away.bw.away_goals }}
-                      {% endif %}
-                      </p>
-                  </a>
-              </td>
-            </tr>
-           <tr>
-              <td>
-                  <a href="{{ home.wd.get_absolute_url }}">
-                  <p class="h3 text-black">
-                      {% if home.wd.home_team == home_team %}
-                      {{ home.wd.home_goals }} - {{ home.wd.away_goals }} v {{ home.wd.away_team.short_name }} (H)
-                      {% else %}
-                      {{ home.wd.home_goals }} - {{ home.wd.away_goals }} v {{ home.wd.home_team.short_name }} (A)
-                      {% endif %}
-                  </p>
-                  </a>
-              </td>
-              <td>
-                  <p class="h3">Worst Defeat</p>
-              </td>
-              <td>
-                <a href="{{ away.wd.get_absolute_url }}">
-                  <p class="h3 text-black">
-                      {% if away.wd.home_team == away_team %}
-                      (H) {{ away.wd.away_team.short_name }} v {{ away.wd.home_goals }} - {{ away.wd.away_goals }}
-                      {% else %}
-                      (A) {{ away.wd.home_team.short_name }} v {{ away.wd.home_goals }} - {{ away.wd.away_goals }}
-                      {% endif %}
-                  </p>
-                </a>
-              </td>
-            </tr>
-
-
-          </tbody>
-        </table>
-
-        {% endwith %}
-      </div>
-      </div>
-
-
+        <div class="container">
+            {% with home_team=match.home_team away_team=match.away_team %}
+                <table class="table table-striped text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">
+                                <h3 class="h2 text-black">{{ match.home_team.short_name }}</h3>
+                            </th>
+                            <th scope="col"></th>
+                            <th scope="col">
+                                <h3 class="h2 text-black">{{ match.away_team.short_name }}</h3>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <p class="h3 text-black">{{ position.home }}</p>
+                            </td>
+                            <td>
+                                <p class="h3">Position</p>
+                            </td>
+                            <td>
+                                <p class="h3 text-black">{{ position.away }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="h3 text-black">{{ so_far_home.won }}</p>
+                            </td>
+                            <td>
+                                <p class="h3">Won</p>
+                            </td>
+                            <td>
+                                <p class="h3 text-black">{{ so_far_away.won }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="h3 text-black">{{ so_far_home.drawn }}</p>
+                            </td>
+                            <td>
+                                <p class="h3">Draw</p>
+                            </td>
+                            <td>
+                                <p class="h3 text-black">{{ so_far_away.drawn }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="h3 text-black">{{ so_far_home.lost }}</p>
+                            </td>
+                            <td>
+                                <p class="h3">Lost</p>
+                            </td>
+                            <td>
+                                <p class="h3 text-black">{{ so_far_away.lost }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="h3 text-black">{{ so_far_home.avg_goals_scored|floatformat:2 }}</p>
+                            </td>
+                            <td>
+                                <p class="h3">Avg Goals Scored Per Match</p>
+                            </td>
+                            <td>
+                                <p class="h3 text-black">{{ so_far_away.avg_goals_scored|floatformat:2 }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="h3 text-black">{{ so_far_home.avg_goals_conceded|floatformat:2 }}</p>
+                            </td>
+                            <td>
+                                <p class="h3">Avg Goals Conceded Per Match</p>
+                            </td>
+                            <td>
+                                <p class="h3 text-black">{{ so_far_away.avg_goals_conceded|floatformat:2 }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="h3 text-black">{{ clean_sheets.home }}</p>
+                            </td>
+                            <td>
+                                <p class="h3">Clean sheets</p>
+                            </td>
+                            <td>
+                                <p class="h3 text-black">{{ clean_sheets.away }}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <a href="{{ home.bw.get_absolute_url }}">
+                                    <p class="h3 text-black">
+                                        {% if home.bw.home_team == home_team %}
+                                            {{ home.bw.home_goals }} - {{ home.bw.away_goals }} v {{ home.bw.away_team.short_name }} (H)
+                                        {% else %}
+                                            {{ home.bw.home_goals }} - {{ home.bw.away_goals }} v {{ home.bw.home_team.short_name }} (A)
+                                        {% endif %}
+                                    </p>
+                                </a>
+                            </td>
+                            <td>
+                                <p class="h3">Biggest Win</p>
+                            </td>
+                            <td>
+                                <a href="{{ away.bw.get_absolute_url }}">
+                                    <p class="h3 text-black">
+                                        {% if away.bw.home_team == away_team %}
+                                            (H) {{ away.bw.away_team.short_name }} v {{ away.bw.home_goals }} - {{ away.bw.away_goals }}
+                                        {% else %}
+                                            (A) {{ away.bw.home_team.short_name }} v {{ away.bw.home_goals }} - {{ away.bw.away_goals }}
+                                        {% endif %}
+                                    </p>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <a href="{{ home.wd.get_absolute_url }}">
+                                    <p class="h3 text-black">
+                                        {% if home.wd.home_team == home_team %}
+                                            {{ home.wd.home_goals }} - {{ home.wd.away_goals }} v {{ home.wd.away_team.short_name }} (H)
+                                        {% else %}
+                                            {{ home.wd.home_goals }} - {{ home.wd.away_goals }} v {{ home.wd.home_team.short_name }} (A)
+                                        {% endif %}
+                                    </p>
+                                </a>
+                            </td>
+                            <td>
+                                <p class="h3">Worst Defeat</p>
+                            </td>
+                            <td>
+                                <a href="{{ away.wd.get_absolute_url }}">
+                                    <p class="h3 text-black">
+                                        {% if away.wd.home_team == away_team %}
+                                            (H) {{ away.wd.away_team.short_name }} v {{ away.wd.home_goals }} - {{ away.wd.away_goals }}
+                                        {% else %}
+                                            (A) {{ away.wd.home_team.short_name }} v {{ away.wd.home_goals }} - {{ away.wd.away_goals }}
+                                        {% endif %}
+                                    </p>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            {% endwith %}
+        </div>
+    </div>
 {% endblock %}

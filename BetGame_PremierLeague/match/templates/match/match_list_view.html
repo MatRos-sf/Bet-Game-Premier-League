@@ -1,99 +1,106 @@
-{% extends 'bet/index.html'%}
+{% extends 'bet/index.html' %}
 {% load crispy_forms_tags %}
 {% load bet_tags %}
-
 {% block title %}{{ title }}{% endblock %}
-
 {% block content %}
     <div class="site-section site-blocks-vs">
-      <div class="container">
+        <div class="container">
             <div class="col-md-12 text-center">
-            <h2 class="text-black">{{ title }}</h2>
+                <h2 class="text-black">{{ title }}</h2>
                 <span class="meta">Season: {{ season_name }}</span>
-          </div>
-
-              <div class="row justify-content-center m-3">
-            <div class="col-12 title-section">
-                <h2 class="heading text-center">Search!</h2>
             </div>
-            <div class="col-5">
-                <form  method="GET">
-                    <div class="input-group mb-3">
-                      <input type="text" name='name_team' class="form-control border-secondary text-black bg-transparent" placeholder="Type a team name and hit enter">
-                      <div class="input-group-append">
-                        <button class="btn btn-primary" type="button" id="button-addon2">Search!</button>
-                      </div>
-                    </div>
-                  </form>
-            </div>
-        </div>
-
-            <div class="row align-items-center mb-5">
-          <div class="col-md-12">
-              {% for match in object_list %}
-                <a href="{{ match.get_absolute_url }}">
-                  <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
-                  <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
-                    <div class="text-center text-lg-left">
-                      <div class="d-block d-lg-flex align-items-center">
-                        <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                          <img src="{{ match.home_team.crest}}" alt="Image" class="img-fluid">
-                        </div>
-                        <div class="text">
-                          <h3 class="h5 mb-0 text-black">{{ match.home_team.short_name}}</h3>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
-                    <div class="d-inline-block">
-                      <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded"><span class="h5">
-                          {% if match.finished %}
-                          {{ match.home_goals }}:{{ match.away_goals }}
-                          {% else %}
-                          vs
-                          {% endif %}
-                      </span></div>
-                     </div>
-
-                  </div>
-
-                  <div class="col-md-4 col-lg-4 text-center text-lg-right">
-                    <div class="">
-                      <div class="d-block d-lg-flex align-items-center">
-                        <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
-                          <img src="{{ match.away_team.crest}}" alt="Image" class="img-fluid">
-                        </div>
-                        <div class="text order-1 w-100">
-                          <h3 class="h5 mb-0 text-black">{{ match.away_team.short_name}}</h3>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <div class="row justify-content-center m-3">
+                <div class="col-12 title-section">
+                    <h2 class="heading text-center">Search!</h2>
                 </div>
-                </a>
-              {% endfor %}
-          </div>
-        </div>
+                <div class="col-5">
+                    <form method="GET">
+                        <div class="input-group mb-3">
+                            <input type="text"
+                                   name='name_team'
+                                   class="form-control border-secondary text-black bg-transparent"
+                                   placeholder="Type a team name and hit enter">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" id="button-addon2">Search!</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row align-items-center mb-5">
+                <div class="col-md-12">
+                    {% for match in object_list %}
+                        <a href="{{ match.get_absolute_url }}">
+                            <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
+                                <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
+                                    <div class="text-center text-lg-left">
+                                        <div class="d-block d-lg-flex align-items-center">
+                                            <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
+                                                <img src="{{ match.home_team.crest }}" alt="Image" class="img-fluid">
+                                            </div>
+                                            <div class="text">
+                                                <h3 class="h5 mb-0 text-black">{{ match.home_team.short_name }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
+                                    <div class="d-inline-block">
+                                        <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded">
+                                            <span class="h5">
+                                                {% if match.finished %}
+                                                    {{ match.home_goals }}:{{ match.away_goals }}
+                                                {% else %}
+                                                    vs
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-lg-4 text-center text-lg-right">
+                                    <div class="">
+                                        <div class="d-block d-lg-flex align-items-center">
+                                            <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
+                                                <img src="{{ match.away_team.crest }}" alt="Image" class="img-fluid">
+                                            </div>
+                                            <div class="text order-1 w-100">
+                                                <h3 class="h5 mb-0 text-black">{{ match.away_team.short_name }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
             <div class="row">
-              <div class="col-md-12 text-center">
+                <div class="col-md-12 text-center">
                     <div class="site-block-27">
-                      <ul>
-                        {% if page_obj.has_previous %}
-                          <li><a href="?page=1">&lt;</a> </li>
-                          <li><a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
-                        {% endif %}
-                          <li class="active"><span>{{ page_obj.number }}</span></li>
-
-                        {% if page_obj.has_next %}
-                          <li> <a href="?page={{ page_obj.next_page_number }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">{{ page_obj.next_page_number}}</a> </li>
-                            <li><a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">&gt;</a></li>
-                        {% endif %}
-
-                      </ul>
+                        <ul>
+                            {% if page_obj.has_previous %}
+                                <li>
+                                    <a href="?page=1">&lt;</a>
+                                </li>
+                                <li>
+                                    <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                                </li>
+                            {% endif %}
+                            <li class="active">
+                                <span>{{ page_obj.number }}</span>
+                            </li>
+                            {% if page_obj.has_next %}
+                                <li>
+                                    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">{{ page_obj.next_page_number }}</a>
+                                </li>
+                                <li>
+                                    <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.name_team %}&name_team={{ request.GET.name_team }}{% endif %}">&gt;</a>
+                                </li>
+                            {% endif %}
+                        </ul>
                     </div>
-                  </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 {% endblock %}
