@@ -20,5 +20,5 @@ repos:
 -   repo: https://github.com/Riverside-Healthcare/djLint
     rev: v1.33.0
     hooks:
-    -   id: djlint-reformat-handlebars
-    -   id: djlint-django
+    -   id: djlint-reformat-django
+    -   id: djlint-reformat
