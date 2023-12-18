@@ -1,10 +1,11 @@
 from django.views.generic import DetailView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.contrib import messages
 from .models import Match
-from league.models import TeamStats, Team
-from django.shortcuts import get_object_or_404
+from league.models import TeamStats
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 
 def count_different(match, team) -> int:
@@ -40,9 +41,57 @@ class MatchDetailView(LoginRequiredMixin, DetailView):
         "matchweek__season__league",
     )
 
+    @staticmethod
+    def __create_chart(bets: dict) -> str:
+        fig = make_subplots(
+            1,
+            2,
+            specs=[[{"type": "domain"}, {"type": "domain"}]],
+            subplot_titles=["Bets Results", "Type of Bets"],
+        )
+        fig.add_trace(
+            go.Pie(
+                labels=["Won", "Lost"],
+                values=[bets["won"], bets["lost"]],
+                marker=dict(colors=["green", "#e23730"]),
+                scalegroup="two",
+            ),
+            1,
+            1,
+        )
+        fig.add_trace(
+            go.Pie(
+                labels=["Bets without risk", "Risk Bets"],
+                values=[bets["normal_bet"], bets["risk"]],
+                scalegroup="two",
+                marker=dict(colors=["#ecc921", "black"]),
+            ),
+            1,
+            2,
+        )
+
+        fig.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            showlegend=True,
+        )
+        pie = fig.to_html()
+        return pie
+
     def get_context_data(self, **kwargs):
         context = super(MatchDetailView, self).get_context_data(**kwargs)
         match = context["match"]
+        if match.finished:
+            bets = match.bets.all()
+            bets = bets.aggregate(
+                won=Count("is_won", filter=Q(is_won=True)),
+                lost=Count("is_won", filter=Q(is_won=False)),
+                normal_bet=Count("risk", filter=Q(risk=False)),
+                risk=Count("risk", filter=Q(risk=True)),
+            )
+            if not all(value == 0 for value in bets.values()):
+                context["chart"] = self.__create_chart(bets)
+
         season, league = match.get_season_and_league()
         table = TeamStats.get_season_table(season=season.start_date.year, league=league)
         context["table"] = table

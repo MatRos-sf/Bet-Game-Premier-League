@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import QuerySet
 from django.utils import timezone
+from django.shortcuts import render, HttpResponse
 
 from match.models import Match, Matchweek
 from .models import Bet

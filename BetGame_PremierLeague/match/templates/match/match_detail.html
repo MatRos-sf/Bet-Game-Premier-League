@@ -56,8 +56,12 @@
             </div>
           </div>
         </div>
+        {% if chart %}
+            {{ chart|safe }}
+        {% endif %}
 
       </div>
+
       </div>
     <!-- Recent Meeting section -->
     <div class="site-section site-blocks-vs">
