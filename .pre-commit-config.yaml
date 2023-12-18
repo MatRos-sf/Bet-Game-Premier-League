@@ -21,4 +21,4 @@ repos:
     rev: v1.33.0
     hooks:
     -   id: djlint-reformat-handlebars
-    -   id: djlint-handlebars
+    -   id: djlint-django
