@@ -1,16 +1,19 @@
-{% extends 'bet/index.html'%}
+{% extends 'bet/index.html' %}
 {% load crispy_forms_tags %}
 {% block title %}Log out!{% endblock %}
-
 {% block content %}
-    <div class="site-blocks-cover overlay" style="background-image: url(/media/website_img/see_ya.webp);" data-aos="fade" data-stellar-background-ratio="0.5">
-      <div class="container">
-        <div class="row align-items-center justify-content-start">
-          <div class="col-md-6 text-center text-md-left" data-aos="fade-up" data-aos-delay="400">
-            <h1 class="bg-text-line">See ya!</h1>
-          </div>
+    <div class="site-blocks-cover overlay"
+         style="background-image: url(/media/website_img/see_ya.webp)"
+         data-aos="fade"
+         data-stellar-background-ratio="0.5">
+        <div class="container">
+            <div class="row align-items-center justify-content-start">
+                <div class="col-md-6 text-center text-md-left"
+                     data-aos="fade-up"
+                     data-aos-delay="400">
+                    <h1 class="bg-text-line">See ya!</h1>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-
 {% endblock %}
