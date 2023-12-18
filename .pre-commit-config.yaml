@@ -21,8 +21,4 @@ repos:
     rev: v1.33.0
     hooks:
     -   id: djlint-reformat-handlebars
-        files: "\\.html"
-        types_or: ['html']
     -   id: djlint-handlebars
-        files: "\\.html"
-        types_or: ['html']
