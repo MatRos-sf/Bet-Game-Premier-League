@@ -1,218 +1,219 @@
-{% extends 'bet/index.html'%}
+{% extends 'bet/index.html' %}
 {% load crispy_forms_tags %}
 {% load bet_tags %}
-
 {% block title %}Home{% endblock %}
-
-
 {% block background_photo %}
-    <div class="site-blocks-cover overlay" style="background-image: url(/media/website_img/EPL_Cover.webp);" data-aos="fade" data-stellar-background-ratio="0.5">
-      <div class="container">
-        <div class="row align-items-center justify-content-start">
-          <div class="col-md-6 text-center text-md-left" data-aos="fade-up" data-aos-delay="400">
-            {% if not user.is_authenticated %}
-            <h1 class="bg-text-line">Are you ready for an exciting journey?</h1>
-            <p class="mt-4">Welcome to Bet Game Premier League! Follow and bet on Premier League matches, compete with other players,
+    <div class="site-blocks-cover overlay"
+         style="background-image: url(/media/website_img/EPL_Cover.webp)"
+         data-aos="fade"
+         data-stellar-background-ratio="0.5">
+        <div class="container">
+            <div class="row align-items-center justify-content-start">
+                <div class="col-md-6 text-center text-md-left"
+                     data-aos="fade-up"
+                     data-aos-delay="400">
+                    {% if not user.is_authenticated %}
+                        <h1 class="bg-text-line">Are you ready for an exciting journey?</h1>
+                        <p class="mt-4">
+                            Welcome to Bet Game Premier League! Follow and bet on Premier League matches, compete with other players,
                             earn points for successful bets, and even create and invite friends to unique football events.
                             Experience the thrill of football betting now!
-            </p>
-            <p>
-              <a href="{% url 'login' %}" class="btn btn-primary py-3 px-4 mr-3">Log In</a>
-              <a href="{% url 'register' %}" class="more light text-white">Create new account</a>
-            </p>
-            {% else %}
-                <h1 class="bg-text-line">Home</h1>
-
-            {% endif %}
-          </div>
+                        </p>
+                        <p>
+                            <a href="{% url 'login' %}" class="btn btn-primary py-3 px-4 mr-3">Log In</a>
+                            <a href="{% url 'register' %}" class="more light text-white">Create new account</a>
+                        </p>
+                    {% else %}
+                        <h1 class="bg-text-line">Home</h1>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 {% endblock %}
-
 {% block content %}
-      <div class="site-blocks-vs site-section bg-light">
-      <div class="container">
-        <!-- next match sector -->
-        <div class="border mb-3 rounded d-block d-lg-flex align-items-center p-3 next-match">
-
-          <div class="mr-auto order-md-1 w-60 text-center text-lg-left mb-3 mb-lg-0">
-            Next match
-            <div id="date-countdown" data-start-time="{{ next_match.start_date|date:'Y-m-d' }}"></div>
-          </div>
-
-          <div class="ml-auto pr-4 order-md-2">
-            <div class="h5 text-black text-uppercase text-center text-lg-left">
-              <div class="d-block d-md-inline-block mb-3 mb-lg-0">
-                    <img src="{{ next_match.home_team.crest }}" alt="Image" class="mr-3 image"><span class="d-block d-md-inline-block ml-0 ml-md-3 ml-lg-0">{{ next_match.home_team.short_name }}</span>
-              </div>
-              <span class="text-muted mx-3 text-normal mb-3 mb-lg-0 d-block d-md-inline ">vs</span>
-              <div class="d-block d-md-inline-block">
-                  <img src="{{ next_match.away_team.crest }}" alt="Image" class="mr-3 image"><span class="d-block d-md-inline-block ml-0 ml-md-3 ml-lg-0">{{ next_match.away_team.short_name }}</span>
-              </div>
-            </div>
-          </div>
-
-
-        </div>
-
-      <a href="{{ next_match.get_absolute_url }}">
-              <div class="bg-image overlay-success rounded mb-5" style="background-image: url('/media/website_img/stadium/stadium.jpg')" data-stellar-background-ratio="0.5">
-
-            <!-- last match sector -->
-          <div class="row align-items-center">
-            <div class="col-md-12 col-lg-4 mb-4 mb-lg-0">
-
-              <div class="text-center text-lg-left">
-                <div class="d-block d-lg-flex align-items-center">
-                  <div class="image mx-auto mb-3 mb-lg-0 mr-lg-3">
-                    <img src="{{ last_match.home_team.crest }}" alt="HomeCrest" class="img-fluid">
-                  </div>
-                  <div class="text">
-                    <h3 class="h5 mb-0 text-black">{{ last_match.home_team.short_name }}</h3>
-                  </div>
+    <div class="site-blocks-vs site-section bg-light">
+        <div class="container">
+            <!-- next match sector -->
+            <div class="border mb-3 rounded d-block d-lg-flex align-items-center p-3 next-match">
+                <div class="mr-auto order-md-1 w-60 text-center text-lg-left mb-3 mb-lg-0">
+                    Next match
+                    <div id="date-countdown"
+                         data-start-time="{{ next_match.start_date|date:'Y-m-d' }}"></div>
                 </div>
-              </div>
-
-            </div>
-            <div class="col-md-12 col-lg-4 text-center mb-4 mb-lg-0">
-              <div class="d-inline-block">
-                <p class="mb-2"><small class="text-uppercase text-black font-weight-bold">Premier League &mdash; Matchweek {{ last_match.matchweek.matchweek }}</small></p>
-                <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded"><span class="h3">{{ last_match.home_goals}}:{{ last_match.away_goals}}</span></div>
-                <p class="mb-0"><small class="text-uppercase text-black font-weight-bold">{{ last_match.start_date|date:"d F / P" }}</small></p>
-              </div>
-            </div>
-            <div class="col-md-12 col-lg-4 text-center text-lg-right">
-              <div class="">
-                <div class="d-block d-lg-flex align-items-center">
-                  <div class="image mx-auto ml-lg-3 mb-3 mb-lg-0 order-2">
-                    <img src="{{ last_match.away_team.crest }}" alt="Image" class="img-fluid">
-                  </div>
-                  <div class="text order-1">
-                    <h3 class="h5 mb-0 text-black">{{ last_match.away_team.short_name }}</h3>
-                  </div>
+                <div class="ml-auto pr-4 order-md-2">
+                    <div class="h5 text-black text-uppercase text-center text-lg-left">
+                        <div class="d-block d-md-inline-block mb-3 mb-lg-0">
+                            <img src="{{ next_match.home_team.crest }}" alt="Image" class="mr-3 image">
+                            <span class="d-block d-md-inline-block ml-0 ml-md-3 ml-lg-0">{{ next_match.home_team.short_name }}</span>
+                        </div>
+                        <span class="text-muted mx-3 text-normal mb-3 mb-lg-0 d-block d-md-inline ">vs</span>
+                        <div class="d-block d-md-inline-block">
+                            <img src="{{ next_match.away_team.crest }}" alt="Image" class="mr-3 image">
+                            <span class="d-block d-md-inline-block ml-0 ml-md-3 ml-lg-0">{{ next_match.away_team.short_name }}</span>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-        </div>
-        </a>
-
-          <!-- table -->
-       <h2 class="h6 text-uppercase text-black font-weight-bold mb-3">Table</h2>
-
-      <div class="row mb-5 justify-content-center">
-          <div class="col-lg-6">
-            <div class="widget-next-match">
-              <table class="table" >
-                <thead>
-                  <tr>
-                    <th>P</th>
-                    <th>Team</th>
-                    <th>W</th>
-                    <th>D</th>
-                    <th>L</th>
-                    <th>PTS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for team in table %}
-                      <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td><strong class="text-black">{{ team.team.name }}</strong></td>
-                        <td>{{ team.won }}</td>
-                        <td>{{ team.drawn }}</td>
-                        <td>{{ team.lost }}</td>
-                        <td>{{ team.points }}</td>
-                      </tr>
-                  {% endfor %}
-
-                </tbody>
-              </table>
+            <a href="{{ next_match.get_absolute_url }}">
+                <div class="bg-image overlay-success rounded mb-5"
+                     style="background-image: url('/media/website_img/stadium/stadium.jpg')"
+                     data-stellar-background-ratio="0.5">
+                    <!-- last match sector -->
+                    <div class="row align-items-center">
+                        <div class="col-md-12 col-lg-4 mb-4 mb-lg-0">
+                            <div class="text-center text-lg-left">
+                                <div class="d-block d-lg-flex align-items-center">
+                                    <div class="image mx-auto mb-3 mb-lg-0 mr-lg-3">
+                                        <img src="{{ last_match.home_team.crest }}"
+                                             alt="HomeCrest"
+                                             class="img-fluid">
+                                    </div>
+                                    <div class="text">
+                                        <h3 class="h5 mb-0 text-black">{{ last_match.home_team.short_name }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-4 text-center mb-4 mb-lg-0">
+                            <div class="d-inline-block">
+                                <p class="mb-2">
+                                    <small class="text-uppercase text-black font-weight-bold">Premier League &mdash; Matchweek {{ last_match.matchweek.matchweek }}</small>
+                                </p>
+                                <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded">
+                                    <span class="h3">{{ last_match.home_goals }}:{{ last_match.away_goals }}</span>
+                                </div>
+                                <p class="mb-0">
+                                    <small class="text-uppercase text-black font-weight-bold">{{ last_match.start_date|date:"d F / P" }}</small>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-4 text-center text-lg-right">
+                            <div class="">
+                                <div class="d-block d-lg-flex align-items-center">
+                                    <div class="image mx-auto ml-lg-3 mb-3 mb-lg-0 order-2">
+                                        <img src="{{ last_match.away_team.crest }}" alt="Image" class="img-fluid">
+                                    </div>
+                                    <div class="text order-1">
+                                        <h3 class="h5 mb-0 text-black">{{ last_match.away_team.short_name }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            <!-- table -->
+            <h2 class="h6 text-uppercase text-black font-weight-bold mb-3">Table</h2>
+            <div class="row mb-5 justify-content-center">
+                <div class="col-lg-6">
+                    <div class="widget-next-match">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>P</th>
+                                    <th>Team</th>
+                                    <th>W</th>
+                                    <th>D</th>
+                                    <th>L</th>
+                                    <th>PTS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for team in table %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <strong class="text-black">{{ team.team.name }}</strong>
+                                        </td>
+                                        <td>{{ team.won }}</td>
+                                        <td>{{ team.drawn }}</td>
+                                        <td>{{ team.lost }}</td>
+                                        <td>{{ team.points }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-
-          </div>
         </div>
-
-      </div>
-      </div>
-
+    </div>
     <!-- stats lastmatchweek -->
     <div class="site-section">
-          <div class="container">
+        <div class="container">
             <div class="row mb-5">
-              <div class="col-md-12 text-center">
-                <h2 class="text-black">About bets from Matchweek {{ last_bets.matchweek }}!</h2>
-              </div>
+                <div class="col-md-12 text-center">
+                    <h2 class="text-black">About bets from Matchweek {{ last_bets.matchweek }}!</h2>
+                </div>
             </div>
             <div class="row">
                 <div class="col-md-6 col-lg-4 mb-4">
-                <div class="post-entry">
-                  <div class="image">
-                    <img src="/media/website_img/stats/stats_2.jpg" alt="Image" class="img-fluid">
-                  </div>
-                  <div class="text p-4">
-                    <h1 class="p-2 h4 text-red text-center">The amount of bets</h1>
-                    <h1 class="p-2 text-center">{{ last_bets.amt_bets }}</h1>
-                  </div>
+                    <div class="post-entry">
+                        <div class="image">
+                            <img src="/media/website_img/stats/stats_2.jpg"
+                                 alt="Image"
+                                 class="img-fluid">
+                        </div>
+                        <div class="text p-4">
+                            <h1 class="p-2 h4 text-red text-center">The amount of bets</h1>
+                            <h1 class="p-2 text-center">{{ last_bets.amt_bets }}</h1>
+                        </div>
+                    </div>
                 </div>
-              </div>
                 <div class="col-md-6 col-lg-4 mb-4">
-                <div class="post-entry">
-                  <div class="image">
-                    <img src="/media/website_img/photo_2.jpg" alt="Image" class="img-fluid">
-                  </div>
-                  <div class="text p-4">
-                    <h1 class="p-2 h4 text-red text-center">The win rate of bets</h1>
-                    <h1 class="p-2 text-center">{{ last_bets.won }}%</h1>
-                  </div>
+                    <div class="post-entry">
+                        <div class="image">
+                            <img src="/media/website_img/photo_2.jpg" alt="Image" class="img-fluid">
+                        </div>
+                        <div class="text p-4">
+                            <h1 class="p-2 h4 text-red text-center">The win rate of bets</h1>
+                            <h1 class="p-2 text-center">{{ last_bets.won }}%</h1>
+                        </div>
+                    </div>
                 </div>
-              </div>
                 <div class="col-md-6 col-lg-4 mb-4">
-                <div class="post-entry">
-                  <div class="image">
-                    <img src="/media/website_img/stats/stats_1.webp" alt="Image" class="img-fluid">
-                  </div>
-                  <div class="text p-4">
-                    <h1 class="p-2 h4 text-red text-center">The amount of risk bet</h1>
-                    <h1 class="p-2 text-center">{{ last_bets.risk_win }}</h1>
-                  </div>
+                    <div class="post-entry">
+                        <div class="image">
+                            <img src="/media/website_img/stats/stats_1.webp"
+                                 alt="Image"
+                                 class="img-fluid">
+                        </div>
+                        <div class="text p-4">
+                            <h1 class="p-2 h4 text-red text-center">The amount of risk bet</h1>
+                            <h1 class="p-2 text-center">{{ last_bets.risk_win }}</h1>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-
-      <div class="site-section block-13 bg-primary fixed overlay-primary bg-image" style="background-image: url('/media/website_img/top_players.webp');"  data-stellar-background-ratio="0.5">
-
-
-      <div class="container">
-        <div class="row mb-5">
-          <div class="col-md-12 text-center">
-            <h2 class="text-white">The Best Players!</h2>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="nonloop-block-13 owl-carousel">
-            {% for player in top_players %}
-              <div class="item">
-              <!-- uses .block-12 -->
-              <div class="block-12">
-                <figure>
-                  <img src="{{ player.image.url }}" alt="ProfileImage" class="img-fluid">
-                </figure>
-                <div class="text">
-                  <a href="{% url 'profile-detail' player.user.username %}"><span class="h2 meta">{{ player.user.username }} {{ player.sum_points }}</span></a>
+    </div>
+    <div class="site-section block-13 bg-primary fixed overlay-primary bg-image"
+         style="background-image: url('/media/website_img/top_players.webp')"
+         data-stellar-background-ratio="0.5">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-md-12 text-center">
+                    <h2 class="text-white">The Best Players!</h2>
                 </div>
-              </div>
             </div>
-
-            {% endfor %}
-
-      </div>
+            <div class="row">
+                <div class="nonloop-block-13 owl-carousel">
+                    {% for player in top_players %}
+                        <div class="item">
+                            <!-- uses .block-12 -->
+                            <div class="block-12">
+                                <figure>
+                                    <img src="{{ player.image.url }}" alt="ProfileImage" class="img-fluid">
+                                </figure>
+                                <div class="text">
+                                    <a href="{% url 'profile-detail' player.user.username %}"><span class="h2 meta">{{ player.user.username }} {{ player.sum_points }}</span></a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-      </div>
-      </div>
-
+    </div>
 {% endblock %}

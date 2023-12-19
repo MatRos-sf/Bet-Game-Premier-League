@@ -1,199 +1,216 @@
-{% extends 'bet/index.html'%}
+{% extends 'bet/index.html' %}
 {% load crispy_forms_tags %}
 {% block title %}Profile{% endblock %}
-
 {% block content %}
     <div class="site-section" data-aos="fade-up">
-      <div class="container">
-        <div class="row align-items-center">
-          <div class="col-md-6">
-              <img src="{{ object.image.url }}" alt="ProfileImage" class="img-fluid">
-          </div>
-          <div class="col-md-6 pl-md-5">
-           <!-- section username -->
-              <div class="row justify-content-md-center">
-                <div class="col-sm-5">
-                  <h2 class="text-black ">{{ object.user.username }}</h2>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <img src="{{ object.image.url }}" alt="ProfileImage" class="img-fluid">
                 </div>
-                <div class="col-6">
-                      {% if self %}
-                        <a href="{% url 'profile-edit' object.user.username %}" class="btn btn-primary btn-sm rounded-0">Settings</a>
-                      {% else %}
-
-                          <form method="POST">
-                          {% csrf_token %}
-                              {% if object.user in user.profile.following.all %}
-                                <button type="submit" class="btn btn-primary btn-sm rounded-0 " value="unfollow" name="button_friend">Unfollow</button>
-                              {% else %}
-                                <button type="submit" class="btn btn-primary btn-sm rounded-0 " value="follow" name="button_friend">Follow</button>
-                              {% endif %}
-                          </form>
-
-
-
-
-                      {% endif %}
+                <div class="col-md-6 pl-md-5">
+                    <!-- section username -->
+                    <div class="row justify-content-md-center">
+                        <div class="col-sm-5">
+                            <h2 class="text-black ">{{ object.user.username }}</h2>
+                        </div>
+                        <div class="col-6">
+                            {% if self %}
+                                <a href="{% url 'profile-edit' object.user.username %}"
+                                   class="btn btn-primary btn-sm rounded-0">Settings</a>
+                            {% else %}
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    {% if object.user in user.profile.following.all %}
+                                        <button type="submit"
+                                                class="btn btn-primary btn-sm rounded-0 "
+                                                value="unfollow"
+                                                name="button_friend">Unfollow</button>
+                                    {% else %}
+                                        <button type="submit"
+                                                class="btn btn-primary btn-sm rounded-0 "
+                                                value="follow"
+                                                name="button_friend">Follow</button>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <span class="meta">Joined {{ object.user.date_joined|date:"M d, Y" }}</span>
+                    <div class="row p-3 justify-content-md-center">
+                        <div class="col-6 pl-md-2">
+                            <p class="mb-6 h4">
+                                Points: <b>{{ object.all_points }}</b>
+                            </p>
+                        </div>
+                        <div class="col-6 pl-md-2">
+                            <p class="mb-1 h4">Rank: {{ rank }}</p>
+                        </div>
+                    </div>
+                    <div class="row justify-content-md-center">
+                        <div class="col-6 pl-md-2">
+                            <p class="mb-6">Following:  {{ amt_following }}</p>
+                        </div>
+                        <div class="col-6 pl-md-2">
+                            <p class="mb-1">Followers:  {{ amt_followers }}</p>
+                        </div>
+                    </div>
+                    <div class="row justify-content-md-center">
+                        <div class="player mb-5 justify-content-center">
+                            <img src="{{ object.support_team.crest }}"
+                                 alt="Image"
+                                 class="img-fluid image rounded-circle">
+                        </div>
+                    </div>
                 </div>
             </div>
-              <span class="meta">Joined {{ object.user.date_joined|date:"M d, Y"}}</span>
-
-              <div class="row p-3 justify-content-md-center">
-                  <div class="col-6 pl-md-2">
-                      <p class="mb-6 h4">Points: <b>{{ object.all_points }}</b></p>
-                  </div>
-                  <div class="col-6 pl-md-2">
-                      <p class="mb-1 h4">Rank: {{ rank }}</p>
-                  </div>
-                </div>
-              <div class="row justify-content-md-center">
-                  <div class="col-6 pl-md-2">
-                      <p class="mb-6">Following:  {{ amt_following }}</p>
-                  </div>
-                  <div class="col-6 pl-md-2">
-                      <p class="mb-1">Followers:  {{ amt_followers }}</p>
-                  </div>
-                </div>
-                <div class="row justify-content-md-center">
-                    <div class="player mb-5 justify-content-center">
-                      <img src="{{ object.support_team.crest }}" alt="Image" class="img-fluid image rounded-circle">
-                    </div>
-                  </div>
-          </div>
         </div>
-      </div>
     </div>
-
     {% if object.description %}
-    <div class="site-section block-13 bg-primary fixed overlay-primary bg-image" style="background-image: url('/media/website_img/description.jpg');"  data-stellar-background-ratio="0.5">
-      <div class="container">
-        <div class="row mb-5">
-          <div class="col-md-12 text-center">
-            <h2 class="text-white">{{ object.description }}</h2>
-          </div>
+        <div class="site-section block-13 bg-primary fixed overlay-primary bg-image"
+             style="background-image: url('/media/website_img/description.jpg')"
+             data-stellar-background-ratio="0.5">
+            <div class="container">
+                <div class="row mb-5">
+                    <div class="col-md-12 text-center">
+                        <h2 class="text-white">{{ object.description }}</h2>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      </div>
     {% endif %}
-
     <div class="site-section">
-          <div class="container">
+        <div class="container">
             <div class="row mb-5">
-              <div class="col-md-12 text-center">
-                <h2 class="text-black">Stats!</h2>
-              </div>
+                <div class="col-md-12 text-center">
+                    <h2 class="text-black">Stats!</h2>
+                </div>
             </div>
             <div class="row justify-content-center">
                 <div class="col-md-6 col-lg-4 mb-4">
-                <div class="post-entry">
-                  <div class="image">
-                    <img src="/media/website_img/stats/bets_2.jpg" alt="Image" class="img-fluid">
-                  </div>
-                  <div class="text p-4">
-                    <h1 class="p-2 h4 text-red text-center">Bets</h1>
-                    <h1 class="p-2 text-center">{{ bet_stats.amt_bets }}</h1>
-                  </div>
+                    <div class="post-entry">
+                        <div class="image">
+                            <img src="/media/website_img/stats/bets_2.jpg"
+                                 alt="Image"
+                                 class="img-fluid">
+                        </div>
+                        <div class="text p-4">
+                            <h1 class="p-2 h4 text-red text-center">Bets</h1>
+                            <h1 class="p-2 text-center">{{ bet_stats.amt_bets }}</h1>
+                        </div>
+                    </div>
                 </div>
-              </div>
-
                 <div class="col-md-6 col-lg-4 mb-4">
-                <div class="post-entry">
-                  <div class="image">
-                    <img src="/media/website_img/stats/won.jpg" alt="Image" class="img-fluid">
-                  </div>
-                  <div class="text p-4">
-                    <h1 class="p-2 h4 text-red text-center">Win Rate</h1>
-                    <h1 class="p-2 text-center">{{ bet_stats.win_rate }}%</h1>
-                  </div>
+                    <div class="post-entry">
+                        <div class="image">
+                            <img src="/media/website_img/stats/won.jpg" alt="Image" class="img-fluid">
+                        </div>
+                        <div class="text p-4">
+                            <h1 class="p-2 h4 text-red text-center">Win Rate</h1>
+                            <h1 class="p-2 text-center">{{ bet_stats.win_rate }}%</h1>
+                        </div>
+                    </div>
                 </div>
-              </div>
-
-
-
             </div>
-              <div class="row justify-content-center">
+            <div class="row justify-content-center">
                 <div class="col-md-6 col-lg-4 mb-4">
-                <div class="post-entry">
-                  <div class="image">
-                    <img src="/media/website_img/stats/risk.jpg" alt="Image" class="img-fluid" style="width: 100%; height: 200px;">
-                  </div>
-                  <div class="text p-4">
-                    <h1 class="p-2 h4 text-red text-center">Risk bets</h1>
-                    <h1 class="p-2 text-center">{{ bet_stats.risk_bets }}</h1>
-                  </div>
+                    <div class="post-entry">
+                        <div class="image">
+                            <img src="/media/website_img/stats/risk.jpg"
+                                 alt="Image"
+                                 class="img-fluid"
+                                 style="width: 100%;
+                                        height: 200px">
+                        </div>
+                        <div class="text p-4">
+                            <h1 class="p-2 h4 text-red text-center">Risk bets</h1>
+                            <h1 class="p-2 text-center">{{ bet_stats.risk_bets }}</h1>
+                        </div>
+                    </div>
                 </div>
-              </div>
-
                 <div class="col-md-6 col-lg-4 mb-4">
-                <div class="post-entry">
-                  <div class="image">
-                    <img src="/media/website_img/stats/risk_won.jpg" alt="Image" class="img-fluid" style="width: 100%; height: 200px;">
-                  </div>
-                  <div class="text p-4">
-                    <h1 class="p-2 h4 text-red text-center">Win rate of risk bets.</h1>
-                    <h1 class="p-2 text-center">{{ bet_stats.win_rate_risk_bet }}%</h1>
-                  </div>
+                    <div class="post-entry">
+                        <div class="image">
+                            <img src="/media/website_img/stats/risk_won.jpg"
+                                 alt="Image"
+                                 class="img-fluid"
+                                 style="width: 100%;
+                                        height: 200px">
+                        </div>
+                        <div class="text p-4">
+                            <h1 class="p-2 h4 text-red text-center">Win rate of risk bets.</h1>
+                            <h1 class="p-2 text-center">{{ bet_stats.win_rate_risk_bet }}%</h1>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              </div>
-          </div>
+            </div>
         </div>
-
+    </div>
     <!-- last bets section -->
     <div class="site-section site-blocks-vs">
-      <div class="container">
+        <div class="container">
             <div class="col-md-12 text-center">
-            <h1 class="text-black">Last bets</h1>
-          </div>
-            <div class="row align-items-center mb-5">
-          <div class="col-md-12">
-              {% for bet in bets %}
-            <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
-              <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
-                <div class="text-center text-lg-left">
-                  <div class="d-block d-lg-flex align-items-center">
-                    <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                      <img src="{{ bet.match.home_team.crest}}" alt="Image" class="img-fluid">
-                    </div>
-                    <div class="text">
-                      <h3 class="h5 mb-0 text-black">{{ bet.match.home_team.short_name}}</h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
-                <div class="d-inline-block">
-                  <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded"><span class="h5">{{ bet.match.home_goals }}:{{ bet.match.away_goals }}</span></div>
-                    <div class="col">
-                        {% if bet.is_won %}
-                            <span class="text-uppercase small country text-success">{% if bet.risk %} <b>+4</b> {% else %}+1 {% endif %}pt</span>
-                        {% else %}
-                        <span class="text-uppercase small country text-danger">
-                            {% if bet.risk %} -1 {% else %}0 {% endif %}pt
-                        </span>
-                        {% endif %}
-                    </div>
-                 </div>
-
-              </div>
-
-              <div class="col-md-4 col-lg-4 text-center text-lg-right">
-                <div class="">
-                  <div class="d-block d-lg-flex align-items-center">
-                    <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
-                      <img src="{{ bet.match.away_team.crest}}" alt="Image" class="img-fluid">
-                    </div>
-                    <div class="text order-1 w-100">
-                      <h3 class="h5 mb-0 text-black">{{ bet.match.away_team.short_name}}</h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                <h1 class="text-black">Last bets</h1>
             </div>
-            {% endfor %}
-          </div>
+            <div class="row align-items-center mb-5">
+                <div class="col-md-12">
+                    {% for bet in bets %}
+                        <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
+                            <div class="col-md-4 col-lg-4 mb-4 mb-lg-0">
+                                <div class="text-center text-lg-left">
+                                    <div class="d-block d-lg-flex align-items-center">
+                                        <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
+                                            <img src="{{ bet.match.home_team.crest }}" alt="Image" class="img-fluid">
+                                        </div>
+                                        <div class="text">
+                                            <h3 class="h5 mb-0 text-black">{{ bet.match.home_team.short_name }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
+                                <div class="d-inline-block">
+                                    <div class="bg-black py-2 px-4 mb-2 text-white d-inline-block rounded">
+                                        <span class="h5">{{ bet.match.home_goals }}:{{ bet.match.away_goals }}</span>
+                                    </div>
+                                    <div class="col">
+                                        {% if bet.is_won %}
+                                            <span class="text-uppercase small country text-success">
+                                                {% if bet.risk %}
+                                                    <b>+4</b>
+                                                {% else %}
+                                                    +1
+                                                {% endif %}
+                                            pt</span>
+                                        {% else %}
+                                            <span class="text-uppercase small country text-danger">
+                                                {% if bet.risk %}
+                                                    -1
+                                                {% else %}
+                                                    0
+                                                {% endif %}
+                                                pt
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-4 text-center text-lg-right">
+                                <div class="">
+                                    <div class="d-block d-lg-flex align-items-center">
+                                        <div class="image image-small ml-lg-3 mb-3 mb-lg-0 order-2">
+                                            <img src="{{ bet.match.away_team.crest }}" alt="Image" class="img-fluid">
+                                        </div>
+                                        <div class="text order-1 w-100">
+                                            <h3 class="h5 mb-0 text-black">{{ bet.match.away_team.short_name }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-
-      </div>
     </div>
-
 {% endblock %}

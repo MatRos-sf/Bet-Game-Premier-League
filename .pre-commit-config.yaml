@@ -17,3 +17,8 @@ repos:
         args:
             - -s
             - B101,B311,B106
+-   repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.33.0
+    hooks:
+    -   id: djlint-reformat-django
+    -   id: djlint-reformat

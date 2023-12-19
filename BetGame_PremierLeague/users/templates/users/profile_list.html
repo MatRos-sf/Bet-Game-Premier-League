@@ -1,117 +1,121 @@
-{% extends 'bet/index.html'%}
+{% extends 'bet/index.html' %}
 {% load crispy_forms_tags %}
 {% load bet_tags %}
-
 {% block title %}Players{% endblock %}
-
 {% block content %}
-  <div class="site-blocks-vs site-section bg-light">
-    <div class="container">
-        <!-- players section -->
-            <div class="bg-image overlay-success rounded mb-5" style="background-image: url('/media/website_img/fans.jpg'); background-position: 0% -115.342px;" data-stellar-background-ratio="0.5">
+    <div class="site-blocks-vs site-section bg-light">
+        <div class="container">
+            <!-- players section -->
+            <div class="bg-image overlay-success rounded mb-5"
+                 style="background-image: url('/media/website_img/fans.jpg');
+                        background-position: 0% -115.342px"
+                 data-stellar-background-ratio="0.5">
                 <div class="row align-items-center">
                     <div class="col-md-12 text-center">
-                        <h1 class="h1 mb-0 text-black">With us {{ amt_players }} player{% if amt_players > 1 %}s{% endif %}!</h1>
+                        <h1 class="h1 mb-0 text-black">
+                            With us {{ amt_players }} player
+                            {% if amt_players > 1 %}s{% endif %}
+                            !
+                        </h1>
                     </div>
                 </div>
             </div>
-        <!-- search section -->
-        <div class="row">
-            <div class="col-12 title-section">
-                <h2 class="heading">Search!</h2>
-            </div>
-            <div class="col-5">
-                <form  method="GET">
-                    <div class="input-group mb-3">
-                      <input type="text" name='username' class="form-control border-secondary text-black bg-transparent" placeholder="Type a username and hit enter">
-                      <div class="input-group-append">
-                        <button class="btn btn-primary" type="submit" id="button-addon2">Search!</button>
-                      </div>
-                    </div>
-                  </form>
-            </div>
-        </div>
-        <!-- result search section -->
-        <div class="row align-items-center mb-5">
-          <div class="col-md-12">
-                {% for u in object_list %}
-                    <a href="{{ u.get_absolute_url }}">
-                        <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
-              <div class="col justify-content-center">
-                <div class="text-center text-lg-left">
-                  <div class="d-block d-lg-flex align-items-center">
-                    <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
-                      <img src="{{ u.image.url }}" alt="ProfileImage" class="img-fluid">
-                    </div>
-                    <div class="text">
-                      <h3 class="h5 mb-0 text-black">{{ u.user.username }}</h3>
-                    </div>
-                  </div>
+            <!-- search section -->
+            <div class="row">
+                <div class="col-12 title-section">
+                    <h2 class="heading">Search!</h2>
                 </div>
-              </div>
+                <div class="col-5">
+                    <form method="GET">
+                        <div class="input-group mb-3">
+                            <input type="text"
+                                   name='username'
+                                   class="form-control border-secondary text-black bg-transparent"
+                                   placeholder="Type a username and hit enter">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit" id="button-addon2">Search!</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-                    </a>
-                {% endfor %}
-          </div>
+            <!-- result search section -->
+            <div class="row align-items-center mb-5">
+                <div class="col-md-12">
+                    {% for u in object_list %}
+                        <a href="{{ u.get_absolute_url }}">
+                            <div class="row bg-white align-items-center ml-0 mr-0 py-4 match-entry">
+                                <div class="col justify-content-center">
+                                    <div class="text-center text-lg-left">
+                                        <div class="d-block d-lg-flex align-items-center">
+                                            <div class="image image-small text-center mb-3 mb-lg-0 mr-lg-3">
+                                                <img src="{{ u.image.url }}" alt="ProfileImage" class="img-fluid">
+                                            </div>
+                                            <div class="text">
+                                                <h3 class="h5 mb-0 text-black">{{ u.user.username }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- table section -->
+            <h2 class="h2 text-uppercase text-black font-weight-bold mb-3">Table</h2>
+            <div class="row mb-5 justify-content-center">
+                <div class="col-lg-6">
+                    <div class="widget-next-match">
+                        <h2 class="text-center">Top 10!</h2>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>P</th>
+                                    <th>User</th>
+                                    <th>PTS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for profile in top_ten %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <strong class="text-black">{{ profile.user.username }}</strong>
+                                        </td>
+                                        <td>{{ profile.sum_points }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="widget-next-match">
+                        <h2>You and your followers!</h2>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>P</th>
+                                    <th>User</th>
+                                    <th>PTS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in following %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <a href="{{ u.profile.get_absolute_url }}"><strong class="{% if user == u %}text-danger{% else %}text-black{% endif %}">{{ u.username }}</strong></a>
+                                        </td>
+                                        <td>{{ u.profile.all_points }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- table section -->
-        <h2 class="h2 text-uppercase text-black font-weight-bold mb-3">Table</h2>
-        <div class="row mb-5 justify-content-center">
-          <div class="col-lg-6">
-            <div class="widget-next-match">
-              <h2 class="text-center">Top 10!</h2>
-                <table class="table" >
-                <thead>
-                  <tr>
-                    <th>P</th>
-                    <th>User</th>
-                    <th>PTS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for profile in top_ten %}
-                      <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td><strong class="text-black">{{ profile.user.username }}</strong></td>
-                        <td>{{ profile.sum_points }}</td>
-                      </tr>
-                  {% endfor %}
-
-                </tbody>
-              </table>
-            </div>
-
-          </div>
-          <div class="col-lg-6">
-            <div class="widget-next-match">
-            <h2>You and your followers!</h2>
-              <table class="table" >
-                <thead>
-                  <tr>
-                    <th>P</th>
-                    <th>User</th>
-                    <th>PTS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                    {% for u in following %}
-                      <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td><a href="{{ u.profile.get_absolute_url }}"><strong class="{% if user == u %}text-danger{% else %}text-black{% endif %}">
-                            {{ u.username }}
-                        </strong></a></td>
-                        <td>{{ u.profile.all_points }}</td>
-                      </tr>
-                  {% endfor %}
-
-                </tbody>
-              </table>
-            </div>
-
-          </div>
-
-        </div>
-
     </div>
-  </div>
 {% endblock %}
