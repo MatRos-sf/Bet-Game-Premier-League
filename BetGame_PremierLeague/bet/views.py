@@ -5,8 +5,11 @@ from django.contrib import messages
 from django.db.models import QuerySet
 from django.utils import timezone
 from typing import Any
+import plotly.graph_objects as go
+
 from match.models import Match, Matchweek
 from .models import Bet, Dict
+from .forms import ChoseSeasonForm
 
 
 class BetsListView(LoginRequiredMixin, ListView):
@@ -118,31 +121,40 @@ class BetSeasonSummaryView(LoginRequiredMixin, ListView):
             match__matchweek__start_date__year=2023, is_active=False
         ).only("is_won", "risk", "choice", "is_won", "match__matchweek__matchweek")
 
-    def __create_pie_chart(self, labels: list, values: list):
-        import plotly.graph_objects as go
+    def __figure_layout(self):
+        return {
+            "paper_bgcolor": "rgba(0,0,0,0)",
+            "plot_bgcolor": "rgba(0,0,0,0)",
+            "showlegend": False,
+        }
 
+    def __create_pie_chart(self, labels: list, values: list) -> go.Figure:
         fig = go.Figure(
             data=[
                 go.Pie(
                     labels=labels,
                     values=values,
                     textinfo="label+percent",
+                    marker=dict(colors=["green", "#e23730"]),
                     insidetextorientation="radial",
                 )
             ]
         )
+
+        fig.update_layout(**self.__figure_layout())
+
         return fig
 
-    def __create_bar_chart(self, labels: list, values: list):
-        import plotly.graph_objects as go
-
+    def __create_bar_chart(self, labels: list, values: list) -> go.Figure:
         fig = go.Figure([go.Bar(x=labels, y=values)])
-
+        fig.update_layout(**self.__figure_layout())
         return fig
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super(BetSeasonSummaryView, self).get_context_data(**kwargs)
         bet_list = context["object_list"]
+        context["form"] = ChoseSeasonForm()
+
         bets = bet_list.aggregate(
             amt_bet_risk=Count("risk", filter=Q(risk=True)),
             amt_bet=Count("pk"),
@@ -155,7 +167,6 @@ class BetSeasonSummaryView(LoginRequiredMixin, ListView):
             max_matchweeks=Max("match__matchweek__matchweek"),
         )
 
-        print(bets["max_matchweeks"])
         # pie chart with kind of bets
         amt_bet = bets["amt_bet"]
         amt_bet_risk = bets["amt_bet_risk"]
@@ -178,25 +189,21 @@ class BetSeasonSummaryView(LoginRequiredMixin, ListView):
         context["chart_choiced"] = chart.to_html()
 
         # group bar chart
-        import plotly.graph_objects as go
-
         list_of_matchweek = list(range(1, bets["max_matchweeks"] + 1))
         query_dict = {}
+
         for i in list_of_matchweek:
-            filter_key = f"matchweek_{i}"
+            filter_key = f"{i}"
             query_dict[filter_key] = Count(
                 "pk", filter=Q(match__matchweek__matchweek=i)
             )
+        dict_of_matchweeks_bet = bet_list.aggregate(**query_dict)
+        x = list(dict_of_matchweeks_bet.keys())
+        y = list(dict_of_matchweeks_bet.values())
 
-        q = bet_list.aggregate(**query_dict)
-
-        fig = go.Figure(
-            data=[
-                go.Bar(name="", x=list(q.keys()), y=list(q.values())),
-                # go.Bar(name='LA Zoo', x=list_of_matchweek, y=[12, 18, 29])
-            ]
-        )
-        # Change the bar mode
-        # fig.update_layout(barmode='stack')
-        context["chart_group"] = fig.to_html()
+        # fig = go.Figure(
+        #         go.Bar(name="", x=x, y=y)
+        # )
+        bar_charts = self.__create_bar_chart(x, y)
+        context["chart_group"] = bar_charts.to_html()
         return context

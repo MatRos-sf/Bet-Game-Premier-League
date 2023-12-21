@@ -1,13 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Title</title>
-    </head>
-    <body>
-        {{ chart_kind_of_bets|safe }}
-        {{ chart_won_lost|safe }}
-        {{ chart_choiced|safe }}
-        {{ chart_group|safe }}
-    </body>
-</html>
+{% extends 'bet/index.html' %}
+{% load crispy_forms_tags %}
+{% load bet_tags %}
+{% block content %}
+    <div class="site-blocks-vs site-section bg-light">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-md-12 text-center">
+                    <h2 class="text-black">Betting Statistics</h2>
+                </div>
+                <div class="col-md-12 text-center">
+                    <form method="get">
+                        <h2 class="text-black">Chose the season:</h2>
+                        {{ form }}
+                        <button type="submit">Search!</button>
+                    </form>
+                </div>
+            </div>
+            <!-- table -->
+            <div class="row mb-5 justify-content-center">
+                <div class="col-lg-6">
+                    <h2 class="h4 text-black text-center mb-3">Types of bets</h2>
+                    {{ chart_kind_of_bets|safe }}
+                </div>
+                <div class="col-lg-6">
+                    <h2 class="h4 text-black text-center mb-3">Bet results</h2>
+                    {{ chart_won_lost|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="site-section">
+        <div class="container">
+            <div class="col-md-12 text-center">
+                <h2 class="text-black">User Preferences!</h2>
+            </div>
+            <div class="row">
+                <div class="col-md-6 offset-md-3">{{ chart_choiced|safe }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="site-blocks-vs site-section bg-light">
+        <div class="container">
+            <div class="row mb-5 justify-content-center">
+                <div class="col">
+                    <h2 class="h4 text-black text-center mb-3">Number of bets in each matchweek</h2>
+                    {{ chart_group|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

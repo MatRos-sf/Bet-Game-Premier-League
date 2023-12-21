@@ -5,7 +5,5 @@ from .views import BetsListView, UserFinishedBetsListView, BetSeasonSummaryView
 urlpatterns = [
     path("", BetsListView.as_view(), name="bet-home"),
     path("finished/", UserFinishedBetsListView.as_view(), name="bet-finished"),
-    path(
-        "summary/<int:year>/", BetSeasonSummaryView.as_view(), name="bet-season-summary"
-    ),
+    path("summary/", BetSeasonSummaryView.as_view(), name="bet-season-summary"),
 ]
