@@ -160,9 +160,11 @@ class BetSeasonSummaryView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super(BetSeasonSummaryView, self).get_context_data(**kwargs)
         bet_list = context["object_list"]
+        context["form"] = ChoseSeasonForm()
+        context["season"] = self.request.GET.get("season")
+
         if not bet_list:
             return context
-        context["form"] = ChoseSeasonForm()
 
         bets = bet_list.aggregate(
             amt_bet_risk=Count("risk", filter=Q(risk=True)),
@@ -195,7 +197,7 @@ class BetSeasonSummaryView(LoginRequiredMixin, ListView):
             ["home", "draw", "away"],
             [bets["home_bet"], bets["draw_bet"], bets["away_bet"]],
         )
-        context["chart_choiced"] = chart.to_html()
+        context["chart_choice"] = chart.to_html()
 
         # group bar chart
         list_of_matchweek = list(range(1, bets["max_matchweeks"] + 1))
