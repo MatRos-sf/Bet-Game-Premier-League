@@ -117,9 +117,16 @@ class BetSeasonSummaryView(LoginRequiredMixin, ListView):
     template_name = "bet/bet_season_summary.html"
 
     def get_queryset(self) -> QuerySet[Bet]:
-        return Bet.objects.filter(
-            match__matchweek__start_date__year=2023, is_active=False
-        ).only("is_won", "risk", "choice", "is_won", "match__matchweek__matchweek")
+        season = self.request.GET.get("season", "all")
+        fields = ["is_won", "risk", "choice", "is_won", "match__matchweek__matchweek"]
+        if season == "all":
+            qs = Bet.objects.filter(is_active=False)
+        else:
+            qs = Bet.objects.filter(
+                match__matchweek__start_date__year=season, is_active=False
+            )
+
+        return qs.only(*fields)
 
     def __figure_layout(self):
         return {
@@ -153,6 +160,8 @@ class BetSeasonSummaryView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super(BetSeasonSummaryView, self).get_context_data(**kwargs)
         bet_list = context["object_list"]
+        if not bet_list:
+            return context
         context["form"] = ChoseSeasonForm()
 
         bets = bet_list.aggregate(
@@ -201,9 +210,6 @@ class BetSeasonSummaryView(LoginRequiredMixin, ListView):
         x = list(dict_of_matchweeks_bet.keys())
         y = list(dict_of_matchweeks_bet.values())
 
-        # fig = go.Figure(
-        #         go.Bar(name="", x=x, y=y)
-        # )
         bar_charts = self.__create_bar_chart(x, y)
         context["chart_group"] = bar_charts.to_html()
         return context
