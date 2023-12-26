@@ -2,164 +2,174 @@
 {% load notifications_tags %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <title>{% block title %}Bet Game &mdash; Website by MR{% endblock %}</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mukta:300,400,700">
-
-    <!-- link with external project -->
-    <link rel="stylesheet" href="{% static 'bet/fonts/icomoon/style.css' %}">
-
-    <link rel="stylesheet" href="{% static 'bet/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'bet/css/magnific-popup.css' %}">
-    <link rel="stylesheet" href="{% static 'bet/css/jquery-ui.css' %}">
-    <link rel="stylesheet" href="{% static 'bet/css/owl.carousel.min.css' %}">
-    <link rel="stylesheet" href="{% static 'bet/css/owl.theme.default.min.css' %}">
-
-
-    <link rel="stylesheet" href="{% static 'bet/css/aos.css' %}">
-    <link rel="stylesheet" href="{% static 'bet/css/style.css' %}">
-
-
-</head>
-<body>
-
-  <dev class="site-wrap">
-
-    <div class="site-mobile-menu">
-      <div class="site-mobile-menu-header">
-        <div class="site-mobile-menu-close mt-3">
-          <span class="icon-close2 js-menu-toggle"></span>
-        </div>
-      </div>
-      <div class="site-mobile-menu-body"></div>
-    </div>
-
-  <!-- Navibar -->
-    <header class="site-navbar absolute transparent" role="banner">
-      <nav class="site-navigation position-relative text-right bg-black text-md-right" role="navigation">
-        <div class="container position-relative">
-
-
-          <div class="d-inline-block d-md-none ml-md-0 mr-auto py-3"><a href="#" class="site-menu-toggle js-menu-toggle text-white"><span class="icon-menu h3"></span></a></div>
-
-          <ul class="site-menu js-clone-nav d-none d-md-block">
-            <li class="{% if request.path == '/' %}active{% endif %}"><a href="{% url 'home' %}">Home</a></li>
-            {% if user.is_authenticated %}
-            <li class="has-children {% if request.path == '/bet/' %}active{% endif %}">
-              <a href="{% url 'bet-home' %}">Bet</a>
-              <ul class="dropdown arrow-top">
-                <li><a href="{% url 'bet-finished' %}">Finished</a></li>
-              </ul>
-            </li>
-            <li class="{% if request.path == '/league/' %}active{% endif %}"><a href="{% url 'league:detail' %}">League</a></li>
-            <li class="has-children {% if request.path == '/match/results/' %}active{% endif %}">
-              <a href="{% url 'match:results' %}">Matches</a>
-              <ul class="dropdown arrow-top">
-                <li><a href="{% url 'match:fixtures' %}">Fixtures</a></li>
-              </ul>
-            </li>
-            {% notifications_unread as unread_count %}
-            <li class="has-children">
-              <a href="{% url 'profile-detail' user.username %}">Profile {% if unread_count > 0 %}
-                  <span class="badge text-bg-secondary align-text-top bg">{% if unread_count > 10 %}10+{% else %}{{ unread_count }}{% endif %}</span>
-                {% endif %}</a>
-              <ul class="dropdown arrow-top">
-                <li><a href="{% url 'profile-notifications' %}">Notifications</a></li>
-              </ul>
-            </li>
-            <li class="{% if request.path == '/profiles/' %}active{% endif %}"><a href="{% url 'profile-list' %}">Players</a></li>
-            <li class="has-children {% if request.path == '/event/' %}active{% endif %}">
-                <a href="{% url 'event:list' %}">Event</a>
-                <ul class="dropdown arrow-top">
-                    <li><a href="{% url 'event:create' %}">Create</a></li>
-                    <li><a href="{% url 'event:requests' %}">Requests</a></li>
-                    <li><a href="{% url 'event:finished' %}">Finished</a></li>
-
-                </ul>
-            </li>
-            <li><a href="{% url 'logout' %}">Log out</a></li>
-
-            {% else %}
-             <li class="{% if request.path == '/login/' %}active{% endif %}"><a href="{% url 'login' %}">Log In</a></li>
-             <li class="{% if request.path == '/register/' %}active{% endif %}"><a href="{% url 'register' %}">Register</a></li>
-            {% endif %}
-          </ul>
-        </div>
-      </nav>
-    </header>
-
-    {% if messages %}
-      {% for message in messages %}
-            <div class = "alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    {% block background_photo %}
-
-    {% endblock %}
-
-    {% block content %}
-
-    {% endblock %}
-
-    <footer class="site-footer border-top">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-4">
-            <div class="mb-5">
-              <h3 class="footer-heading mb-4">About Project</h3>
-              <p>Bet Game Premier League is a straightforward platform for betting on Premier League matches. Stay updated on match information and compete with other players.</p>
-            </div>
-
-          </div>
-          <div class="col-lg-4 mb-5 mb-lg-0">
-            <div class="row">
-              <div class="col-md-12">
-                <h3 class="footer-heading mb-4">Follow Us</h3>
-
-                <div>
-                  <a href="https://github.com/MatRos-sf/Bet-Game-Premier-League" class="pl-0 pr-3"><span class="icon-github"></span></a>
-                  <a href="#" class="pl-3 pr-3"><span class="icon-linkedin"></span></a>
+    <head>
+        <title>
+            {% block title %}Bet Game &mdash; Website by MR{% endblock %}
+        </title>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet"
+              href="https://fonts.googleapis.com/css?family=Mukta:300,400,700">
+        <!-- link with external project -->
+        <link rel="stylesheet" href="{% static 'bet/fonts/icomoon/style.css' %}">
+        <link rel="stylesheet" href="{% static 'bet/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="{% static 'bet/css/magnific-popup.css' %}">
+        <link rel="stylesheet" href="{% static 'bet/css/jquery-ui.css' %}">
+        <link rel="stylesheet" href="{% static 'bet/css/owl.carousel.min.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'bet/css/owl.theme.default.min.css' %}">
+        <link rel="stylesheet" href="{% static 'bet/css/aos.css' %}">
+        <link rel="stylesheet" href="{% static 'bet/css/style.css' %}">
+    </head>
+    <body>
+        <dev class="site-wrap">
+        <div class="site-mobile-menu">
+            <div class="site-mobile-menu-header">
+                <div class="site-mobile-menu-close mt-3">
+                    <span class="icon-close2 js-menu-toggle"></span>
                 </div>
-              </div>
             </div>
-
-          </div>
-
+            <div class="site-mobile-menu-body"></div>
         </div>
-        <div class="row pt-5 mt-5 text-center justify-content-center">
-          <div class="col-md-12">
-            <p>
-            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-            Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank" >Colorlib</a>
-            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-            </p>
-          </div>
-
-        </div>
-      </div>
-    </footer>
-
-  </dev>
-
-  <!-- .site-wrap -->
-
-  <script src="{% static 'bet/js/jquery-3.3.1.min.js' %}"></script>
-  <script src="{% static 'bet/js/jquery-migrate-3.0.1.min.js' %}"></script>
-  <script src="{% static 'bet/js/jquery-ui.js' %}"></script>
-  <script src="{% static 'bet/js/popper.min.js' %}"></script>
-  <script src="{% static 'bet/js/bootstrap.min.js' %}"></script>
-  <script src="{% static 'bet/js/owl.carousel.min.js' %}"></script>
-  <script src="{% static 'bet/js/jquery.stellar.min.js' %}"></script>
-  <script src="{% static 'bet/js/jquery.countdown.min.js' %}"></script>
-  <script src="{% static 'bet/js/jquery.magnific-popup.min.js' %}"></script>
-  <script src="{% static 'bet/js/aos.js' %}"></script>
-
-  <script src="{% static 'bet/js/main.js' %}"></script>
-
-</body>
+        <!-- Navibar -->
+        <header class="site-navbar absolute transparent" role="banner">
+            <nav class="site-navigation position-relative text-right bg-black text-md-right"
+                 role="navigation">
+                <div class="container position-relative">
+                    <div class="d-inline-block d-md-none ml-md-0 mr-auto py-3">
+                        <a href="#" class="site-menu-toggle js-menu-toggle text-white"><span class="icon-menu h3"></span></a>
+                    </div>
+                    <ul class="site-menu js-clone-nav d-none d-md-block">
+                        <li class="{% if request.path == '/' %}active{% endif %}">
+                            <a href="{% url 'home' %}">Home</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="has-children {% if request.path == '/bet/' %}active{% endif %}">
+                                <a href="{% url 'bet-home' %}">Bet</a>
+                                <ul class="dropdown arrow-top">
+                                    <li>
+                                        <a href="{% url 'bet-finished' %}">Finished</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'bet-season-summary' %}">Summary</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="{% if request.path == '/league/' %}active{% endif %}">
+                                <a href="{% url 'league:detail' %}">League</a>
+                            </li>
+                            <li class="has-children {% if request.path == '/match/results/' %}active{% endif %}">
+                                <a href="{% url 'match:results' %}">Matches</a>
+                                <ul class="dropdown arrow-top">
+                                    <li>
+                                        <a href="{% url 'match:fixtures' %}">Fixtures</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            {% notifications_unread as unread_count %}
+                            <li class="has-children">
+                                <a href="{% url 'profile-detail' user.username %}">Profile
+                                    {% if unread_count > 0 %}
+                                        <span class="badge text-bg-secondary align-text-top bg">
+                                            {% if unread_count > 10 %}
+                                                10+
+                                            {% else %}
+                                                {{ unread_count }}
+                                            {% endif %}
+                                        </span>
+                                    {% endif %}
+                                </a>
+                                <ul class="dropdown arrow-top">
+                                    <li>
+                                        <a href="{% url 'profile-notifications' %}">Notifications</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="{% if request.path == '/profiles/' %}active{% endif %}">
+                                <a href="{% url 'profile-list' %}">Players</a>
+                            </li>
+                            <li class="has-children {% if request.path == '/event/' %}active{% endif %}">
+                                <a href="{% url 'event:list' %}">Event</a>
+                                <ul class="dropdown arrow-top">
+                                    <li>
+                                        <a href="{% url 'event:create' %}">Create</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'event:requests' %}">Requests</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'event:finished' %}">Finished</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="{% url 'logout' %}">Log out</a>
+                            </li>
+                        {% else %}
+                            <li class="{% if request.path == '/login/' %}active{% endif %}">
+                                <a href="{% url 'login' %}">Log In</a>
+                            </li>
+                            <li class="{% if request.path == '/register/' %}active{% endif %}">
+                                <a href="{% url 'register' %}">Register</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        {% if messages %}
+            {% for message in messages %}<div class = "alert alert-{{ message.tags }}">{{ message }}</div>{% endfor %}
+        {% endif %}
+        {% block background_photo %}{% endblock %}
+        {% block content %}{% endblock %}
+        <footer class="site-footer border-top">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-4">
+                        <div class="mb-5">
+                            <h3 class="footer-heading mb-4">About Project</h3>
+                            <p>
+                                Bet Game Premier League is a straightforward platform for betting on Premier League matches. Stay updated on match information and compete with other players.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mb-5 mb-lg-0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3 class="footer-heading mb-4">Follow Us</h3>
+                                <div>
+                                    <a href="https://github.com/MatRos-sf/Bet-Game-Premier-League"
+                                       class="pl-0 pr-3"><span class="icon-github"></span></a>
+                                    <a href="#" class="pl-3 pr-3"><span class="icon-linkedin"></span></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row pt-5 mt-5 text-center justify-content-center">
+                    <div class="col-md-12">
+                        <p>
+                            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                            Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        </dev>
+        <!-- .site-wrap -->
+        <script src="{% static 'bet/js/jquery-3.3.1.min.js' %}"></script>
+        <script src="{% static 'bet/js/jquery-migrate-3.0.1.min.js' %}"></script>
+        <script src="{% static 'bet/js/jquery-ui.js' %}"></script>
+        <script src="{% static 'bet/js/popper.min.js' %}"></script>
+        <script src="{% static 'bet/js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'bet/js/owl.carousel.min.js' %}"></script>
+        <script src="{% static 'bet/js/jquery.stellar.min.js' %}"></script>
+        <script src="{% static 'bet/js/jquery.countdown.min.js' %}"></script>
+        <script src="{% static 'bet/js/jquery.magnific-popup.min.js' %}"></script>
+        <script src="{% static 'bet/js/aos.js' %}"></script>
+        <script src="{% static 'bet/js/main.js' %}"></script>
+    </body>
 </html>
