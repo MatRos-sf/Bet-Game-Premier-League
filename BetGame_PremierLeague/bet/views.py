@@ -112,30 +112,29 @@ class UserFinishedBetsListView(LoginRequiredMixin, ListView):
         )
 
 
-class BetSeasonSummaryView(LoginRequiredMixin, ListView):
-    model = Bet
-    template_name = "bet/bet_season_summary.html"
-
-    def get_queryset(self) -> QuerySet[Bet]:
-        season = self.request.GET.get("season", "all")
-        fields = ["is_won", "risk", "choice", "is_won", "match__matchweek__matchweek"]
-        if season == "all":
-            qs = Bet.objects.filter(is_active=False)
-        else:
-            qs = Bet.objects.filter(
-                match__matchweek__start_date__year=season, is_active=False
-            )
-
-        return qs.only(*fields)
-
-    def __figure_layout(self):
-        return {
+class Chart:
+    def __init__(self):
+        self._figure_layout = {
             "paper_bgcolor": "rgba(0,0,0,0)",
             "plot_bgcolor": "rgba(0,0,0,0)",
             "showlegend": False,
         }
 
-    def __create_pie_chart(self, labels: list, values: list) -> go.Figure:
+    @property
+    def figure_layout(self) -> Dict[str, Any]:
+        return self._figure_layout
+
+    @figure_layout.setter
+    def figure_layout(self, **kwargs) -> None:
+        for key, value in kwargs.items():
+            self._figure_layout[key] = value
+
+    def create_pie_chart(
+        self, labels: list, values: list, to_html: bool = False
+    ) -> str | go.Figure:
+        """
+        Creates simple pie chart. If to_html is True turn figure into html string
+        """
         fig = go.Figure(
             data=[
                 go.Pie(
@@ -148,11 +147,52 @@ class BetSeasonSummaryView(LoginRequiredMixin, ListView):
             ]
         )
 
-        fig.update_layout(**self.__figure_layout())
+        fig.update_layout(**self._figure_layout)
 
-        return fig
+        return fig.to_html() if to_html else fig
+
+    def create_bar_chart(
+        self, labels: list, values: list, to_html: bool = False
+    ) -> go.Figure:
+        """
+        Creates simple bar chart.
+        """
+        fig = go.Figure([go.Bar(x=labels, y=values)])
+        fig.update_layout(**self.figure_layout)
+
+        return fig.to_html() if to_html else fig
+
+
+class BetSeasonSummaryView(LoginRequiredMixin, ListView):
+    model = Bet
+    template_name = "bet/bet_season_summary.html"
+
+    def get_queryset(self) -> QuerySet[Bet]:
+        season = self.request.GET.get("season", "all")
+
+        fields = ["is_won", "risk", "choice", "is_won", "match__matchweek__matchweek"]
+
+        if season == "all":
+            qs = Bet.objects.filter(is_active=False)
+        else:
+            qs = Bet.objects.filter(
+                match__matchweek__start_date__year=season, is_active=False
+            )
+
+        return qs.only(*fields)
+
+    def __figure_layout(self) -> Dict[str, Any]:
+        """ """
+        return {
+            "paper_bgcolor": "rgba(0,0,0,0)",
+            "plot_bgcolor": "rgba(0,0,0,0)",
+            "showlegend": False,
+        }
 
     def __create_bar_chart(self, labels: list, values: list) -> go.Figure:
+        """
+        Creates simple bar chart.
+        """
         fig = go.Figure([go.Bar(x=labels, y=values)])
         fig.update_layout(**self.__figure_layout())
         return fig
@@ -178,40 +218,34 @@ class BetSeasonSummaryView(LoginRequiredMixin, ListView):
             max_matchweeks=Max("match__matchweek__matchweek"),
         )
 
+        chart = Chart()
+
         # pie chart with kind of bets
         amt_bet = bets["amt_bet"]
         amt_bet_risk = bets["amt_bet_risk"]
-        pie = self.__create_pie_chart(
-            ["bets without risk", "risk bets"], [amt_bet - amt_bet_risk, amt_bet_risk]
+        context["chart_kind_of_bets"] = chart.create_pie_chart(
+            ["bets without risk", "risk bets"],
+            [amt_bet - amt_bet_risk, amt_bet_risk],
+            True,
         )
-        context["chart_kind_of_bets"] = pie.to_html()
 
         # pie chart with win and loses
-        pie = self.__create_pie_chart(
-            ["won bets", "lost bets"], [bets["win_bets"], bets["lose_bets"]]
+        context["chart_won_lost"] = chart.create_pie_chart(
+            ["won bets", "lost bets"], [bets["win_bets"], bets["lose_bets"]], True
         )
-        context["chart_won_lost"] = pie.to_html()
 
         # Bar Charts
-        chart = self.__create_bar_chart(
+        context["chart_choice"] = chart.create_bar_chart(
             ["home", "draw", "away"],
             [bets["home_bet"], bets["draw_bet"], bets["away_bet"]],
+            True,
         )
-        context["chart_choice"] = chart.to_html()
 
         # group bar chart
-        list_of_matchweek = list(range(1, bets["max_matchweeks"] + 1))
-        query_dict = {}
+        stat_season = Bet.get_stats_season(bet_list, bets["max_matchweeks"])
+        x = stat_season["matchweek"]
+        y = stat_season["amt_bets"]
 
-        for i in list_of_matchweek:
-            filter_key = f"{i}"
-            query_dict[filter_key] = Count(
-                "pk", filter=Q(match__matchweek__matchweek=i)
-            )
-        dict_of_matchweeks_bet = bet_list.aggregate(**query_dict)
-        x = list(dict_of_matchweeks_bet.keys())
-        y = list(dict_of_matchweeks_bet.values())
+        context["chart_group"] = chart.create_bar_chart(x, y, True)
 
-        bar_charts = self.__create_bar_chart(x, y)
-        context["chart_group"] = bar_charts.to_html()
         return context
