@@ -13,7 +13,7 @@ class MatchweekTest(SimpleDB):
     @parameterized.expand([1, 2, 3, 4, 5, 6])
     def test_model_str(self, pk):
         mw = Matchweek.objects.get(matchweek=pk)
-        season_date = str(mw.start_date.year)
+        season_date = str(mw.season.start_date.year)
         expected = f"Matchweek {mw.matchweek}/{season_date[2:]}"
         self.assertEquals(str(mw), expected)
 

@@ -78,7 +78,7 @@ class Match(models.Model):
     finished = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ["-start_date"]
+        ordering = ["start_date"]
 
     def __str__(self):
         return f"{self.home_team} vs {self.away_team} {self.score or '' }"
