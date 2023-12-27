@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 import requests
 from requests.exceptions import HTTPError, Timeout
@@ -7,11 +6,12 @@ from dotenv import load_dotenv
 from datetime import datetime
 from django.utils import timezone
 from http import HTTPStatus
+from django.conf import settings
 
 load_dotenv()
 
-# HEADER = {"X-Auth-Token": settings.API_TOKEN}
-HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
+HEADER = {"X-Auth-Token": settings.API_TOKEN}
+# HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
 
 
 @dataclass

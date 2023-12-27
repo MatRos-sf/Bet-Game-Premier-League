@@ -333,3 +333,47 @@ class PremierLeagueTest(TestCase):
 
         pl = PremierLeague()
         self.assertFalse(pl.check_new_season(season))
+
+    @mock.patch(
+        "football_data.premier_league.PremierLeague._PremierLeague__get_response"
+    )
+    def test_check_match_should_return_none_if_match_is_canceled(self, mock_payload):
+        payload = self.__load_payload("payload_check_match.json")
+        response = mock.MagicMock()
+        response.json.return_value = payload
+        mock_payload.return_value = (True, response)
+
+        pl = PremierLeague()
+        actually = pl.check_match(2023, 17, 1044, 389)
+        self.assertIsNone(actually)
+
+    @mock.patch(
+        "football_data.premier_league.PremierLeague._PremierLeague__get_response"
+    )
+    def test_check_match_should_return_score_when_match_is_finished(self, mock_payload):
+        payload = self.__load_payload("payload_check_match.json")
+        response = mock.MagicMock()
+        response.json.return_value = payload
+        mock_payload.return_value = (True, response)
+
+        expected = {"home": 2, "away": 0}
+        pl = PremierLeague()
+        actually = pl.check_match(2023, 17, 61, 356)
+
+        self.assertDictEqual(expected, actually)
+
+    @mock.patch(
+        "football_data.premier_league.PremierLeague._PremierLeague__get_response"
+    )
+    def test_check_match_should_return_none_when_ids_do_not_contains_in_payload(
+        self, mock_payload
+    ):
+        payload = self.__load_payload("payload_check_match.json")
+        response = mock.MagicMock()
+        response.json.return_value = payload
+        mock_payload.return_value = (True, response)
+
+        pl = PremierLeague()
+        actually = pl.check_match(2023, 17, 33333, 2222)
+
+        self.assertIsNone(actually)
