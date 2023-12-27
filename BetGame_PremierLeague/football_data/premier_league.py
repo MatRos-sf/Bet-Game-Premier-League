@@ -56,6 +56,7 @@ class Match:
     home_goals: int
     away_goals: int
     finished: bool
+    canceled: bool
     matchweek: int
 
 
@@ -317,6 +318,7 @@ class PremierLeague:
             home_goals=data["score"]["fullTime"]["home"],
             away_goals=data["score"]["fullTime"]["away"],
             finished=data["status"] == "FINISHED",
+            canceled=data["status"] == "CANCELLED",
             matchweek=data["matchday"],
         )
         return match_obj
@@ -437,8 +439,10 @@ class PremierLeague:
             ):
                 if match["status"] == "FINISHED":
                     return {
-                        "home": match["score"]["home"],
-                        "away": match["score"]["away"],
+                        "home": match["score"]["fullTime"]["home"],
+                        "away": match["score"]["fullTime"]["away"],
                     }
                 else:
                     return
+
+        return
