@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 import requests
 from requests.exceptions import HTTPError, Timeout
@@ -6,8 +5,8 @@ from typing import Dict, List, Tuple, Optional
 from dotenv import load_dotenv
 from datetime import datetime
 from django.utils import timezone
-from django.conf import settings
 from http import HTTPStatus
+from django.conf import settings
 
 load_dotenv()
 
@@ -57,6 +56,7 @@ class Match:
     home_goals: int
     away_goals: int
     finished: bool
+    cancelled: bool
     matchweek: int
 
 
@@ -149,9 +149,7 @@ class PremierLeague:
         Retrieve information on current football matches from football-data. Return provide
         scores feedback and verify if the matchweek is ended.
         """
-        url = self.__get_full_url(
-            self.url_matchweek, [f"matchday={str(mw)}", "status=FINISHED"]
-        )
+        url = self.__get_full_url(self.url_matchweek, [f"matchday={str(mw)}"])
         _, response = self.__get_response(url)
 
         dataset = response.json()
@@ -184,7 +182,7 @@ class PremierLeague:
             dataset["currentSeason"]["endDate"], "%Y-%m-%d"
         )
         matchweek: int = dataset["currentSeason"]["currentMatchday"]
-        is_currently: bool = dataset["currentSeason"]["winner"] == None
+        is_currently: bool = dataset["currentSeason"]["winner"] is None
 
         return Season(
             fb_id=fb_id,
@@ -318,6 +316,7 @@ class PremierLeague:
             home_goals=data["score"]["fullTime"]["home"],
             away_goals=data["score"]["fullTime"]["away"],
             finished=data["status"] == "FINISHED",
+            cancelled=data["status"] == "CANCELLED" or data["status"] == "POSTPONED",
             matchweek=data["matchday"],
         )
         return match_obj
@@ -413,3 +412,35 @@ class PremierLeague:
             }
 
             season -= 1
+
+    def check_match(
+        self, season: int, matchweek: int, home_team_id: int, away_team_id: int
+    ) -> Optional[Dict[str, int]]:
+        """
+        Checks match. If match is finished return dict with score otherwise return None
+        """
+        url = self.__get_full_url(
+            self.url_matchweek, [f"season={str(season)}", f"matchday={matchweek}"]
+        )
+        succeed, response = self.__get_response(url)
+
+        if not succeed:
+            return
+
+        dataset = response.json()
+        matches = dataset["matches"]
+
+        for match in matches:
+            if (
+                match["homeTeam"]["id"] == home_team_id
+                and match["awayTeam"]["id"] == away_team_id
+            ):
+                if match["status"] == "FINISHED":
+                    return {
+                        "home": match["score"]["fullTime"]["home"],
+                        "away": match["score"]["fullTime"]["away"],
+                    }
+                else:
+                    return
+
+        return

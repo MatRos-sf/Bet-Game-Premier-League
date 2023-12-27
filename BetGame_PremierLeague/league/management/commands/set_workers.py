@@ -13,7 +13,7 @@ class Command(BaseCommand):
             schedule_type=Schedule.HOURLY,
             repeats=-1,
         )
-        self.stdout.write(f"First task has been created.", ending="+ \n")
+        self.stdout.write("First task has been created.", ending="+ \n")
         Schedule.objects.create(
             name="event_update",
             func="cron.func_event.check_event",
@@ -21,4 +21,12 @@ class Command(BaseCommand):
             schedule_type=Schedule.DAILY,
             repeats=-1,
         )
-        self.stdout.write(f"Second task has been created.", ending="+ \n")
+        self.stdout.write("Second task has been created.", ending="+ \n")
+        Schedule.objects.create(
+            name="cancelled_matches_update",
+            func="cron.func.check_and_update_cancelled_matches",
+            hook="cron.hooks.check_match",
+            schedule_type=Schedule.DAILY,
+            repeats=-1,
+        )
+        self.stdout.write("Third task has been created.", ending="+ \n")

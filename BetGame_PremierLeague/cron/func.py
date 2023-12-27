@@ -3,7 +3,7 @@ from django.utils import timezone
 
 from match.models import Matchweek, Match
 from football_data.premier_league import PremierLeague
-from league.models import League, Team, Season, TeamStats
+from league.models import Season, TeamStats
 from league.management.commands.pull_fd import Command
 
 
@@ -28,17 +28,17 @@ def check_and_update_currently_matchweek() -> str:
     If there are discrepancies, updates the matches and matchweek accordingly.
     :return:
     """
-    matchweek = Matchweek.objects.filter(finished=False).first()
+    matchweek = Matchweek.objects.filter(finished=False, cancelled=False).first()
 
     if not matchweek:
         if create_new_season():
-            return f"The new season has been created"
+            return "The new season has been created"
         return f"The {matchweek.season.start_date.year } season has ended!"
     elif timezone.now().date() < matchweek.start_date:
         return "No changes!"
     elif matchweek.matchweek == matchweek.season.amt_matchweeks and matchweek.finished:
         if create_new_season():
-            return f"The new season has been created"
+            return "The new season has been created"
         return f"The {matchweek.season.start_date.year } season has ended!"
 
     pl = PremierLeague()
@@ -57,6 +57,13 @@ def check_and_update_currently_matchweek() -> str:
         if match_obj.finished:
             continue
 
+        if match.cancelled:
+            match_obj.cancelled = True
+            match_obj.save()
+
+        elif not match.finished:
+            continue
+
         match_obj.set_score(match.home_goals, match.away_goals)
 
         # update stats
@@ -71,5 +78,28 @@ def check_and_update_currently_matchweek() -> str:
         matchweek.finished = True
         matchweek.save()
         return check_and_update_currently_matchweek()
+    elif matchweek.matches.count() == matchweek.matches.filter(cancelled=True).count():
+        matchweek.cancelled = True
+        matchweek.save()
+        return check_and_update_currently_matchweek()
 
     return f"Matchweek: {matchweek.matchweek}"
+
+
+def check_and_update_cancelled_matches() -> str:
+    matches = Match.objects.filter(cancelled=True)
+
+    pl = PremierLeague()
+    count = 0
+    for match in matches:
+        score = pl.check_match(
+            match.matchweek.start_date.year,
+            match.matchweek.matchweek,
+            match.home_team.fb_id,
+            match.away_team.fb_id,
+        )
+        if score:
+            match.set_score(score["home"], score["away"])
+            count += 1
+
+    return f"Update {count} matches!"

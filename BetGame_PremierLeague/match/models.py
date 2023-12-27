@@ -1,12 +1,10 @@
-import datetime
 from typing import Tuple, Optional
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
-from django.utils import timezone
 from django.urls import reverse
 from django.core.exceptions import ValidationError
-from django.db.models import QuerySet, Q, Case, Value, When, CharField, F, Sum, Count
+from django.db.models import QuerySet, Q, Case, Value, When, CharField, F, Count
 
 from league.models import Team, Season
 
@@ -21,7 +19,7 @@ class Matchweek(models.Model):
     season = models.ForeignKey(
         "league.Season", on_delete=models.CASCADE, related_name="current_season"
     )
-    canceled = models.BooleanField(default=False)
+    cancelled = models.BooleanField(default=False)
 
     finished = models.BooleanField(default=False)
 
@@ -76,6 +74,7 @@ class Match(models.Model):
     away_goals = models.SmallIntegerField(blank=True, null=True)
 
     finished = models.BooleanField(default=False)
+    cancelled = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["start_date"]
@@ -165,10 +164,12 @@ class Match(models.Model):
     def get_next_match(cls, team: Optional[Team] = None) -> QuerySet:
         if team:
             next_match = cls.objects.filter(
-                Q(finished=False), Q(home_team=team) | Q(away_team=team)
+                Q(finished=False),
+                Q(cancelled=False),
+                Q(home_team=team) | Q(away_team=team),
             )
         else:
-            next_match = cls.objects.filter(finished=False)
+            next_match = cls.objects.filter(finished=False, cancelled=False)
 
         return next_match.select_related("home_team", "away_team", "matchweek").first()
 
@@ -232,6 +233,8 @@ class Match(models.Model):
 
             for bet in bets:
                 bet.check_bet()
+
+            self.cancelled = False
 
     def has_bet_for_match(self, user):
         return self.bet_set.filter(user=user).exists()
