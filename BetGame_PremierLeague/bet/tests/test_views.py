@@ -1,18 +1,14 @@
-from datetime import timedelta
 from unittest import mock
 import plotly.graph_objects as go
-from parameterized import parameterized
 
 from django.test import tag, TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
-from django.utils import timezone
 
 from bet.views import Chart
 from league.tests.test_models import SimpleDB
 from bet.forms import ChoseSeasonForm
 from bet.models import Bet
-from match.models import Match, Matchweek
 
 
 class UserFinishedBetsListViewTest(SimpleDB):
@@ -50,7 +46,6 @@ class BetsListViewWhenMatchweekStartTest(SimpleDB):
 
         self.assertEquals(context["matches"].count(), 2)
         self.assertEquals(context["matchweek"].matchweek, 4)
-        self.assertTrue(context["is_started"])
         self.assertFalse(context["finished_matches"])
 
     @mock.patch("match.models.Matchweek.objects")

@@ -1,6 +1,6 @@
 import time
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from typing import List
 
 from league.models import Season, League, Team, TeamStats
@@ -8,7 +8,7 @@ from match.models import Match, Matchweek
 from football_data import premier_league as pl
 
 
-class CCDQWDQWommand(BaseCommand):
+class Command(BaseCommand):
     help = "Execute the command to fetch the dataset and set or update the previous seasons."
 
     def handle(self, *args, **options):

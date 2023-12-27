@@ -56,7 +56,7 @@ class Match:
     home_goals: int
     away_goals: int
     finished: bool
-    canceled: bool
+    cancelled: bool
     matchweek: int
 
 
@@ -149,9 +149,7 @@ class PremierLeague:
         Retrieve information on current football matches from football-data. Return provide
         scores feedback and verify if the matchweek is ended.
         """
-        url = self.__get_full_url(
-            self.url_matchweek, [f"matchday={str(mw)}", "status=FINISHED"]
-        )
+        url = self.__get_full_url(self.url_matchweek, [f"matchday={str(mw)}"])
         _, response = self.__get_response(url)
 
         dataset = response.json()
@@ -318,7 +316,7 @@ class PremierLeague:
             home_goals=data["score"]["fullTime"]["home"],
             away_goals=data["score"]["fullTime"]["away"],
             finished=data["status"] == "FINISHED",
-            canceled=data["status"] == "CANCELLED",
+            cancelled=data["status"] == "CANCELLED" or data["status"] == "POSTPONED",
             matchweek=data["matchday"],
         )
         return match_obj
