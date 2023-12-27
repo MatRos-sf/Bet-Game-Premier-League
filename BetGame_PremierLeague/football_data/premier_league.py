@@ -6,13 +6,12 @@ from typing import Dict, List, Tuple, Optional
 from dotenv import load_dotenv
 from datetime import datetime
 from django.utils import timezone
-from django.conf import settings
 from http import HTTPStatus
 
 load_dotenv()
 
-HEADER = {"X-Auth-Token": settings.API_TOKEN}
-# HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
+# HEADER = {"X-Auth-Token": settings.API_TOKEN}
+HEADER = {"X-Auth-Token": str(os.getenv("API_TOKEN"))}
 
 
 @dataclass
@@ -184,7 +183,7 @@ class PremierLeague:
             dataset["currentSeason"]["endDate"], "%Y-%m-%d"
         )
         matchweek: int = dataset["currentSeason"]["currentMatchday"]
-        is_currently: bool = dataset["currentSeason"]["winner"] == None
+        is_currently: bool = dataset["currentSeason"]["winner"] is None
 
         return Season(
             fb_id=fb_id,
@@ -413,3 +412,33 @@ class PremierLeague:
             }
 
             season -= 1
+
+    def check_match(
+        self, season: int, matchweek: int, home_team_id: int, away_team_id: int
+    ) -> Optional[Dict[str, int]]:
+        """
+        Checks match. If match is finished return dict with score otherwise return None
+        """
+        url = self.__get_full_url(
+            self.url_matchweek, [f"season={str(season)}", f"matchday={matchweek}"]
+        )
+        succeed, response = self.__get_response(url)
+
+        if not succeed:
+            return
+
+        dataset = response.json()
+        matches = dataset["matches"]
+
+        for match in matches:
+            if (
+                match["homeTeam"]["id"] == home_team_id
+                and match["awayTeam"]["id"] == away_team_id
+            ):
+                if match["status"] == "FINISHED":
+                    return {
+                        "home": match["score"]["home"],
+                        "away": match["score"]["away"],
+                    }
+                else:
+                    return
