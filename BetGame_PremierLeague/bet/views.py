@@ -42,7 +42,7 @@ class BetsListView(LoginRequiredMixin, ListView):
         matchweek = context["matches"].first().matchweek
         context["matchweek"] = matchweek
 
-        matchweek_is_started = timezone.now().date() <= matchweek.start_date
+        matchweek_is_started = timezone.now().date() < matchweek.start_date
 
         context["is_started"] = matchweek_is_started
         finished_matches = Match.objects.filter(
