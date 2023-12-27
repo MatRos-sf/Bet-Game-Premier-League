@@ -125,8 +125,8 @@ class Chart:
         return self._figure_layout
 
     @figure_layout.setter
-    def figure_layout(self, **kwargs) -> None:
-        for key, value in kwargs.items():
+    def figure_layout(self, new_settings: Dict[str, Any]) -> None:
+        for key, value in new_settings.items():
             self._figure_layout[key] = value
 
     def create_pie_chart(
@@ -180,22 +180,6 @@ class BetSeasonSummaryView(LoginRequiredMixin, ListView):
             )
 
         return qs.only(*fields)
-
-    def __figure_layout(self) -> Dict[str, Any]:
-        """ """
-        return {
-            "paper_bgcolor": "rgba(0,0,0,0)",
-            "plot_bgcolor": "rgba(0,0,0,0)",
-            "showlegend": False,
-        }
-
-    def __create_bar_chart(self, labels: list, values: list) -> go.Figure:
-        """
-        Creates simple bar chart.
-        """
-        fig = go.Figure([go.Bar(x=labels, y=values)])
-        fig.update_layout(**self.__figure_layout())
-        return fig
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super(BetSeasonSummaryView, self).get_context_data(**kwargs)
