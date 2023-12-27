@@ -1,0 +1,72 @@
+{% extends 'bet/index.html' %}
+{% load crispy_forms_tags %}
+{% load bet_tags %}
+{% block content %}
+    <div class="site-blocks-vs site-section bg-light">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-md-12 text-center">
+                    <h1 class="h1 text-black">Betting Statistics</h1>
+                    {% if season %}<h1 class="h5">Season {{ season }}</h1>{% endif %}
+                </div>
+                <div class="col-md-12 text-center">
+                    <form method="get">
+                        <div class="p-3 p-lg-5 ">
+                            {{ form }}
+                            <button type="submit" class="btn btn-primary">Search!</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- bets info -->
+            <div class="row mb-5 justify-content-center">
+                <div class="col-lg-6">
+                    <h2 class="h4 text-black text-center mb-3">Types of bets</h2>
+                    {% if chart_kind_of_bets %}
+                        {{ chart_kind_of_bets|safe }}
+                    {% else %}
+                        <h1 class="h5 text-center">There is no data.</h1>
+                    {% endif %}
+                </div>
+                <div class="col-lg-6">
+                    <h2 class="h4 text-black text-center mb-3">Bet results</h2>
+                    {% if chart_won_lost %}
+                        {{ chart_won_lost|safe }}
+                    {% else %}
+                        <h1 class="h5 text-center">There is no data.</h1>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="site-section">
+        <div class="container">
+            <div class="col-md-12 text-center">
+                <h2 class="text-black">User Preferences!</h2>
+            </div>
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    {% if chart_choice %}
+                        {{ chart_choice|safe }}
+                    {% else %}
+                        <h1 class="h5 text-center">There is no data.</h1>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="site-blocks-vs site-section bg-light">
+        <div class="container">
+            <div class="row mb-5 justify-content-center">
+                <div class="col">
+                    <h2 class="h4 text-black text-center mb-3">Number of bets in each matchweek</h2>
+                    {% if chart_group %}
+                        {{ chart_group|safe }}
+                    {% else %}
+                        <h1 class="h5 text-center">There is no data.</h1>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -18,3 +18,11 @@ class BetTest(SimpleDB):
         bet = Bet.objects.first()
 
         self.assertEquals(str(bet), str(bet.pk))
+
+    def test_get_stats_season_should_return_correct_inforamtion_about_currently_season(
+        self,
+    ):
+        expected = {"matchweek": ["1", "2", "3", "4", "5"], "amt_bets": [6, 3, 0, 0, 0]}
+        bets = Bet.objects.filter(is_active=False)
+        actual = Bet.get_stats_season(bets, 5)
+        self.assertDictEqual(expected, actual)

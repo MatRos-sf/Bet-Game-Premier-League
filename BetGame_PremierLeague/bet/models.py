@@ -1,8 +1,9 @@
+from __future__ import annotations
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models import Avg, Count, Q, Sum
-from typing import Dict
+from typing import Dict, List
 
 from match.models import Matchweek
 
@@ -103,3 +104,34 @@ class Bet(models.Model):
         # stats["win_rate"] = int(stats["win_rate"] * 100)
 
         return stats
+
+    @classmethod
+    def get_stats_season(
+        cls, bets: Bet, matchweek_end: int
+    ) -> Dict[str, List[str] | List[int]]:
+        """
+        Returns a dictionary with the following keys:
+        - "matchweek": a list of matchweek numbers in ascending order.
+        - "amt_bets": a list of the number of bets played in each corresponding matchweek.
+          The list is ordered by matchweek, so amt_bets[0] corresponds to the 1st matchweek.
+
+        :param matchweek_end: it is a last matchweek number
+        :return: a dictionary containing "matchweek" and "amt_bets" lists.
+        """
+        list_of_matchweek = list(range(1, matchweek_end + 1))
+        query_dict = {}
+
+        for i in list_of_matchweek:
+            filter_key = f"{i}"
+            query_dict[filter_key] = Count(
+                "pk", filter=Q(match__matchweek__matchweek=i)
+            )
+
+        dict_of_matchweeks_bet = bets.aggregate(**query_dict)
+
+        stat_season = {
+            "matchweek": list(dict_of_matchweeks_bet.keys()),
+            "amt_bets": list(dict_of_matchweeks_bet.values()),
+        }
+
+        return stat_season
