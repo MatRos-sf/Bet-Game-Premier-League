@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from bet.views import Chart
 from league.tests.test_models import SimpleDB
-from bet.forms import ChoseSeasonForm
+from league.forms import ChoseSeasonForm
 from bet.models import Bet
 
 

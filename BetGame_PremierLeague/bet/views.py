@@ -1,4 +1,4 @@
-from django.views.generic import ListView, DetailView, View
+from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q, Max
 from django.contrib import messages
@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 
 from match.models import Match, Matchweek
 from .models import Bet, Dict
-from .forms import ChoseSeasonForm
+from league.forms import ChoseSeasonForm
 
 
 class BetsListView(LoginRequiredMixin, ListView):
