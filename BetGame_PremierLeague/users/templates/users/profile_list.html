@@ -13,8 +13,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-12 text-center">
                         <h1 class="h1 mb-0 text-black">
-                            With us {{ amt_players }} player
-                            {% if amt_players > 1 %}s{% endif %}
+                            With us {{ amt_players }} player{{ amt_players|pluralize }}
                             !
                         </h1>
                     </div>

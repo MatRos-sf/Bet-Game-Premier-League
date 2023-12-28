@@ -27,6 +27,6 @@ urlpatterns = [
     path("match/", include("match.urls")),
     path("event/", include("event.urls")),
     path("api/", include("api.urls")),
-    path("__debug__/", include("debug_toolbar.urls")),
+    # path("__debug__/", include("debug_toolbar.urls")),
     # path("silk/", include("silk.urls", namespace="silk")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
