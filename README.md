@@ -34,6 +34,7 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
+        <li><a href="#docker">Docker</a></li>
       </ul>
     </li>
     <li><a href="#screenshot">Screenshot</a></li>
@@ -57,6 +58,7 @@ Bet Game Premier League is a straightforward platform for betting on Premier Lea
 * Support for teams
 * Access match information, including the current season's performance, recent team matches, and form.
 * Fixture and match results
+* Stats about bets
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -110,7 +112,14 @@ This key is essential for connecting with the project.
     ```sh
     python3 manage.py pull_history
    ```
+### Docker
+You can also run the project using Docker. Docker configuration files are stored in the `.docker` directory.
+Remember to set the `DB_HOST` variable in the `.env` file; it should be the hostname.
 
+To get started, use the following command:
+```shell
+docker-compose up --build
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
