@@ -2,7 +2,7 @@ from __future__ import annotations
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.db.models import Avg, Count, Q, Sum
+from django.db.models import Count, Q
 from typing import Dict, List
 
 from match.models import Matchweek
@@ -42,7 +42,6 @@ class Bet(models.Model):
             self.is_active = False
             self.save()
 
-            # notifications
         return self.is_won
 
     def save(self, *args, **kwargs):

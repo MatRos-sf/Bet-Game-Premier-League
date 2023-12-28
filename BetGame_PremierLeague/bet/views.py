@@ -176,7 +176,7 @@ class BetSeasonSummaryView(LoginRequiredMixin, ListView):
             qs = Bet.objects.filter(is_active=False)
         else:
             qs = Bet.objects.filter(
-                match__matchweek__start_date__year=season, is_active=False
+                match__matchweek__season__start_date__year=season, is_active=False
             )
 
         return qs.only(*fields)
