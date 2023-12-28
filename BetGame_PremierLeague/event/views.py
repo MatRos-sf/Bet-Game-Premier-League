@@ -5,12 +5,12 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.contrib import messages
 from django.db.models import QuerySet, Q
 from django.contrib import messages
 
 from .models import Event, EventRequest
 from .forms import EventForm, SearchUsernameForm
+from users.models import UserScores
 
 
 @login_required
@@ -21,13 +21,21 @@ def create(request):
         if form.is_valid():
             cd = form.cleaned_data
             if request.user.profile.all_points - cd["fee"] < 0:
-                # raise ValidationError("You don't have enough points to create event!")
                 messages.warning(
                     request, "You don't have enough points to create event!"
                 )
             else:
                 cd["owner"] = request.user
                 event = Event.objects.create(**cd)
+
+                fee = cd["fee"]
+                if fee:
+                    UserScores.objects.create(
+                        profile=request.user.profile,
+                        points=-fee,
+                        kind=UserScores.Kind.EVENT,
+                        description=UserScores.render_description(-fee, "Event"),
+                    )
                 return redirect(event)
 
     return render(
@@ -68,9 +76,9 @@ class EventDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
                 messages.success(request, f"The request for {username} has been send.")
             else:
                 if event.canceled:
-                    messages.warning(request, f"The user has canceled your request")
+                    messages.warning(request, "The user has canceled your request")
                 else:
-                    messages.warning(request, f"Your request has already been sent!")
+                    messages.warning(request, "Your request has already been sent!")
 
         return self.get(request)
 
