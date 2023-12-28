@@ -121,9 +121,7 @@ This key is essential for connecting with the project.
 
 <!-- USAGE EXAMPLES -->
 ## Screenshot
-
-### Home
-### Profile
+<img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/a51c52fb-dfcb-4f4c-9164-ce9976270e44" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/34a0d150-0cae-4e5b-b72c-85249b61c31c" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/a29e5e0c-6dd1-428e-a2e2-ceaa9dd8a0e1" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/d4d686cf-3acc-4889-b218-8ec7adb95f5c" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/a6134ae7-0107-44d2-a28a-081da06eeb64" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/17f2bff5-1107-4a37-bc57-5a4dd0c45193" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/715d3cda-a83e-42ad-b473-07906b4d5522" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/fc44b1f4-3620-4c54-a016-6f6dbf870a48" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/973acfb0-bf5c-413b-b3c7-53a3b94aee25" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/333a8ce3-2887-4cd9-bc06-3cda0d748b98" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/b5e0887c-3058-4b22-b89b-85467bbc4a9f" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/5e8de7ec-0c38-453b-bf0d-db300b52101e" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/3e3cb477-bd67-49e0-8a56-a2424a8d7061" width="45%"></img> <img src="https://github.com/MatRos-sf/Bet-Game-Premier-League/assets/59665130/06bbba6c-a002-49c6-b123-1c1dafc75548" width="45%"></img> 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
