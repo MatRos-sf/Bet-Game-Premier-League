@@ -12,7 +12,10 @@ def provide_user_points(user: User, points: int, place: str, event: Event) -> No
             points, f"event {event.pk} {place} place"
         )
         UserScores.objects.create(
-            profile=user.profile, points=points, description=description
+            profile=user.profile,
+            points=points,
+            description=description,
+            kind=UserScores.Kind.EVENT,
         )
         notify.send(
             event,
@@ -51,7 +54,7 @@ def finish_event() -> None:
 
             if number_of_members > 0:
                 first_place_points = event.calculate_first_place_points
-                provide_user_points(rank[0], first_place_points, f"1st", event)
+                provide_user_points(rank[0], first_place_points, "1st", event)
 
             if number_of_members > 1:
                 second_place_points = event.calculate_second_place_points
@@ -68,7 +71,7 @@ def finish_event() -> None:
             # send notification others members about finished event
             other_members = set(event.members.all()).difference(set(rank))
             for user in other_members:
-                notify.send(event, recipient=user, verb=f"has finished.")
+                notify.send(event, recipient=user, verb="has finished.")
         events.update(status="finished")
 
 

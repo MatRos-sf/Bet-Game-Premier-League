@@ -85,12 +85,18 @@ class Profile(models.Model):
 
 
 class UserScores(models.Model):
+    class Kind(models.TextChoices):
+        BET = "bet", "Bet"
+        EVENT = "event", "Event"
+        OTHER = "other", "Other"
+
     profile = models.ForeignKey(
         Profile, related_name="points", on_delete=models.CASCADE
     )
     points = models.IntegerField(default=0)
     description = models.TextField(max_length=500)
     got = models.DateTimeField(auto_now_add=True)
+    kind = models.CharField(max_length=10, choices=Kind.choices, default=Kind.BET)
 
     def __str__(self):
         return f"{self.profile.user.username} [{self.pk}]: {self.description}"
