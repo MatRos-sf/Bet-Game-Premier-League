@@ -39,6 +39,7 @@ def home(request: HttpRequest) -> HttpResponse:
         last_matchweek_bet_stat["matchweek"] = mw.matchweek
     else:
         last_matchweek_bet_stat = {}
+
     # top 3 players
     top_players = Profile.top_players(5)
 
@@ -136,7 +137,7 @@ class ProfileListView(LoginRequiredMixin, ListView):
         if username:
             object_list = self.model.objects.filter(user__username__contains=username)
             if not object_list.exists():
-                messages.info(self.request, f"User not found!")
+                messages.info(self.request, "User not found!")
         else:
             object_list = self.model.objects.none()
 
