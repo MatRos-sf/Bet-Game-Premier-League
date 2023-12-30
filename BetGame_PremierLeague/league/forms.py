@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Team, Season
+from .models import Season, Team
 
 
 class TeamForm(forms.ModelForm):
@@ -14,8 +14,8 @@ class ChoseSeasonForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        SEASON_YEARS = Season.objects.values_list(
+        season_years = Season.objects.values_list(
             "start_date__year", flat=True
         ).order_by()
-        SEASON_CHOICE = [("all", "All")] + [(year, str(year)) for year in SEASON_YEARS]
-        self.fields["season"].choices = SEASON_CHOICE
+        season_choice = [("all", "All")] + [(year, str(year)) for year in season_years]
+        self.fields["season"].choices = season_choice

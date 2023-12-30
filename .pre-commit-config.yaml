@@ -34,3 +34,9 @@ repos:
     -   id: ruff
         args: [ --fix ]
     -   id: ruff-format
+-   repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: isort (python)
+        args: ["--profile", "black", "--filter-files"]

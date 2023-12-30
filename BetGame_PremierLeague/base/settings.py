@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -35,11 +36,6 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    "users",
-    "league",
-    "match",
-    "bet",
-    "event",
     "crispy_forms",
     "crispy_bootstrap5",
     "django.contrib.admin",
@@ -50,12 +46,26 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_q",
     "django_extensions",
-    # "debug_toolbar",
     "rest_framework",
     "rest_framework.authtoken",
     "notifications",
-    # "silk",
 ]
+
+INSTALLED_EXTENSIONS = [
+    "users",
+    "league",
+    "match",
+    "bet",
+    "event",
+    "deployment",
+]
+
+# if DEBUG:
+#     INSTALLED_APPS.append('debug_toolbar')
+#     INSTALLED_APPS.append('silk')
+#
+
+INSTALLED_APPS += INSTALLED_EXTENSIONS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -65,11 +75,13 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # "debug_toolbar.middleware.DebugToolbarMiddleware",
-    # "silk.middleware.SilkyMiddleware",
 ]
 
-ROOT_URLCONF = "BetGame_PremierLeague.urls"
+# if DEBUG:
+#     MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
+#     MIDDLEWARE.append("silk.middleware.SilkyMiddleware")
+
+ROOT_URLCONF = "base.urls"
 
 TEMPLATES = [
     {
@@ -87,8 +99,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "BetGame_PremierLeague.wsgi.application"
-
+WSGI_APPLICATION = "base.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

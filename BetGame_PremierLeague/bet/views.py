@@ -1,15 +1,15 @@
-from django.views.generic import ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count, Q, Max
-from django.contrib import messages
-from django.db.models import QuerySet
-from django.utils import timezone
 from typing import Any
-import plotly.graph_objects as go
 
-from match.models import Match, Matchweek
-from .models import Bet, Dict
+import plotly.graph_objects as go
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Count, Max, Q, QuerySet
+from django.utils import timezone
+from django.views.generic import ListView
 from league.forms import ChoseSeasonForm
+from match.models import Match, Matchweek
+
+from .models import Bet, Dict
 
 
 class BetsListView(LoginRequiredMixin, ListView):
@@ -114,7 +114,7 @@ class UserFinishedBetsListView(LoginRequiredMixin, ListView):
 
 class Chart:
     def __init__(self):
-        self._figure_layout = {
+        self._figure_layout: Dict[str, Any] = {
             "paper_bgcolor": "rgba(0,0,0,0)",
             "plot_bgcolor": "rgba(0,0,0,0)",
             "showlegend": False,

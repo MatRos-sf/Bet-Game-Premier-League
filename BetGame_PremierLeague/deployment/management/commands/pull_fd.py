@@ -1,9 +1,9 @@
-from django.core.management.base import BaseCommand, CommandError
 from typing import List
 
-from league.models import Season, League, Team, TeamStats
-from match.models import Match, Matchweek
+from django.core.management.base import BaseCommand
 from football_data import premier_league as pl
+from league.models import League, Season, Team, TeamStats
+from match.models import Match, Matchweek
 
 
 class Command(BaseCommand):

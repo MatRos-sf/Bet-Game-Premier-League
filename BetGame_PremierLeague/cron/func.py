@@ -1,10 +1,9 @@
-from requests.exceptions import HTTPError, Timeout
 from django.utils import timezone
-
-from match.models import Matchweek, Match
 from football_data.premier_league import PremierLeague
-from league.models import Season, TeamStats
 from league.management.commands.pull_fd import Command
+from league.models import Season, TeamStats
+from match.models import Match, Matchweek
+from requests.exceptions import HTTPError, Timeout
 
 
 def get_previous_season_year() -> int:
@@ -13,9 +12,9 @@ def get_previous_season_year() -> int:
 
 def create_new_season() -> bool:
     new_season = get_previous_season_year()
-    pl = PremierLeague()
+    league = PremierLeague()
 
-    if pl.check_new_season(new_season):
+    if league.check_new_season(new_season):
         command_instance = Command()
         command_instance.handle()
         return True
@@ -26,7 +25,6 @@ def check_and_update_currently_matchweek() -> str:
     """
     Checks the current matchweek stored in the database and compares it with the data from football-data.api.
     If there are discrepancies, updates the matches and matchweek accordingly.
-    :return:
     """
     matchweek = Matchweek.objects.filter(finished=False, cancelled=False).first()
 
@@ -41,10 +39,10 @@ def check_and_update_currently_matchweek() -> str:
             return "The new season has been created"
         return f"The {matchweek.season.start_date.year } season has ended!"
 
-    pl = PremierLeague()
+    league = PremierLeague()
 
     try:
-        finished_matches = pl.update_score_matches(matchweek.matchweek)
+        finished_matches = league.update_score_matches(matchweek.matchweek)
     except (HTTPError, Timeout) as e:
         return f"Something wrong: \n{e}"
 
@@ -89,10 +87,10 @@ def check_and_update_currently_matchweek() -> str:
 def check_and_update_cancelled_matches() -> str:
     matches = Match.objects.filter(cancelled=True)
 
-    pl = PremierLeague()
+    league = PremierLeague()
     count = 0
     for match in matches:
-        score = pl.check_match(
+        score = league.check_match(
             match.matchweek.start_date.year,
             match.matchweek.matchweek,
             match.home_team.fb_id,
