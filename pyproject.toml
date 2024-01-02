@@ -30,6 +30,9 @@ psycopg2-binary = "2.9.9"
 python-dotenv = "1.0.0"
 Pillow = "10.1.0"
 plotly = "5.18.0"
+django-storages = "^1.14.2"
+boto3 = "^1.34.11"
+python-decouple = "^3.8"
 
 [build-system]
 requires = ["poetry-core"]
