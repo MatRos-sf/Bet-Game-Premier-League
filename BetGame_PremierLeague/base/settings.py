@@ -126,8 +126,9 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = "/static/"
 
-DEFAULT_FILE_STORAGE = "storages.backends.s3.S3Storage"
-STATICFILES_STORAGE = "storages.backends.s3.S3Storage"
+if not DEBUG:
+    DEFAULT_FILE_STORAGE = "storages.backends.s3.S3Storage"
+    STATICFILES_STORAGE = "storages.backends.s3.S3Storage"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
