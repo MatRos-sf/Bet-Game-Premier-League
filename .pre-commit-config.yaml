@@ -27,13 +27,11 @@ repos:
     rev: v1.33.0
     hooks:
     -   id: djlint-reformat-django
-    -   id: djlint-reformat
+    -   id: djlint-django
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.1.8
     hooks:
     -   id: ruff
-        args: [ --fix ]
-    -   id: ruff-format
 -   repo: https://github.com/PyCQA/isort
     rev: 5.13.2
     hooks:

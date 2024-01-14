@@ -1,6 +1,6 @@
+from deployment.management.commands.pull_fd import Command
 from django.utils import timezone
 from football_data.premier_league import PremierLeague
-from league.management.commands.pull_fd import Command
 from league.models import Season, TeamStats
 from match.models import Match, Matchweek
 from requests.exceptions import HTTPError, Timeout

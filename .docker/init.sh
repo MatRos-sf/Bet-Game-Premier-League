@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python BetGame_PremierLeague/manage.py pull_fd
+poetry run python BetGame_PremierLeague/manage.py pull_fd

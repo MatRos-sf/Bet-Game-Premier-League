@@ -7,15 +7,26 @@ services:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
     env_file:
       - ../.env
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}"]
+      interval: 5s
+      timeout: 30s
+      retries: 6
   web:
     build: .
     env_file:
       - ../.env
-    command: bash -c "python BetGame_PremierLeague/manage.py makemigrations && python BetGame_PremierLeague/manage.py migrate && ./init.sh && python BetGame_PremierLeague/manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: bash -c "poetry run python BetGame_PremierLeague/manage.py makemigrations && poetry run python BetGame_PremierLeague/manage.py migrate && ./init.sh && poetry run python BetGame_PremierLeague/manage.py runserver 0.0.0.0:8000"
     container_name: bet_app
     volumes:
       - ..:/app_bet
     ports:
       - "8000:8000"
+    restart: always
