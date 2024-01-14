@@ -31,3 +31,5 @@ jobs:
     - name: Run Tests
       run: |
         poetry run python BetGame_PremierLeague/manage.py test
+      env: 
+        ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
