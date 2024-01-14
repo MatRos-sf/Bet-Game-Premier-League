@@ -3,8 +3,8 @@ profile="django"
 
 [tool.ruff]
 line-length = 88
-select = [
-    "F401"
+ignore = [
+    "F403"
 ]
 
 [tool.poetry]
