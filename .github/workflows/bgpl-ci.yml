@@ -35,4 +35,4 @@ jobs:
         ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
         USE_S3: ${{ secrets.USE_S3 }}
         ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
-        
+        API_TOKEN: ${{ secrets.API_TOKEN }}
