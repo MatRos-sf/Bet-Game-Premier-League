@@ -1,19 +1,21 @@
-from django.test import TestCase, tag
-from parameterized import parameterized
 import json
 import os
-from football_data.premier_league import (
-    PremierLeague,
-    League,
-    Season,
-    Team,
-    Match,
-    TeamStats,
-    Matchweek,
-)
-import mock
 from datetime import datetime
 from http import HTTPStatus
+
+import mock
+from django.conf import settings
+from django.test import TestCase, tag
+from football_data.premier_league import (
+    League,
+    Match,
+    Matchweek,
+    PremierLeague,
+    Season,
+    Team,
+    TeamStats,
+)
+from parameterized import parameterized
 
 
 @tag("PremierLeague")
@@ -21,6 +23,14 @@ class PremierLeagueTest(TestCase):
     def setUp(self):
         self.base_url = "http://api.football-data.org/v4/"
         self.sample_league = League("Test_name", "Test_country", "Test_emblem")
+
+    def __load_payload(self, name_file: str) -> dict:
+        file_path = os.path.join(
+            settings.BASE_DIR, "football_data", "tests", "payload", name_file
+        )
+        with open(file_path) as file:
+            payload = json.load(file)
+        return payload
 
     def test_url(self):
         self.assertEquals(PremierLeague.API, self.base_url)
@@ -168,14 +178,7 @@ class PremierLeagueTest(TestCase):
         self.assertEquals(matches[0].start_date.date(), expected_start_date)
         self.assertEquals(matches[-1].start_date.date(), expected_end_date)
 
-    def __load_payload(self, name_file: str) -> dict:
-        file_path = os.path.join(
-            os.getcwd(), "football_data", "tests", "payload", name_file
-        )
-        with open(file_path) as file:
-            payload = json.load(file)
-        return payload
-
+    @tag("test_x")
     def test_capture_match_when_data_is_correctly(self):
         payload = self.__load_payload("payload_matches.json")
         pl = PremierLeague()
