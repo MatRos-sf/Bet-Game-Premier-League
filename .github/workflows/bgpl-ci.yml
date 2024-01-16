@@ -30,7 +30,8 @@ jobs:
         poetry install
     - name: Run Tests
       run: |
-        poetry run python BetGame_PremierLeague/manage.py test
+        cd BetGame_PremierLeague
+        poetry run python manage.py test
       env: 
         ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
         USE_S3: ${{ secrets.USE_S3 }}
